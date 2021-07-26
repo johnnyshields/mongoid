@@ -67,7 +67,7 @@ module Mongoid
           #
           # @since 4.0.0
           def each_loaded_document(&block)
-            each_loaded_document_of_class(@association.klass, keys_from_docs, &block)
+            each_loaded_document_of_class(@association.klass, @association.scope, keys_from_docs, &block)
           end
 
           # Retrieves the documents of the specified class, that have the
@@ -76,15 +76,25 @@ module Mongoid
           # When the documents are retrieved, the set of inclusions applied
           # is the set of inclusions applied to the host document minus the
           # association that is being eagerly loaded.
-          private def each_loaded_document_of_class(cls, keys)
+          private def each_loaded_document_of_class(cls, scope, keys)
             # Note: keys should not include nil elements.
             # Upstream code is responsible for eliminating nils from keys.
             return cls.none if keys.empty?
 
             criteria = cls.any_in(key => keys)
+            criteria = apply_scope(criteria, scope)
             criteria.inclusions = criteria.inclusions - [@association]
             criteria.each do |doc|
               yield doc
+            end
+          end
+
+          # Applies association scope to the criteria
+          private def apply_scope(criteria, scope)
+            case scope
+            when Proc then criteria.instance_exec(&scope)
+            when Symbol then criteria.send(scope)
+            else criteria
             end
           end
 

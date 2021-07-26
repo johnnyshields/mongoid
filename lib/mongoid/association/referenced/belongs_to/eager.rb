@@ -30,7 +30,7 @@ module Mongoid
           def each_loaded_document(&block)
             if @association.polymorphic?
               keys_by_type_from_docs.each do |type, keys|
-                each_loaded_document_of_class(Object.const_get(type), keys, &block)
+                each_loaded_document_of_class(Object.const_get(type), @association.scope, keys, &block)
               end
             else
               super
