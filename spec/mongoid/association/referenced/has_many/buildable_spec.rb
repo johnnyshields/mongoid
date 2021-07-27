@@ -63,7 +63,7 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
 
       let(:options) do
         {
-            scope: -> { where(rating: 3) },
+          scope: -> { where(rating: 3) },
         }
       end
 
