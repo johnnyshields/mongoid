@@ -35,8 +35,9 @@ module Mongoid
           end
 
           def query_criteria(object, type)
-            model = type ? type.constantize : relation_class
-            model.where(primary_key => object)
+            crit = (type ? type.constantize : relation_class).all
+            crit = crit.apply_scope(scope)
+            crit.where(primary_key => object)
           end
 
           def query?(object)

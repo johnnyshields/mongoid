@@ -82,6 +82,7 @@ module Mongoid
             return cls.none if keys.empty?
 
             criteria = cls.any_in(key => keys)
+            criteria = criteria.apply_scope(@association.scope)
             criteria.inclusions = criteria.inclusions - [@association]
             criteria.each do |doc|
               yield doc

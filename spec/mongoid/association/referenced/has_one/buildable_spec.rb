@@ -15,8 +15,12 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
       association.build(base, object)
     end
 
+    let(:options) do
+      {}
+    end
+
     let(:association) do
-      Mongoid::Association::Referenced::HasOne.new(Person, :account)
+      Mongoid::Association::Referenced::HasOne.new(Person, :account, options)
     end
 
     context "when provided an id" do
@@ -35,6 +39,15 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
 
       it "sets the document" do
         expect(document).to eq(account)
+      end
+
+      context "when scope is specified" do
+
+        let(:options) do
+          {
+              # scope: -> { gt(balance: 100) },
+          }
+        end
       end
     end
 
