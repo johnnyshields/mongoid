@@ -24,7 +24,7 @@ module Mongoid
           # @param [ nil ] selected_fields Must be nil.
           #
           # @return [ Document ] A single document.
-          def build(base, object, type = nil, scope = nil, selected_fields = nil)
+          def build(base, object, type = nil, _scope = nil, selected_fields = nil)
             return (object || []) unless query?(object)
             return [] if object.is_a?(Array)
             query_criteria(object, base, scope)

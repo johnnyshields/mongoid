@@ -250,7 +250,7 @@ module Mongoid
           PRIMARY_KEY_DEFAULT
         end
 
-        def query_criteria(object, base, scope)
+        def query_criteria(object, base)
           crit = klass.all
           crit = crit.apply_scope(scope)
           crit = crit.where(foreign_key => object)
