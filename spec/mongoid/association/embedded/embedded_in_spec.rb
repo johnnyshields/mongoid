@@ -901,4 +901,11 @@ describe Mongoid::Association::Embedded::EmbeddedIn do
       expect(association.create_relation(owner, target)).to be_a(EmbeddedObject)
     end
   end
+
+  describe '#scope' do
+
+    it 'returns nil' do
+      expect(association.scope).to be_nil
+    end
+  end
 end

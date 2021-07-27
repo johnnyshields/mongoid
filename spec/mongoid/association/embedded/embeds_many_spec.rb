@@ -310,6 +310,13 @@ describe Mongoid::Association::Embedded::EmbedsMany do
     end
   end
 
+  describe '#scope' do
+
+    it 'returns nil' do
+      expect(association.scope).to be_nil
+    end
+  end
+
   describe '#as' do
 
     context 'when :as is specified in the options' do

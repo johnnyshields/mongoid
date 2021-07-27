@@ -173,6 +173,15 @@ module Mongoid
           apply_ordering(criterion)
         end
 
+        # The scope of the association. Not used.
+        #
+        # @return [ NilClass ] nil.
+        #
+        # @since 7.4
+        def scope
+          nil
+        end
+
         private
 
         def apply_ordering(criteria)
