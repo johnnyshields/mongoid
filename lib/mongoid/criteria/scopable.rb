@@ -28,13 +28,11 @@ module Mongoid
       #
       # @since 7.4.0
       def apply_scope(scope)
-        # TODO: should I use merge! method here?
-        # klass.without_default_scope do
-        #   merge!(klass.default_scoping.call)
-        # end
+        # TODO: should I use merge! method here? apply_default_scope users merge
         case scope
         when Proc then instance_exec(&scope)
         when Symbol then send(scope)
+        when Criteria then merge(scope)
         else self
         end
       end
