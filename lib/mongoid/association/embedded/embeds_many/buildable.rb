@@ -22,13 +22,14 @@ module Mongoid
           #
           # @param [ Object ] base The base object.
           # @param [ Object ] object The object to use to build the association.
-          # @param [ String ] type Not used in this context.
+          # @param [ String ] _type Not used in this context.
+          # @param [ Proc, Symbol ] _scope Not used in this context.
           # @param [ Hash ] selected_fields Fields which were retrieved via
           #   #only. If selected_fields are specified, fields not listed in it
           #   will not be accessible in the built documents.
           #
           # @return [ Array<Document ] The documents.
-          def build(base, object, type = nil, selected_fields = nil)
+          def build(base, object, _type = nil, _scope = nil, selected_fields = nil)
             return [] if object.blank?
             return object if object.first.is_a?(Document)
             docs = []

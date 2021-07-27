@@ -20,6 +20,25 @@ module Mongoid
         self.scoping_options = true, false
       end
 
+      # Applies a scope to the criteria
+      #
+      # @param [ Proc, Symbol ] scope The scope to apply.
+      #
+      # @return [ Criteria ] The criteria with scoping removed.
+      #
+      # @since 7.4.0
+      def apply_scope(scope)
+        # TODO: should I use merge! method here?
+        # klass.without_default_scope do
+        #   merge!(klass.default_scoping.call)
+        # end
+        case scope
+        when Proc then instance_exec(&scope)
+        when Symbol then send(scope)
+        else self
+        end
+      end
+
       # Given another criteria, remove the other criteria's scoping from this
       # criteria.
       #

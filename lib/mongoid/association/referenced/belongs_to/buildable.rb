@@ -20,23 +20,25 @@ module Mongoid
           # @param [ Object ] base The base object.
           # @param [ Object ] object The object to use to build the association.
           # @param [ String ] type The type of the association.
+          # @param [ Proc, Symbol ] scope Optional association scope.
           # @param [ nil ] selected_fields Must be nil.
           #
           # @return [ Document ] A single document.
-          def build(base, object, type = nil, selected_fields = nil)
+          def build(base, object, type = nil, scope = nil, selected_fields = nil)
             return object unless query?(object)
-            execute_query(object, type)
+            execute_query(object, type, scope)
           end
 
           private
 
-          def execute_query(object, type)
-            query_criteria(object, type).limit(1).first(id_sort: :none)
+          def execute_query(object, type, scope)
+            query_criteria(object, type, scope).limit(1).first(id_sort: :none)
           end
 
-          def query_criteria(object, type)
-            model = type ? type.constantize : relation_class
-            model.where(primary_key => object)
+          def query_criteria(object, type, scope)
+            crit = (type ? type.constantize : relation_class).all
+            crit = crit.apply_scope(scope)
+            crit.where(primary_key => object)
           end
 
           def query?(object)

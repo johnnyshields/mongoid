@@ -47,7 +47,7 @@ module Mongoid
       # @since 2.0.0.rc.1
       def create_relation(object, association, selected_fields = nil)
         type = @attributes[association.inverse_type]
-        target = association.build(self, object, type, selected_fields)
+        target = association.build(self, object, type, association.scope, selected_fields)
         target ? association.create_relation(self, target) : nil
       end
 

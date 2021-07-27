@@ -82,19 +82,10 @@ module Mongoid
             return cls.none if keys.empty?
 
             criteria = cls.any_in(key => keys)
-            criteria = apply_scope(criteria, scope)
+            criteria = criteria.apply_scope(scope)
             criteria.inclusions = criteria.inclusions - [@association]
             criteria.each do |doc|
               yield doc
-            end
-          end
-
-          # Applies association scope to the criteria
-          private def apply_scope(criteria, scope)
-            case scope
-            when Proc then criteria.instance_exec(&scope)
-            when Symbol then criteria.send(scope)
-            else criteria
             end
           end
 

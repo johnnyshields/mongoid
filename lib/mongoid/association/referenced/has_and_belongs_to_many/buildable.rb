@@ -20,12 +20,13 @@ module Mongoid
           # @param [ Object ] base The base object.
           # @param [ Object ] object The object to use to build the association.
           # @param [ String ] type Not used in this context.
+          # @param [ Proc, Symbol ] scope Optional association scope.
           # @param [ nil ] selected_fields Must be nil.
           #
           # @return [ Array<Document> ] The documents.
-          def build(base, object, type = nil, selected_fields = nil)
+          def build(base, object, type = nil, scope = nil, selected_fields = nil)
             if query?(object)
-              query_criteria(object)
+              query_criteria(object, scope)
             else
               object.try(:dup)
             end

@@ -137,8 +137,8 @@ module Mongoid
         # @return [ Mongoid::Criteria ] The criteria used for querying this association.
         #
         # @since 7.0
-        def criteria(base)
-          query_criteria(base.send(primary_key), base)
+        def criteria(base, scope = nil)
+          query_criteria(base.send(primary_key), base, scope)
         end
 
         # The type of this association if it's polymorphic.
@@ -250,8 +250,10 @@ module Mongoid
           PRIMARY_KEY_DEFAULT
         end
 
-        def query_criteria(object, base)
-          crit = klass.where(foreign_key => object)
+        def query_criteria(object, base, scope)
+          crit = klass.all
+          crit = crit.apply_scope(scope)
+          crit = crit.where(foreign_key => object)
           crit = with_polymorphic_criterion(crit, base)
           crit.association = self
           crit.parent_document = base

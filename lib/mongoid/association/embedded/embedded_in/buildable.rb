@@ -20,13 +20,14 @@ module Mongoid
           #
           # @param [ Object ] base The object.
           # @param [ Object ] object The parent hash or document.
-          # @param [ String ] type Not used in this context.
+          # @param [ String ] _type Not used in this context.
+          # @param [ Proc, Symbol ] _scope Not used in this context.
           # @param [ Hash ] selected_fields Fields which were retrieved via
           #   #only. If selected_fields are specified, fields not listed in it
           #   will not be accessible in the built document.
           #
           # @return [ Document ] A single document.
-          def build(base, object, type = nil, selected_fields = nil)
+          def build(base, object, _type = nil, _scope = nil, selected_fields = nil)
             return object unless object.is_a?(Hash)
             if _loading?
               Factory.from_db(klass, object, nil, selected_fields)

@@ -18,13 +18,14 @@ module Mongoid
           # @param [ Object ] base The base object.
           # @param [ Object ] object The object to use to build the association.
           # @param [ String ] type The type of the association.
+          # @param [ Proc, Symbol ] scope Optional association scope.
           # @param [ nil ] selected_fields Must be nil.
           #
           # @return [ Document ] A single document.
-          def build(base, object, type = nil, selected_fields = nil)
+          def build(base, object, type = nil, scope = nil, selected_fields = nil)
             if query?(object)
               if !base.new_record?
-                execute_query(object, base)
+                execute_query(object, base, scope)
               end
             else
               clear_associated(object)
@@ -48,13 +49,15 @@ module Mongoid
             end
           end
 
-          def query_criteria(object, base)
-            crit = klass.where(foreign_key => object)
+          def query_criteria(object, base, scope)
+            crit = klass.all
+            crit = crit.apply_scope(scope)
+            crit.where(foreign_key => object)
             with_polymorphic_criterion(crit, base)
           end
 
-          def execute_query(object, base)
-            query_criteria(object, base).limit(1).first(id_sort: :none)
+          def execute_query(object, base, scope)
+            query_criteria(object, base, scope).limit(1).first(id_sort: :none)
           end
 
           def with_polymorphic_criterion(criteria, base)

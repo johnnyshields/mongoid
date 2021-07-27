@@ -135,8 +135,8 @@ module Mongoid
         # @return [ Mongoid::Criteria ] The criteria used for querying this association.
         #
         # @since 7.0
-        def criteria(base, id_list = nil)
-          query_criteria(id_list || base.send(foreign_key))
+        def criteria(base, id_list = nil, scope = nil)
+          query_criteria(id_list || base.send(foreign_key), scope)
         end
 
         # Get the foreign key field on the inverse.
@@ -297,8 +297,10 @@ module Mongoid
           end
         end
 
-        def query_criteria(id_list)
-          crit = relation_class.all_of(primary_key => {"$in" => id_list || []})
+        def query_criteria(id_list, scope)
+          crit = relation_class.all
+          crit = crit.apply_scope(scope)
+          crit = crit.all_of(primary_key => {"$in" => id_list || []})
           with_ordering(crit)
         end
       end
