@@ -192,6 +192,7 @@ describe 'scoped associations' do
 
   context 'invalid relation' do
     # TODO: name conflict
+    # TODO: invalid relation types
 
     let(:bad_scope) do
       Plumber.association_scope :bad, :foobars, -> { where(foo: :bar) }

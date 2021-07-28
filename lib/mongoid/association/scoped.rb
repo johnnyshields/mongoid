@@ -4,6 +4,13 @@
 module Mongoid
   module Association
     class Scoped
+      VALID_TARGET_CLASSES = [
+        Mongoid::Association::Referenced::BelongsTo,
+        Mongoid::Association::Referenced::HasOne,
+        Mongoid::Association::Referenced::HasMany,
+        Mongoid::Association::Referenced::HasAndBelongsToMany
+      ]
+
       attr_reader :name,
                   :target,
                   :scope
@@ -21,7 +28,9 @@ module Mongoid
         @name = name
         @scope = scope
         @target = _class.relations[target]
-        raise Errors::InvalidAssociationScope.new(@owner_class, name, target) unless @target
+        unless @target && @target.class.in?(VALID_TARGET_CLASSES)
+          raise Errors::InvalidAssociationScope.new(@owner_class, name, target)
+        end
       end
 
       def setup!
