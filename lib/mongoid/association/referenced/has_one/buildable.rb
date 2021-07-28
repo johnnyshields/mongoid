@@ -51,7 +51,7 @@ module Mongoid
           def query_criteria(object, base)
             crit = klass.criteria
             crit = crit.apply_scope(scope)
-            crit.where(foreign_key => object)
+            crit = crit.where(foreign_key => object)
             with_polymorphic_criterion(crit, base)
           end
 

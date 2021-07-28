@@ -13,6 +13,7 @@ require 'mongoid/association/relatable'
 require 'mongoid/association/nested'
 require 'mongoid/association/referenced'
 require 'mongoid/association/embedded'
+require 'mongoid/association/scoped'
 require 'mongoid/association/macros'
 
 require 'mongoid/association/reflections'

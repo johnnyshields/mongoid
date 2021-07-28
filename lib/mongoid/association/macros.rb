@@ -192,6 +192,12 @@ module Mongoid
           define_association!(__method__, name, options, &block)
         end
 
+        def association_scope(name, underlying, scope)
+          assoc = Association::Scoped.new(self, name, underlying, scope)
+          assoc.setup!
+          self.relations = self.relations.merge(name => assoc)
+        end
+
         private
 
         def define_association!(macro_name, name, options = {}, &block)

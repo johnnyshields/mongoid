@@ -103,6 +103,8 @@ class Person
     validate: false
   has_and_belongs_to_many :user_accounts, validate: false
   has_and_belongs_to_many :houses, validate: false
+  association_scope :prefab_houses, :houses, -> { where(model: 'Prefab') }
+
   has_and_belongs_to_many :ordered_preferences, order: :value.desc, validate: false
 
   has_many :drugs, validate: false
