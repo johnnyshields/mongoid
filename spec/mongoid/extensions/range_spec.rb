@@ -17,22 +17,18 @@ describe Mongoid::Extensions::Range do
   end
 
   describe ".demongoize" do
+    subject { expect(Range.demongoize(hash)) }
 
     context "when the range is ascending" do
-
-      let(:hash) do
-        { "min" => 1, "max" => 3 }
-      end
+      let(:hash) { { "min" => 1, "max" => 3 } }
 
       it "returns an ascending range" do
-        expect(Range.demongoize(hash)).to eq(1..3)
+        is_expected.to eq(1..3)
       end
     end
 
     context "when the range is ascending with exclude end" do
-
-      let(:hash) do
-        { "min" => 1, "max" => 3, "exclude_end" => true }
+      let(:hash) { { "min" => 1, "max" => 3, "exclude_end" => true } }
       end
 
       it "returns an ascending range" do
@@ -41,10 +37,7 @@ describe Mongoid::Extensions::Range do
     end
 
     context "when the range is descending" do
-
-      let(:hash) do
-        { "min" => 5, "max" => 1 }
-      end
+      let(:hash) { { "min" => 5, "max" => 1, "exclude_end" => true } }
 
       it "returns an descending range" do
         expect(Range.demongoize(hash)).to eq(5..1)
@@ -83,6 +76,9 @@ describe Mongoid::Extensions::Range do
         expect(Range.demongoize(hash)).to eq("a"..."z")
       end
     end
+
+
+    ruby_version_gte '2.5'
   end
 
   describe ".mongoize" do
@@ -99,6 +95,13 @@ describe Mongoid::Extensions::Range do
 
       it "returns the object hash when passed a letter range" do
         expect(Range.mongoize("a".."z")).to eq({ "min" => "a", "max" => "z" })
+      end
+
+      it "return the object hash when passed a ActiveSupport::TimeWithZone range" do
+        obj = Range.mongoize(Time.at(0).in_time_zone..Time.at(1).in_time_zone)
+        expect(obj).to eq({"min" => Time.at(0), "max" => Time.at(1)})
+        expect(obj["min"].utc?).to be(true)
+        expect(obj["max"].utc?).to be(true)
       end
     end
 
