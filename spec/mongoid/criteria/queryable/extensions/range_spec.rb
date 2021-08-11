@@ -72,6 +72,30 @@ describe Range do
       end
     end
 
+    context "when the range is descending" do
+      subject(:evolved) { (max..min).__evolve_date__ }
+      let(:min) { min_time.to_i }
+      let(:max) { max_time.to_i }
+      let(:min_time) { Time.utc(2010, 1, 1, 0, 0, 0, 0) }
+      let(:max_time) { Time.utc(2010, 1, 3, 0, 0, 0, 0) }
+
+      it "returns a selection of times" do
+        is_expected.to eq("$gte" => min_time, "$lte" => max_time)
+      end
+    end
+
+    context "when the range is descending" do
+      subject(:evolved) { (max...min).__evolve_date__ }
+      let(:min) { min_time.to_i }
+      let(:max) { max_time.to_i }
+      let(:min_time) { Time.utc(2010, 1, 1, 0, 0, 0, 0) }
+      let(:max_time) { Time.utc(2010, 1, 3, 0, 0, 0, 0) }
+
+      it "returns a selection of times" do
+        is_expected.to eq("$gt" => min_time, "$lte" => max_time)
+      end
+    end
+
     context "when the range is endless" do
       subject(:evolved) { (min..).__evolve_date__ }
       let(:min_time) { Time.utc(2010, 1, 1, 0, 0, 0, 0) }
@@ -169,8 +193,8 @@ describe Range do
 
     context "when the range is not inclusive" do
       subject(:evolved) { (min...max).__evolve_time__ }
-      let(:min_time) { Time.utc(2010, 1, 1, 0, 0, 0, 0) }
-      let(:max_time) { Time.utc(2010, 1, 3, 0, 0, 0, 0) }
+      let(:min_time) { Time.utc(2010, 1, 1, 12, 0, 0, 0) }
+      let(:max_time) { Time.utc(2010, 1, 3, 12, 0, 0, 0) }
       let(:min) { min_time.to_i }
       let(:max) { max_time.to_i }
 
@@ -179,9 +203,33 @@ describe Range do
       end
     end
 
+    context "when the range is descending" do
+      subject(:evolved) { (max..min).__evolve_time__ }
+      let(:min) { min_time.to_i }
+      let(:max) { max_time.to_i }
+      let(:min_time) { Time.utc(2010, 1, 1, 12, 0, 0, 0) }
+      let(:max_time) { Time.utc(2010, 1, 3, 12, 0, 0, 0) }
+
+      it "returns a selection of times" do
+        is_expected.to eq("$gte" => min_time, "$lte" => max_time)
+      end
+    end
+
+    context "when the range is descending" do
+      subject(:evolved) { (max...min).__evolve_time__ }
+      let(:min) { min_time.to_i }
+      let(:max) { max_time.to_i }
+      let(:min_time) { Time.utc(2010, 1, 1, 12, 0, 0, 0) }
+      let(:max_time) { Time.utc(2010, 1, 3, 12, 0, 0, 0) }
+
+      it "returns a selection of times" do
+        is_expected.to eq("$gt" => min_time, "$lte" => max_time)
+      end
+    end
+
     context "when the range is endless" do
       subject(:evolved) { (min..).__evolve_time__ }
-      let(:min_time) { Time.utc(2010, 1, 1, 0, 0, 0, 0) }
+      let(:min_time) { Time.utc(2010, 1, 1, 12, 0, 0, 0) }
       let(:min) { min_time.to_i }
 
       it "returns a selection of times" do
@@ -191,7 +239,7 @@ describe Range do
 
     context "when the range is beginning-less" do
       subject(:evolved) { (..max).__evolve_time__ }
-      let(:max_time) { Time.utc(2010, 1, 3, 0, 0, 0, 0) }
+      let(:max_time) { Time.utc(2010, 1, 3, 12, 0, 0, 0) }
       let(:max) { max_time.to_i }
 
       it "returns a selection of times" do
@@ -201,7 +249,7 @@ describe Range do
 
     context "when the range is beginning-less not inclusive" do
       subject(:evolved) { (...max).__evolve_time__ }
-      let(:max_time) { Time.utc(2010, 1, 3, 0, 0, 0, 0) }
+      let(:max_time) { Time.utc(2010, 1, 3, 12, 0, 0, 0) }
       let(:max) { max_time.to_i }
 
       it "returns a selection of times" do
@@ -226,6 +274,22 @@ describe Range do
 
         it "returns the non inclusive range criterion" do
           is_expected.to eq("$gte" => 1, "$lt" => 3)
+        end
+      end
+
+      context "when the range is descending" do
+        let(:range) { 3..1 }
+
+        it "returns the inclusive range criterion" do
+          is_expected.to eq("$gte" => 1, "$lte" => 3)
+        end
+      end
+
+      context "when the range is descending not inclusive" do
+        let(:range) { 3...1 }
+
+        it "returns the inclusive range criterion" do
+          is_expected.to eq("$gt" => 1, "$lte" => 3)
         end
       end
 

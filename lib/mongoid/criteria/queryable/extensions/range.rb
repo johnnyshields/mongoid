@@ -65,8 +65,10 @@ module Mongoid
 
           def __evolve_range_naive__
             hash = {}
-            hash['$gte'] = self.begin if self.begin
-            hash[exclude_end? ? "$lt" : "$lte"] = self.end if self.end
+            descending = self.begin && self.end && self.begin > self.end
+            first, last = descending ? [self.end, self.begin] : [self.begin, self.end]
+            hash[descending && exclude_end? ? "$gt" : "$gte"] = first if first
+            hash[!descending && exclude_end? ? "$lt" : "$lte"] = last if last
             hash
           end
 
