@@ -83,15 +83,21 @@ module Mongoid
         private
 
         def __mongoize_hash__(object)
-          object.stringify_keys.slice('min', 'max', 'exclude_end').transform_values!(&:mongoize)
+          hash = object.stringify_keys
+          hash.slice!('min', 'max', 'exclude_end')
+          hash.compact!
+          hash.transform_values!(&:mongoize)
+          hash
         end
 
         def __mongoize_range__(object)
-          { "min" => object.begin.mongoize, "max" => object.end.mongoize }.tap do |hash|
-            if object.respond_to?(:exclude_end?) && object.exclude_end?
-              hash.merge!("exclude_end" => true)
-            end
+          hash = {}
+          hash['min'] = object.begin.mongoize if object.begin
+          hash['max'] = object.end.mongoize if object.end
+          if object.respond_to?(:exclude_end?) && object.exclude_end?
+            hash['exclude_end'] = true
           end
+          hash
         end
       end
     end
