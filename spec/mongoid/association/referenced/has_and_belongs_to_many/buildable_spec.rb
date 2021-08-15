@@ -10,7 +10,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Buildable do
   end
 
   let(:options) do
-    { }
+    {}
   end
 
   describe "#build" do
@@ -60,6 +60,31 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Buildable do
 
       let(:criteria) do
         Preference.all_of("_id" => { "$in" => object }).order_by(options[:order])
+      end
+
+      it "returns the criteria" do
+        expect(documents).to eq(criteria)
+      end
+    end
+
+    context "when scope is specified" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:options) do
+        {
+          scope: -> { where(rating: 3) }
+        }
+      end
+
+      let(:object) do
+        [ object_id ]
+      end
+
+      let(:criteria) do
+        Preference.all_of("_id" => { "$in" => object }).where(rating: 3)
       end
 
       it "returns the criteria" do
