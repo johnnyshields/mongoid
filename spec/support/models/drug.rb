@@ -6,4 +6,5 @@ class Drug
   field :name, type: String
   field :generic, type: Mongoid::Boolean
   belongs_to :person, counter_cache: true
+  belongs_to :band
 end
