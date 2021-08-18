@@ -135,7 +135,7 @@ module Mongoid
       # @since 3.0.0
       def distinct(field)
         view.distinct(klass.database_field_name(field)).map do |value|
-          value.class.demongoize(value)
+          field.demongoize(value)
         end
       end
 
@@ -455,16 +455,27 @@ module Mongoid
       # @return [ Array<Object, Array> ] The plucked values.
       #
       # @since 3.1.0
-      def pluck(*fields)
-        normalized_select = fields.inject({}) do |hash, f|
-          hash[klass.database_field_name(f)] = 1
-          hash
+      def pluck(*fields, raw: false)
+        normalized_select = {}
+        field_objects = {}
+
+        fields.each do |f|
+          db_name = klass.database_field_name(f)
+          normalized_select[db_name] = 1
+          field_objects[db_name] = self.fields[db_name] if self.fields[db_name]
         end
 
-        view.projection(normalized_select).reduce([]) do |plucked, doc|
-          values = normalized_select.keys.map do |n|
-            n =~ /\./ ? doc[n.partition('.')[0]] : doc[n]
+        view.projection(normalized_select).each_with_object([]) do |doc, plucked|
+          values = normalized_select.keys.map do |key|
+            if key.include?('.')
+              # demongoize object embedded
+              value = doc[key.partition('.')[0]]
+              value.class.demongoize(value)
+            else
+              (field_objects[db_name] || value.class).demongoize(value)
+            end
           end
+
           plucked << (values.size == 1 ? values.first : values)
         end
       end
