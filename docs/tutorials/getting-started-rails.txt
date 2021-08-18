@@ -236,7 +236,7 @@ Create the ``Comment`` model:
 
 .. code-block:: sh
 
-    bin/rails g scaffold Comment name:string message:string post:belongs_to
+    bin/rails g scaffold Comment name:string message:string post:belongs_to_one
 
 Open the ``Post`` model file, ``app/models/post.rb``, and add a ``has_many``
 association for the comments:
@@ -255,7 +255,7 @@ association for the comments:
     end
 
 Open the ``Comment`` model file, ``app/models/comment.rb``, and change the
-generated ``embedded_in`` association to ``belongs_to``:
+generated ``embedded_in`` association to ``belongs_to_one``:
 
 .. code-block:: ruby
   :name: app/models/comment.rb
@@ -267,7 +267,7 @@ generated ``embedded_in`` association to ``belongs_to``:
       field :name, type: String
       field :message, type: String
 
-      belongs_to :post
+      belongs_to_one :post
     end
 
 Open the post show view file, ``app/views/posts/show.html.erb``, and add

@@ -315,7 +315,7 @@ describe Mongoid::Association::Macros do
     end
   end
 
-  describe ".belongs_to" do
+  describe ".belongs_to_one" do
 
     let(:_class) do
       class RelationsTestClass
@@ -324,7 +324,7 @@ describe Mongoid::Association::Macros do
     end
 
     let(:conf) do
-      CONFIG.merge(options: { belongs_to_required_by_default: default_require })
+      CONFIG.merge(options: { belongs_to_one_required_by_default: default_require })
     end
 
     let(:relation) do
@@ -333,13 +333,13 @@ describe Mongoid::Association::Macros do
 
     let(:relation_options) { {} }
 
-    let(:default_require) { Mongoid.belongs_to_required_by_default }
+    let(:default_require) { Mongoid.belongs_to_one_required_by_default }
 
     before do
       Mongoid.configure do |config|
         config.load_configuration(conf)
       end
-      _class.belongs_to(:person, relation_options)
+      _class.belongs_to_one(:person, relation_options)
     end
 
     after do
@@ -353,7 +353,7 @@ describe Mongoid::Association::Macros do
     end
 
     it "defines the macro" do
-      expect(_class).to respond_to(:belongs_to)
+      expect(_class).to respond_to(:belongs_to_one)
     end
 
     context 'when the relation has options' do
@@ -362,7 +362,7 @@ describe Mongoid::Association::Macros do
 
         it 'raises an InvalidRelationOption exception' do
           expect {
-            klass.belongs_to(:person, sandwich: true)
+            klass.belongs_to_one(:person, sandwich: true)
           }.to raise_exception(Mongoid::Errors::InvalidRelationOption)
         end
       end
@@ -627,7 +627,7 @@ describe Mongoid::Association::Macros do
       context "when indexed is true" do
 
         before do
-          klass.belongs_to(:relatable, polymorphic: true, index: true)
+          klass.belongs_to_one(:relatable, polymorphic: true, index: true)
         end
 
         let(:index) do
@@ -645,7 +645,7 @@ describe Mongoid::Association::Macros do
       context 'when the relation name is invalid' do
 
         let(:relation) do
-          klass.belongs_to(:fields)
+          klass.belongs_to_one(:fields)
         end
 
         it 'raises an InvalidRelation exception' do
@@ -656,7 +656,7 @@ describe Mongoid::Association::Macros do
       end
 
       before do
-        klass.belongs_to(:person)
+        klass.belongs_to_one(:person)
       end
 
       it "adds the association to the klass" do
@@ -681,7 +681,7 @@ describe Mongoid::Association::Macros do
 
       it "creates the correct relation" do
         expect(klass.relations["person"]).to be_a(
-          Mongoid::Association::Referenced::BelongsTo
+          Mongoid::Association::Referenced::BelongsToOne
         )
       end
 
@@ -811,10 +811,10 @@ describe Mongoid::Association::Macros do
     end
   end
 
-  describe ".has_and_belongs_to_many" do
+  describe ".belongs_to_many" do
 
     it "defines the macro" do
-      expect(klass).to respond_to(:has_and_belongs_to_many)
+      expect(klass).to respond_to(:belongs_to_many)
     end
 
     context "when defining the relation" do
@@ -822,7 +822,7 @@ describe Mongoid::Association::Macros do
       context 'when the relation name is invalid' do
 
         let(:relation) do
-          klass.has_and_belongs_to_many(:fields)
+          klass.belongs_to_many(:fields)
         end
 
         it 'raises an InvalidRelation exception' do
@@ -836,13 +836,13 @@ describe Mongoid::Association::Macros do
 
         it 'raises an InvalidRelationOption exception' do
           expect {
-            klass.has_and_belongs_to_many(:fields, sandwich: true)
+            klass.belongs_to_many(:fields, sandwich: true)
           }.to raise_exception(Mongoid::Errors::InvalidRelationOption)
         end
       end
 
       before do
-        klass.has_and_belongs_to_many(:preferences)
+        klass.belongs_to_many(:preferences)
       end
 
       it "adds the association to the klass" do
@@ -859,7 +859,7 @@ describe Mongoid::Association::Macros do
 
       it "creates the correct relation" do
         expect(klass.relations["preferences"]).to be_a(
-          Mongoid::Association::Referenced::HasAndBelongsToMany
+          Mongoid::Association::Referenced::BelongsToMany
         )
       end
 
@@ -870,7 +870,7 @@ describe Mongoid::Association::Macros do
       context 'when defining order on relation' do
 
         before do
-          klass.has_and_belongs_to_many(:preferences, order: :ranking.asc)
+          klass.belongs_to_many(:preferences, order: :ranking.asc)
         end
 
         let(:association) do

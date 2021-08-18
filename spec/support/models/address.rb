@@ -43,8 +43,8 @@ class Address
   accepts_nested_attributes_for :code, :target
   accepts_nested_attributes_for :locations, allow_destroy: true
 
-  belongs_to :account
-  belongs_to :band
+  belongs_to_one :account
+  belongs_to_one :band
 
   scope :without_postcode, ->{ where(postcode: nil) }
   scope :ordered, ->{ order_by(state: 1) }

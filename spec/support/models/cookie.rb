@@ -5,5 +5,5 @@ class Cookie
   include Mongoid::Document
   include Mongoid::Timestamps::Updated
 
-  belongs_to :jar
+  belongs_to_one :jar
 end

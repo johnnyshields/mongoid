@@ -13,9 +13,12 @@ Associations
 Referenced Associations
 =======================
 
-Mongoid supports the ``has_one``, ``has_many``, ``belongs_to`` and
-``has_and_belongs_to_many`` associations familiar to ActiveRecord users.
+Mongoid supports the associations familiar to ActiveRecord users:
 
+* ``has_one``
+* ``has_many``
+* ``belongs_to_one`` (alias of ``belongs_to``)
+* ``belongs_to_many`` (alias of ``has_and_belongs_to_many``)
 
 Has One
 -------
@@ -31,7 +34,7 @@ a separate collection. The child is optional by default:
     has_one :studio
   end
 
-When using ``has_one``, the child model must use ``belongs_to`` to declare the
+When using ``has_one``, the child model must use ``belongs_to_one`` to declare the
 association with the parent:
 
 .. code-block:: ruby
@@ -39,7 +42,7 @@ association with the parent:
   class Studio
     include Mongoid::Document
     
-    belongs_to :band
+    belongs_to_one :band
   end
 
 Given the above definitions, every child document contains a reference to
@@ -80,7 +83,7 @@ children stored in a separate collection:
     has_many :members
   end
 
-Like with ``has_one``, the child model must use ``belongs_to`` to declare the
+Like with ``has_one``, the child model must use ``belongs_to_one`` to declare the
 association with the parent:
 
 .. code-block:: ruby
@@ -88,7 +91,7 @@ association with the parent:
   class Member
     include Mongoid::Document
     
-    belongs_to :band
+    belongs_to_one :band
   end
 
 Also as with ``has_one``, the child documents contain references to their
@@ -206,11 +209,11 @@ The following examle illustrates the difference between ``exists?`` and
 Belongs To
 ----------
 
-Use the ``belongs_to`` macro to associate a child with a parent stored in a
+Use the ``belongs_to_one`` macro to associate a child with a parent stored in a
 separate collection. The ``_id`` of the parent (if a parent is associated)
 is stored in the child.
 
-By default, if a ``belongs_to`` association is defined on a model, it must be
+By default, if a ``belongs_to_one`` association is defined on a model, it must be
 provided a value for a model instance to be saved. Use the ``optional: true```
 option to make the instances persistable without specifying the parent:
 
@@ -225,19 +228,19 @@ option to make the instances persistable without specifying the parent:
   class Studio
     include Mongoid::Document
     
-    belongs_to :band, optional: true
+    belongs_to_one :band, optional: true
   end
   
   studio = Studio.create!
   # => #<Studio _id: 600118184896684987aa884f, band_id: nil>
 
-To change the default behavior of ``belongs_to`` associations to not require
-their respective parents globally, set the ``belongs_to_required_by_default``
+To change the default behavior of ``belongs_to_one`` associations to not require
+their respective parents globally, set the ``belongs_to_one_required_by_default``
 :ref:`configuration option <configuration-options>` to ``false``.
 
 Although ``has_one`` and ``has_many`` associations require the
-corresponding ``belongs_to`` association to be defined on the child,
-``belongs_to`` may also be used without a corresponding ``has_one`` or
+corresponding ``belongs_to_one`` association to be defined on the child,
+``belongs_to_one`` may also be used without a corresponding ``has_one`` or
 ``has_many`` macro. In this case the child is not accessible from the parent
 but the parent is accessible from the child:
 
@@ -250,7 +253,7 @@ but the parent is accessible from the child:
   class Studio
     include Mongoid::Document
     
-    belongs_to :band
+    belongs_to_one :band
   end
 
 For clarity it is possible to add the ``inverse_of: nil`` option in cases when
@@ -265,14 +268,14 @@ the parent does not define the association:
   class Studio
     include Mongoid::Document
     
-    belongs_to :band, inverse_of: nil
+    belongs_to_one :band, inverse_of: nil
   end
 
 
 Has And Belongs To Many
 -----------------------
 
-Use the ``has_and_belongs_to_many`` macro to declare a many-to-many
+Use the ``belongs_to_many`` macro to declare a many-to-many
 association:
 
 .. code-block:: ruby
@@ -280,13 +283,13 @@ association:
   class Band
     include Mongoid::Document
     
-    has_and_belongs_to_many :tags
+    belongs_to_many :tags
   end
 
   class Tag
     include Mongoid::Document
     
-    has_and_belongs_to_many :bands
+    belongs_to_many :bands
   end
 
 Both model instances store a list of ids of the associated models, if any:
@@ -299,7 +302,7 @@ Both model instances store a list of ids of the associated models, if any:
   band.tags
   # => [#<Tag _id: 60011d554896684b8b910a29, band_ids: [BSON::ObjectId('60011d554896684b8b910a2a')]>]
 
-You can create a one-sided ``has_and_belongs_to_many`` association to store
+You can create a one-sided ``belongs_to_many`` association to store
 the ids only in one document using the ``inverse_of: nil`` option:
 
 .. code-block:: ruby
@@ -307,7 +310,7 @@ the ids only in one document using the ``inverse_of: nil`` option:
   class Band
     include Mongoid::Document
     
-    has_and_belongs_to_many :tags, inverse_of: nil
+    belongs_to_many :tags, inverse_of: nil
   end
 
   class Tag
@@ -320,7 +323,7 @@ the ids only in one document using the ``inverse_of: nil`` option:
   band.tags
   # => [#<Tag _id: 60011dbc4896684bbbaa9254, >]
 
-A one-sided ``has_and_belongs_to_many`` association is, naturally, only
+A one-sided ``belongs_to_many`` association is, naturally, only
 usable from the model where it is defined.
 
 
@@ -354,7 +357,7 @@ For example, given the following models:
   class Tour
     include Mongoid::Document
     
-    belongs_to :band
+    belongs_to_one :band
     
     field :year, type: Integer
   end
@@ -362,7 +365,7 @@ For example, given the following models:
   class Award
     include Mongoid::Document
     
-    belongs_to :band
+    belongs_to_one :band
     
     field :name, type: String
   end
@@ -867,7 +870,7 @@ Custom Primary & Foreign Keys
 
 The fields used when looking up associations can be explicitly specified.
 The default is to use ``id`` on the "parent" association and ``#{association_name}_id``
-on the "child" association, for example with a has_many/belongs_to:
+on the "child" association, for example with a has_many/belongs_to_one:
 
 .. code-block:: ruby
 
@@ -878,7 +881,7 @@ on the "child" association, for example with a has_many/belongs_to:
 
   class Email
     include Mongoid::Document
-    belongs_to :company
+    belongs_to_one :company
   end
 
   company = Company.find(id)
@@ -903,14 +906,14 @@ association:
     # field :c_ref, type: Object
     # But the type can also be specified:
     field :c_ref, type: String
-    belongs_to :company, foreign_key: 'c_ref', primary_key: 'c'
+    belongs_to_one :company, foreign_key: 'c_ref', primary_key: 'c'
   end
 
   company = Company.find(id)
   # looks up emails where emails.c_ref == company.c
   company.emails
 
-With a has_and_belongs_to_many association, since the data is stored on both
+With a belongs_to_many association, since the data is stored on both
 sides of the association, there are 4 fields configurable when the association
 is defined:
 
@@ -933,7 +936,7 @@ An example might make this more clear:
     field :c_id, type: Integer
     field :e_ids, type: Array
 
-    has_and_belongs_to_many :employees,
+    belongs_to_many :employees,
       primary_key: :e_id, foreign_key: :e_ids,
       inverse_primary_key: :c_id, inverse_foreign_key: :c_ids
   end
@@ -944,7 +947,7 @@ An example might make this more clear:
     field :e_id, type: Integer
     field :c_ids, type: Array
 
-    has_and_belongs_to_many :companies,
+    belongs_to_many :companies,
       primary_key: :c_id, foreign_key: :c_ids,
       inverse_primary_key: :e_id, inverse_foreign_key: :e_ids
   end
@@ -980,7 +983,7 @@ this applies to are:
 - ``embeds_one``
 - ``has_many``
 - ``has_one``
-- ``has_and_belongs_to_many``
+- ``belongs_to_many``
 
 If you do not want this behavior, you may turn it off when defining the association.
 
@@ -1019,7 +1022,7 @@ have managers as follows:
   class Manager
     include Mongoid::Document
 
-    belongs_to :unit, polymorphic: true
+    belongs_to_one :unit, polymorphic: true
   end
 
   dept = Department.create!
@@ -1041,7 +1044,7 @@ polymorphic association:
     include Mongoid::Document
 
     field :name, type: String
-    has_and_belongs_to_many :bundles
+    belongs_to_many :bundles
 
     embeds_many :prices, as: :item
   end
@@ -1050,7 +1053,7 @@ polymorphic association:
     include Mongoid::Document
 
     field :name, type: String
-    has_and_belongs_to_many :products
+    belongs_to_many :products
 
     embeds_many :prices, as: :item
   end
@@ -1083,7 +1086,7 @@ that a bundle may contain other bundles or products:
     has_many :items, polymorphic: true
   end
 
-``has_and_belongs_to_many`` associations do not support polymorphism.
+``belongs_to_many`` associations do not support polymorphism.
 
 
 Cascading Callbacks
@@ -1128,12 +1131,12 @@ The child may become orphaned if it is ordinarily only referenced via the parent
    class Band
      include Mongoid::Document
      has_many :albums, dependent: :delete_all
-     belongs_to :label, dependent: :nullify
+     belongs_to_one :label, dependent: :nullify
    end
 
    class Album
      include Mongoid::Document
-     belongs_to :band
+     belongs_to_one :band
    end
 
    class Label
@@ -1212,7 +1215,7 @@ Mongoid to instantiate a new document when the association is accessed and it is
 Touching
 --------
 
-Any ``belongs_to`` association can take an optional ``:touch`` option which
+Any ``belongs_to_one`` association can take an optional ``:touch`` option which
 will cause the parent document be touched whenever the child document is
 touched:
 
@@ -1220,7 +1223,7 @@ touched:
 
   class Band
     include Mongoid::Document
-    belongs_to :label, touch: true
+    belongs_to_one :label, touch: true
   end
 
   band = Band.first
@@ -1240,7 +1243,7 @@ be touched on the parent association in addition to updated_at:
 
   class Band
     include Mongoid::Document
-    belongs_to :label, touch: :bands_updated_at
+    belongs_to_one :label, touch: :bands_updated_at
   end
   
   label = Label.create!
@@ -1275,7 +1278,7 @@ For example:
 
   class Order
     include Mongoid::Document
-    belongs_to :customer, counter_cache: true
+    belongs_to_one :customer, counter_cache: true
   end
 
   class Customer
@@ -1297,7 +1300,7 @@ accessed, depending on the association:
 
   class Order
     include Mongoid::Document
-    belongs_to :customer
+    belongs_to_one :customer
     
     private
     
@@ -1324,7 +1327,7 @@ accessed, depending on the association:
   customer.orders.first.internal_status
   # NoMethodError (private method `internal_status' called for #<Order:0x000055af2ec46c50>)
   
-  # belongs_to permits calling private methods on the target
+  # belongs_to_one permits calling private methods on the target
   order.customer.internal_id
   # => 42
 
@@ -1474,13 +1477,13 @@ referenced associations:
 
   class Tour
     include Mongoid::Document
-    belongs_to :band
+    belongs_to_one :band
     field :year, type: Integer
   end
 
   class Award
     include Mongoid::Document
-    belongs_to :band
+    belongs_to_one :band
     field :name, type: String
   end
 

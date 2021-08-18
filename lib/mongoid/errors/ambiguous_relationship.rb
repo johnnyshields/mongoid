@@ -17,8 +17,8 @@ module Mongoid
     #   class Invitation
     #     include Mongoid::Document
     #
-    #     belongs_to :person
-    #     belongs_to :referred_by, class_name: "Person"
+    #     belongs_to_one :person
+    #     belongs_to_one :referred_by, class_name: "Person"
     #   end
     class AmbiguousRelationship < MongoidError
 

@@ -188,7 +188,7 @@ describe Mongoid::Association::Builders do
 
         context "when a document already exists" do
 
-          context "when the relation belongs_to is already set" do
+          context "when the relation belongs_to_one is already set" do
 
             let!(:game_one) do
               game = person.create_game(name: "Starcraft")
@@ -212,7 +212,7 @@ describe Mongoid::Association::Builders do
             end
           end
 
-          context 'when the relation belongs_to is not already set' do
+          context 'when the relation belongs_to_one is not already set' do
 
             let!(:game_two) do
               person.create_game(name: "Skyrim")

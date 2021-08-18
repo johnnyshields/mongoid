@@ -4,9 +4,9 @@
 module Mongoid
   module Association
     module Referenced
-      class BelongsTo
+      class BelongsToOne
 
-        # Binding class for belongs_to associations.
+        # Binding class for belongs_to_one associations.
         class Binding
           include Bindable
 

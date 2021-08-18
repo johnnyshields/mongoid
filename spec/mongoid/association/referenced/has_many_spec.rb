@@ -35,7 +35,7 @@ describe Mongoid::Association::Referenced::HasMany do
 
     let(:expected_complements) do
       [
-          Mongoid::Association::Referenced::BelongsTo,
+          Mongoid::Association::Referenced::BelongsToOne,
       ]
     end
 
@@ -212,7 +212,7 @@ describe Mongoid::Association::Referenced::HasMany do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to_one macro
             described_class.new(has_many_class, name, options)
           end
 
@@ -232,7 +232,7 @@ describe Mongoid::Association::Referenced::HasMany do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to_one macro
             described_class.new(has_many_class, name, options)
           end
 
@@ -252,7 +252,7 @@ describe Mongoid::Association::Referenced::HasMany do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to_one macro
             described_class.new(has_many_class, name, options)
           end
 
@@ -272,7 +272,7 @@ describe Mongoid::Association::Referenced::HasMany do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to_one macro
             described_class.new(has_many_class, name, options)
           end
 
@@ -292,7 +292,7 @@ describe Mongoid::Association::Referenced::HasMany do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup_instance_methods! method will be called by the :belongs_to macro
+            # setup_instance_methods! method will be called by the :belongs_to_one macro
             described_class.new(has_many_class, name, options)
           end
 
@@ -660,7 +660,7 @@ describe Mongoid::Association::Referenced::HasMany do
     context 'when polymorphic' do
 
       before do
-        BelongingObject.belongs_to :containable, polymorphic: true
+        BelongingObject.belongs_to_one :containable, polymorphic: true
       end
 
       let(:options) do
@@ -726,7 +726,7 @@ describe Mongoid::Association::Referenced::HasMany do
     context 'when not polymorphic' do
 
       before do
-        BelongingObject.belongs_to :owner_object
+        BelongingObject.belongs_to_one :owner_object
       end
 
       context 'when inverse_of is specified' do
@@ -761,7 +761,7 @@ describe Mongoid::Association::Referenced::HasMany do
     context 'when polymorphic' do
 
       before do
-        BelongingObject.belongs_to :containable, polymorphic: true
+        BelongingObject.belongs_to_one :containable, polymorphic: true
       end
 
       let(:options) do
@@ -827,7 +827,7 @@ describe Mongoid::Association::Referenced::HasMany do
     context 'when not polymorphic' do
 
       before do
-        BelongingObject.belongs_to :owner_object
+        BelongingObject.belongs_to_one :owner_object
       end
 
       context 'when inverse_of is specified' do
@@ -1050,7 +1050,7 @@ describe Mongoid::Association::Referenced::HasMany do
     context 'when an inverse can be determined' do
 
       before do
-        BelongingObject.belongs_to :owner_object
+        BelongingObject.belongs_to_one :owner_object
       end
 
       it 'returns the name of the inverse followed by =' do
@@ -1217,7 +1217,7 @@ describe Mongoid::Association::Referenced::HasMany do
 
     before do
       association
-      BelongingObject.belongs_to :owner_object
+      BelongingObject.belongs_to_one :owner_object
     end
 
     it 'returns an the target (EmbeddedObject)' do

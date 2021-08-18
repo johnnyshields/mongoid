@@ -15,13 +15,13 @@ class HmmEmail
   include Mongoid::Document
 
   field :f, type: Integer
-  belongs_to :company, primary_key: :p, foreign_key: :f, class_name: 'HmmCompany'
+  belongs_to_one :company, primary_key: :p, foreign_key: :f, class_name: 'HmmCompany'
 end
 
 class HmmAddress
   include Mongoid::Document
 
-  belongs_to :company, class_name: 'HmmCompany'
+  belongs_to_one :company, class_name: 'HmmCompany'
 end
 
 class HmmSchool
@@ -36,7 +36,7 @@ end
 class HmmStudent
   include Mongoid::Document
 
-  belongs_to :school, class_name: 'HmmSchool'
+  belongs_to_one :school, class_name: 'HmmSchool'
 
   field :name, type: String
   field :grade, type: Integer, default: 3
@@ -45,7 +45,7 @@ end
 class HmmTicket
   include Mongoid::Document
 
-  belongs_to :person
+  belongs_to_one :person
 end
 
 class HmmBus
@@ -57,5 +57,5 @@ end
 class HmmBusSeat
   include Mongoid::Document
 
-  # No belongs_to :bus
+  # No belongs_to_one :bus
 end

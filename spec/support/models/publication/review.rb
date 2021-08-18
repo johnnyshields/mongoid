@@ -7,8 +7,8 @@ module Publication
 
     field :summary
 
-    belongs_to :reviewable, polymorphic: true
-    belongs_to :reviewer, polymorphic: true
-    belongs_to :template
+    belongs_to_one :reviewable, polymorphic: true
+    belongs_to_one :reviewer, polymorphic: true
+    belongs_to_one :template
   end
 end

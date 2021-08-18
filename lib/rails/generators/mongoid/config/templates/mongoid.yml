@@ -123,10 +123,10 @@ development:
     # Create indexes in background by default. (default: false)
     # background_indexing: false
     
-    # Mark belongs_to associations as required by default, so that saving a
-    # model with a missing belongs_to association will trigger a validation
+    # Mark belongs_to_one associations as required by default, so that saving a
+    # model with a missing belongs_to_one association will trigger a validation
     # error. (default: true)
-    # belongs_to_required_by_default: true
+    # belongs_to_one_required_by_default: true
     
     # Raise an exception when a field is redefined. (default: false)
     # duplicate_fields_exception: false

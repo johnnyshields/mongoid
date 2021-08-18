@@ -114,7 +114,7 @@ describe Mongoid::Config do
     end
   end
 
-  context 'when the belongs_to_required_by_default option is not set in the config' do
+  context 'when the belongs_to_one_required_by_default option is not set in the config' do
 
     before do
       Mongoid::Config.reset
@@ -123,12 +123,12 @@ describe Mongoid::Config do
       end
     end
 
-    it 'sets the Mongoid.belongs_to_required_by_default value to true' do
-      expect(Mongoid.belongs_to_required_by_default).to be(true)
+    it 'sets the Mongoid.belongs_to_one_required_by_default value to true' do
+      expect(Mongoid.belongs_to_one_required_by_default).to be(true)
     end
   end
 
-  context 'when the belongs_to_required_by_default option is set in the config' do
+  context 'when the belongs_to_one_required_by_default option is set in the config' do
 
     before do
       Mongoid.configure do |config|
@@ -139,18 +139,18 @@ describe Mongoid::Config do
     context 'when the value is set to true' do
 
       let(:conf) do
-        CONFIG.merge(options: { belongs_to_required_by_default: true })
+        CONFIG.merge(options: { belongs_to_one_required_by_default: true })
       end
 
-      it 'sets the Mongoid.belongs_to_required_by_default value to true' do
-        expect(Mongoid.belongs_to_required_by_default).to be(true)
+      it 'sets the Mongoid.belongs_to_one_required_by_default value to true' do
+        expect(Mongoid.belongs_to_one_required_by_default).to be(true)
       end
     end
 
     context 'when the value is set to false' do
 
       let(:conf) do
-        CONFIG.merge(options: { belongs_to_required_by_default: false })
+        CONFIG.merge(options: { belongs_to_one_required_by_default: false })
       end
 
       before do
@@ -160,8 +160,8 @@ describe Mongoid::Config do
         end
       end
 
-      it 'sets the Mongoid.belongs_to_required_by_default value to false' do
-        expect(Mongoid.belongs_to_required_by_default).to be(false)
+      it 'sets the Mongoid.belongs_to_one_required_by_default value to false' do
+        expect(Mongoid.belongs_to_one_required_by_default).to be(false)
       end
     end
   end

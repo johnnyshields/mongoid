@@ -243,10 +243,10 @@ can be configured.
       # Create indexes in background by default. (default: false)
       background_indexing: false
 
-      # Mark belongs_to associations as required by default, so that saving a
-      # model with a missing belongs_to association will trigger a validation
+      # Mark belongs_to_one associations as required by default, so that saving a
+      # model with a missing belongs_to_one association will trigger a validation
       # error. (default: true)
-      belongs_to_required_by_default: true
+      belongs_to_one_required_by_default: true
 
       # Set the global discriminator key. (default: "_type")
       discriminator_key: "_type"

@@ -305,4 +305,4 @@ were ignored.
 
 Improvement: ``Model.where`` can now be called with no arguments.
 
-Improvement: Polymorphic ``belongs_to`` associations can now be eagerly loaded.
+Improvement: Polymorphic ``belongs_to_one`` associations can now be eagerly loaded.

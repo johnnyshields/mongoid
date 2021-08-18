@@ -14,7 +14,7 @@ module Mongoid
           # Instantiate the eager load class.
           #
           # @example Create the new belongs to eager load preloader.
-          #   BelongsTo.new(association, parent_docs)
+          #   BelongsToOne.new(association, parent_docs)
           #
           # @param [ Array<Association> ] associations Associations to eager load
           # @param [ Array<Document> ] docs Documents to preload the associations

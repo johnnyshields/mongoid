@@ -39,14 +39,14 @@ module TouchableSpec
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      belongs_to :building
+      belongs_to_one :building
     end
 
     class Floor
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      belongs_to :building, touch: true
+      belongs_to_one :building, touch: true
     end
   end
 end

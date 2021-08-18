@@ -16,7 +16,7 @@ describe "Polymorphic Associations" do
       context "when the relation stores a foreign key" do
 
         let!(:association) do
-          klass.belongs_to :ratable, polymorphic: true
+          klass.belongs_to_one :ratable, polymorphic: true
         end
 
         it "sets polymorphic to true" do
@@ -151,7 +151,7 @@ describe "Polymorphic Associations" do
         class Owned
           include Mongoid::Document
 
-          belongs_to :belongs_relation_polymorphic_touch_owner, polymorphic: true, touch: true
+          belongs_to_one :belongs_relation_polymorphic_touch_owner, polymorphic: true, touch: true
         end
       end
 

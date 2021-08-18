@@ -7,12 +7,12 @@ class Comment
   field :title, type: String
   field :text, type: String
 
-  belongs_to :account
-  belongs_to :movie
-  belongs_to :rating
-  belongs_to :wiki_page
+  belongs_to_one :account
+  belongs_to_one :movie
+  belongs_to_one :rating
+  belongs_to_one :wiki_page
 
-  belongs_to :commentable, polymorphic: true
+  belongs_to_one :commentable, polymorphic: true
 
   validates :title, presence: true
   validates :movie, :rating, associated: true

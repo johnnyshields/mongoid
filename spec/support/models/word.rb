@@ -6,7 +6,7 @@ class Word
   field :name, type: String
   field :origin, type: String
 
-  belongs_to :dictionary
+  belongs_to_one :dictionary
 
   embeds_many :definitions, validate: false
   embeds_many :word_origins, validate: false

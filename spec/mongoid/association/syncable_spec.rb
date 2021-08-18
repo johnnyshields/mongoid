@@ -8,8 +8,8 @@ describe "Syncable Association" do
   before(:all) do
     Mongoid.raise_not_found_error = true
     Person._synced(Person.relations["preferences"])
-    Person.has_and_belongs_to_many :preferences
-    Preference.has_and_belongs_to_many :people
+    Person.belongs_to_many :preferences
+    Preference.belongs_to_many :people
   end
 
   after(:all) do

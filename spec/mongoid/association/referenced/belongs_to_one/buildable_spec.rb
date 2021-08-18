@@ -3,7 +3,7 @@
 
 require "spec_helper"
 
-describe Mongoid::Association::Referenced::BelongsTo::Buildable do
+describe Mongoid::Association::Referenced::BelongsToOne::Buildable do
 
   let(:base) do
     double

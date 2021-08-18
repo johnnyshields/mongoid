@@ -11,12 +11,12 @@ module Fruits
 
   class Banana
     include Mongoid::Document
-    belongs_to :apple, class_name: "Fruits::Apple"
+    belongs_to_one :apple, class_name: "Fruits::Apple"
   end
 
   class Melon
     include Mongoid::Document
-    belongs_to :fruit_apple, class_name: "Fruits::Apple"
+    belongs_to_one :fruit_apple, class_name: "Fruits::Apple"
   end
 
   class Pineapple

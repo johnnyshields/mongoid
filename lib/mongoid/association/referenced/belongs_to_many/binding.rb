@@ -4,9 +4,9 @@
 module Mongoid
   module Association
     module Referenced
-      class HasAndBelongsToMany
+      class BelongsToMany
 
-        # Binding class for all has_and_belongs_to_many associations.
+        # Binding class for all belongs_to_many associations.
         class Binding
           include Bindable
 

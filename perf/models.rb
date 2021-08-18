@@ -12,7 +12,7 @@ class Person
 
   has_many :posts, :validate => false
   has_one :game, :validate => false
-  has_and_belongs_to_many :preferences, :validate => false
+  belongs_to_many :preferences, :validate => false
 
   index preference_ids: 1
 end
@@ -42,7 +42,7 @@ class Post
 
   field :title, :type => String
   field :content, :type => String
-  belongs_to :person
+  belongs_to_one :person
 
   index person_id: 1
 end
@@ -51,7 +51,7 @@ class Game
   include Mongoid::Document
 
   field :name, :type => String
-  belongs_to :person
+  belongs_to_one :person
 
   index person_id: 1
 end
@@ -60,7 +60,7 @@ class Preference
   include Mongoid::Document
 
   field :name, :type => String
-  has_and_belongs_to_many :people, :validate => false
+  belongs_to_many :people, :validate => false
 
   index person_ids: 1
 end

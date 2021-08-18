@@ -3,7 +3,7 @@
 
 require "spec_helper"
 
-describe Mongoid::Association::Referenced::BelongsTo::Binding do
+describe Mongoid::Association::Referenced::BelongsToOne::Binding do
 
   let(:person) do
     Person.new
@@ -53,7 +53,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Binding do
       context "when the document is bindable with username as pk" do
 
         before do
-          Game.belongs_to :person, index: true, validate: true, primary_key: :username
+          Game.belongs_to_one :person, index: true, validate: true, primary_key: :username
 
           expect(person).to receive(:save).never
           expect(game).to receive(:save).never
@@ -61,7 +61,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Binding do
         end
 
         after do
-          Game.belongs_to :person, index: true, validate: true
+          Game.belongs_to_one :person, index: true, validate: true
         end
 
         it "sets the inverse relation" do

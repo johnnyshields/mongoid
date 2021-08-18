@@ -4,9 +4,9 @@
 module Mongoid
   module Association
     module Referenced
-      class BelongsTo
+      class BelongsToOne
 
-        # Eager class for belongs_to associations.
+        # Eager class for belongs_to_one associations.
         class Eager < Association::Referenced::Eager::Base
 
           private

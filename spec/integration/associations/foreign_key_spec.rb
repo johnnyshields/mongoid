@@ -5,7 +5,7 @@ require 'spec_helper'
 require_relative './foreign_key_spec_models'
 
 describe 'Association foreign key configuration' do
-  describe 'has_many/belongs_to' do
+  describe 'has_many/belongs_to_one' do
     it 'creates child' do
       company = ForeignKeySpec::Company.create!(c: 'test')
       email = ForeignKeySpec::Email.create!(company: company)
@@ -55,7 +55,7 @@ describe 'Association foreign key configuration' do
     end
   end
 
-  describe 'has_one/belongs_to' do
+  describe 'has_one/belongs_to_one' do
     it 'creates child' do
       company = ForeignKeySpec::Company.create!(c: 'test')
       founder = ForeignKeySpec::Founder.create!(company: company)
@@ -79,7 +79,7 @@ describe 'Association foreign key configuration' do
     end
   end
 
-  describe 'has_and_belongs_to_many' do
+  describe 'belongs_to_many' do
     it 'persists association on the other side' do
       animal = ForeignKeySpec::Animal.create!(a: 'bear')
       zoo = ForeignKeySpec::Zoo.create!(z: 'bz')

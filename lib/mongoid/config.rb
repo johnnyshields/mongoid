@@ -27,10 +27,10 @@ module Mongoid
     # Create indexes in background by default.
     option :background_indexing, default: false
 
-    # Mark belongs_to associations as required by default, so that saving a
-    # model with a missing belongs_to association will trigger a validation
+    # Mark belongs_to_one associations as required by default, so that saving a
+    # model with a missing belongs_to_one association will trigger a validation
     # error.
-    option :belongs_to_required_by_default, default: true
+    option :belongs_to_one_required_by_default, default: true
 
     # Set the global discriminator key.
     option :discriminator_key, default: "_type"

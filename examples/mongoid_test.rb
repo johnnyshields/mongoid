@@ -17,7 +17,7 @@ end
 
 class Post
   include Mongoid::Document
-  belongs_to :person
+  belongs_to_one :person
 end
 
 class Person

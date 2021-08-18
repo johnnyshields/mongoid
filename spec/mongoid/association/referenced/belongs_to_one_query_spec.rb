@@ -4,7 +4,7 @@
 require "spec_helper"
 require_relative './has_many_models'
 
-describe Mongoid::Association::Referenced::BelongsTo do
+describe Mongoid::Association::Referenced::BelongsToOne do
   context 'when projecting with #only' do
     before do
       school = HmmSchool.create!(district: 'foo', team: 'Bulldogs')

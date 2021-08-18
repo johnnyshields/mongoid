@@ -25,7 +25,7 @@ describe Mongoid::Errors::InverseNotFound do
 
     it "contains the resolution in the message" do
       expect(error.message).to include(
-        "If an inverse is not required, like a belongs_to or"
+        "If an inverse is not required, like a belongs_to_one or"
       )
     end
   end

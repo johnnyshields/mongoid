@@ -15,7 +15,7 @@ end
 class HomAccreditation
   include Mongoid::Document
 
-  belongs_to :college, class_name: 'HomCollege'
+  belongs_to_one :college, class_name: 'HomCollege'
 
   field :degree, type: String
   field :year, type: Integer, default: 2012
@@ -32,13 +32,13 @@ end
 class HomAccreditation::Child
   include Mongoid::Document
 
-  belongs_to :hom_college
+  belongs_to_one :hom_college
 end
 
 class HomAddress
   include Mongoid::Document
 
-  belongs_to :college, class_name: 'HomCollege'
+  belongs_to_one :college, class_name: 'HomCollege'
 end
 
 module HomNs
@@ -51,7 +51,7 @@ module HomNs
   class PrefixedChild
     include Mongoid::Document
 
-    belongs_to :parent, class_name: 'PrefixedParent'
+    belongs_to_one :parent, class_name: 'PrefixedParent'
   end
 end
 
@@ -64,7 +64,7 @@ end
 class HomPolymorphicChild
   include Mongoid::Document
 
-  belongs_to :p_parent, polymorphic: true
+  belongs_to_one :p_parent, polymorphic: true
 end
 
 class HomBus
@@ -76,5 +76,5 @@ end
 class HomBusDriver
   include Mongoid::Document
 
-  # No belongs_to :bus
+  # No belongs_to_one :bus
 end

@@ -807,11 +807,11 @@ should therefore be avoided.
   fields in projection in the same query.
 
 ``only`` can be specified with referenced associations (has_one, has_many,
-has_and_belongs_to_many) but is currently ignored for referenced associations -
+belongs_to_many) but is currently ignored for referenced associations -
 all fields of referenced associations will be loaded
 (`MONGOID-4704 <https://jira.mongodb.org/browse/MONGOID-4704>`_).
 
-Note that if a document has ``has_one`` or ``has_and_belongs_to_many`` associations,
+Note that if a document has ``has_one`` or ``belongs_to_many`` associations,
 the fields with foreign keys must be included in the list of attributes
 loaded with ``only`` for those associations to be loaded. For example:
 
@@ -822,13 +822,13 @@ loaded with ``only`` for those associations to be loaded. For example:
 
     field :name, type: String
 
-    has_and_belongs_to_many :managers
+    belongs_to_many :managers
   end
 
   class Manager
     include Mongoid::Document
 
-    has_and_belongs_to_many :bands
+    belongs_to_many :bands
   end
 
   band = Band.create!(name: 'Astral Projection')
@@ -1427,7 +1427,7 @@ Eager Loading
 Mongoid provides a facility to eager load documents
 from associations to prevent the n+1 issue when
 iterating over documents with association access. Eager loading is supported on
-all associations with the exception of polymorphic ``belongs_to``
+all associations with the exception of polymorphic ``belongs_to_one``
 associations.
 
 .. code-block:: ruby
@@ -1439,7 +1439,7 @@ associations.
 
   class Album
     include Mongoid::Document
-    belongs_to :band
+    belongs_to_one :band
   end
 
   Band.includes(:albums).each do |band|

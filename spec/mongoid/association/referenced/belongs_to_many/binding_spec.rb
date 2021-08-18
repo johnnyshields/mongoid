@@ -3,7 +3,7 @@
 
 require "spec_helper"
 
-describe Mongoid::Association::Referenced::HasAndBelongsToMany::Binding do
+describe Mongoid::Association::Referenced::BelongsToMany::Binding do
 
   let(:person) do
     Person.new

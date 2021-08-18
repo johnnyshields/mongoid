@@ -119,8 +119,8 @@ This only works on the association macro that the foreign key is stored on:
 
     class Comment
       include Mongoid::Document
-      belongs_to :post, index: true
-      has_and_belongs_to_many :preferences, index: true
+      belongs_to_one :post, index: true
+      belongs_to_many :preferences, index: true
     end
 
 Index Management Rake Tasks

@@ -9,8 +9,8 @@ class Video
   field :genres, type: Array
 
   embedded_in :person
-  belongs_to :post
-  belongs_to :game
+  belongs_to_one :post
+  belongs_to_one :game
 
   default_scope ->{ asc(:title) }
 end

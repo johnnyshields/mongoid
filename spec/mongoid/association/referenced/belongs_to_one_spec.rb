@@ -4,7 +4,7 @@
 require "spec_helper"
 require_relative './has_one_models'
 
-describe Mongoid::Association::Referenced::BelongsTo do
+describe Mongoid::Association::Referenced::BelongsToOne do
 
   before do
     class OwnerObject; include Mongoid::Document; end
@@ -25,7 +25,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
   end
 
   let(:association) do
-    belonging_class.belongs_to name, options
+    belonging_class.belongs_to_one name, options
   end
 
   let(:options) do
@@ -85,7 +85,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
         let(:association) do
           # Note that it is necessary to create the association directly, otherwise the
-          # setup!! method will be called by the :belongs_to macro
+          # setup!! method will be called by the :belongs_to_one macro
           described_class.new(belonging_class, name, options)
         end
 
@@ -136,7 +136,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
         let(:association) do
           # Note that it is necessary to create the association directly, otherwise the
-          # setup! method will be called by the :belongs_to macro
+          # setup! method will be called by the :belongs_to_one macro
           described_class.new(belonging_class, name, options)
         end
 
@@ -156,7 +156,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
         let(:association) do
           # Note that it is necessary to create the association directly, otherwise the
-          # setup! method will be called by the :belongs_to macro
+          # setup! method will be called by the :belongs_to_one macro
           described_class.new(belonging_class, name, options)
         end
 
@@ -264,7 +264,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to_one macro
             described_class.new(belonging_class, name, options)
           end
 
@@ -284,7 +284,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to_one macro
             described_class.new(belonging_class, name, options)
           end
 
@@ -304,7 +304,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to_one macro
             described_class.new(belonging_class, name, options)
           end
 
@@ -324,7 +324,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to_one macro
             described_class.new(belonging_class, name, options)
           end
 
@@ -344,7 +344,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to_one macro
             described_class.new(belonging_class, name, options)
           end
 
@@ -448,7 +448,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
         let(:association) do
           # Note that it is necessary to create the association directly, otherwise the
-          # setup! method will be called by the :belongs_to macro
+          # setup! method will be called by the :belongs_to_one macro
           described_class.new(belonging_class, name, options)
         end
 
@@ -499,7 +499,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
         let(:association) do
           # Note that it is necessary to create the association directly, otherwise the
-          # setup! method will be called by the :belongs_to macro
+          # setup! method will be called by the :belongs_to_one macro
           described_class.new(belonging_class, name, options)
         end
 
@@ -527,7 +527,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
         let(:association) do
           # Note that it is necessary to create the association directly, otherwise the
-          # setup! method will be called by the :belongs_to macro
+          # setup! method will be called by the :belongs_to_one macro
           described_class.new(belonging_class, name, options)
         end
 
@@ -542,21 +542,21 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
       let(:association) do
         # Note that it is necessary to create the association directly, otherwise the
-        # setup! method will be called by the :belongs_to macro
+        # setup! method will be called by the :belongs_to_one macro
         described_class.new(belonging_class, name, options)
       end
 
       context 'when the global config option is true' do
 
         around(:example) do |example|
-          original_config = Mongoid.belongs_to_required_by_default
-          Mongoid.belongs_to_required_by_default = true
+          original_config = Mongoid.belongs_to_one_required_by_default
+          Mongoid.belongs_to_one_required_by_default = true
           example.run
-          Mongoid.belongs_to_required_by_default = original_config
+          Mongoid.belongs_to_one_required_by_default = original_config
         end
 
         let!(:original_required_config) do
-          Mongoid.belongs_to_required_by_default
+          Mongoid.belongs_to_one_required_by_default
         end
 
         context 'when the required option is true' do
@@ -687,10 +687,10 @@ describe Mongoid::Association::Referenced::BelongsTo do
       context 'when the global config option is false' do
 
         around(:example) do |example|
-          original_config = Mongoid.belongs_to_required_by_default
-          Mongoid.belongs_to_required_by_default = false
+          original_config = Mongoid.belongs_to_one_required_by_default
+          Mongoid.belongs_to_one_required_by_default = false
           example.run
-          Mongoid.belongs_to_required_by_default = original_config
+          Mongoid.belongs_to_one_required_by_default = original_config
         end
 
         context 'when the required option is true' do
@@ -978,8 +978,8 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
   describe '#relation' do
 
-    it 'returns Mongoid::Association::Referenced::BelongsTo::Proxy' do
-      expect(association.relation).to be(Mongoid::Association::Referenced::BelongsTo::Proxy)
+    it 'returns Mongoid::Association::Referenced::BelongsToOne::Proxy' do
+      expect(association.relation).to be(Mongoid::Association::Referenced::BelongsToOne::Proxy)
     end
   end
 
@@ -1706,7 +1706,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
     context 'polymorphic association' do
       let(:association) do
-        belonging_class.belongs_to :poly_owner, polymorphic: true
+        belonging_class.belongs_to_one :poly_owner, polymorphic: true
       end
 
       it 'returns the name of the owner class' do
@@ -1723,7 +1723,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
     context 'polymorphic association' do
       let(:association) do
-        belonging_class.belongs_to :poly_owner, polymorphic: true
+        belonging_class.belongs_to_one :poly_owner, polymorphic: true
       end
 
       it 'returns the owner class' do
@@ -1877,7 +1877,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
     context 'when a block is passed' do
 
       let(:association) do
-        belonging_class.belongs_to name, options do; end
+        belonging_class.belongs_to_one name, options do; end
       end
 
       it 'defines an extension module' do
@@ -2018,8 +2018,8 @@ describe Mongoid::Association::Referenced::BelongsTo do
       OwnerObject.has_one :belonging_object
     end
 
-    it 'returns an instance of Mongoid::Association::Referenced::BelongsTo::Proxy' do
-      expect(Mongoid::Association::Referenced::BelongsTo::Proxy).to receive(:new).and_call_original
+    it 'returns an instance of Mongoid::Association::Referenced::BelongsToOne::Proxy' do
+      expect(Mongoid::Association::Referenced::BelongsToOne::Proxy).to receive(:new).and_call_original
       expect(association.create_relation(owner, target)).to be_a(OwnerObject)
     end
   end

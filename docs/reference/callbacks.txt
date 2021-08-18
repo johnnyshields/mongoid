@@ -95,7 +95,7 @@ associations - these are:
 
 Each time a document is added or removed from any of the following associations,
 the respective callbacks are invoked: ``embeds_many``,
-``has_many``, and ``has_and_belongs_to_many``.
+``has_many``, and ``belongs_to_many``.
 
 Association callbacks are specified as options on the respective association.
 The document added/removed will be passed as the parameter to the specified

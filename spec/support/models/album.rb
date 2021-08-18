@@ -4,7 +4,7 @@
 class Album
   include Mongoid::Document
 
-  belongs_to :artist
+  belongs_to_one :artist
   before_destroy :set_parent_name
 
   attr_accessor :before_add_called

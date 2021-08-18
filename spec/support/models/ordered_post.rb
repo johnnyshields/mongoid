@@ -5,7 +5,7 @@ class OrderedPost
   include Mongoid::Document
   field :title, type: String
   field :rating, type: Integer
-  belongs_to :person
+  belongs_to_one :person
 
   after_destroy do
     person.title = 'Minus one ordered post.'

@@ -4,6 +4,6 @@
 module Ownable
   extend ActiveSupport::Concern
   included do
-    belongs_to :user
+    belongs_to_one :user
   end
 end

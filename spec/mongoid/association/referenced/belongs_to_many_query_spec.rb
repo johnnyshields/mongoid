@@ -2,9 +2,9 @@
 # encoding: utf-8
 
 require "spec_helper"
-require_relative './has_and_belongs_to_many_models'
+require_relative './belongs_to_many_models'
 
-describe Mongoid::Association::Referenced::HasAndBelongsToMany do
+describe Mongoid::Association::Referenced::BelongsToMany do
   context 'when projecting with #only' do
     before do
       contract = HabtmmContract.create!(item: 'foo')

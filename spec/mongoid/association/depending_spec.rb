@@ -17,7 +17,7 @@ describe Mongoid::Association::Depending do
             class DependentReportCard
               include Mongoid::Document
 
-              belongs_to :dependent_student
+              belongs_to_one :dependent_student
             end
 
             class DependentUser
@@ -25,7 +25,7 @@ describe Mongoid::Association::Depending do
             end
 
             class DependentStudent < DependentUser
-              belongs_to :dependent_teacher
+              belongs_to_one :dependent_teacher
               has_many :dependent_report_cards, dependent: :destroy
             end
 
@@ -131,13 +131,13 @@ describe Mongoid::Association::Depending do
             class DependentOwnedOne
               include Mongoid::Document
 
-              belongs_to :dependent_superclass
+              belongs_to_one :dependent_superclass
             end
 
             class DependentOwnedTwo
               include Mongoid::Document
 
-              belongs_to :dependent_superclass
+              belongs_to_one :dependent_superclass
             end
 
             class DependentSuperclass
@@ -187,7 +187,7 @@ describe Mongoid::Association::Depending do
             class Dep
               include Mongoid::Document
 
-              belongs_to :double_assoc
+              belongs_to_one :double_assoc
             end
 
             class DoubleAssoc
@@ -621,12 +621,12 @@ describe Mongoid::Association::Depending do
         context "when restricting a many to many" do
 
           let!(:association) do
-            Person.has_and_belongs_to_many :houses, dependent: :restrict_with_exception
+            Person.belongs_to_many :houses, dependent: :restrict_with_exception
           end
 
           after do
             Person.dependents.delete(association)
-            Person.has_and_belongs_to_many :houses, validate: false
+            Person.belongs_to_many :houses, validate: false
           end
 
           context "when the relation is empty" do
@@ -927,12 +927,12 @@ describe Mongoid::Association::Depending do
       context "when restricting a many to many" do
 
         let!(:association) do
-          Person.has_and_belongs_to_many :houses, dependent: :restrict_with_error
+          Person.belongs_to_many :houses, dependent: :restrict_with_error
         end
 
         after do
           Person.dependents.delete(association)
-          Person.has_and_belongs_to_many :houses, validate: false
+          Person.belongs_to_many :houses, validate: false
         end
 
         let(:person) do

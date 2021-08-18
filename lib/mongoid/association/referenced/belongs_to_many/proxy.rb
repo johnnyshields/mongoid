@@ -4,7 +4,7 @@
 module Mongoid
   module Association
     module Referenced
-      class HasAndBelongsToMany
+      class BelongsToMany
 
         # This class defines the behavior for all associations that are a
         # many-to-many between documents in different collections.
@@ -236,7 +236,7 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def binding
-            HasAndBelongsToMany::Binding.new(_base, _target, _association)
+            BelongsToMany::Binding.new(_base, _target, _association)
           end
 
           # Determine if the child document should be persisted.

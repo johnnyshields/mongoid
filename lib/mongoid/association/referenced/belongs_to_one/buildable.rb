@@ -4,9 +4,9 @@
 module Mongoid
   module Association
     module Referenced
-      class BelongsTo
+      class BelongsToOne
 
-        # The Builder behavior for belongs_to associations.
+        # The Builder behavior for belongs_to_one associations.
         #
         # @since 7.0
         module Buildable

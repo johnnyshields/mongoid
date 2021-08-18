@@ -146,7 +146,7 @@ Now we can define some models:
       field :name, type: String
       field :message, type: String
 
-      belongs_to :post
+      belongs_to_one :post
     end
 
 ... and add some routes:

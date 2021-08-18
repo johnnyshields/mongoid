@@ -96,14 +96,14 @@ class Person
     end
   end
   has_many :ordered_posts, order: :rating.desc, validate: false
-  has_and_belongs_to_many \
+  belongs_to_many \
     :preferences,
     index: true,
     dependent: :nullify,
     validate: false
-  has_and_belongs_to_many :user_accounts, validate: false
-  has_and_belongs_to_many :houses, validate: false
-  has_and_belongs_to_many :ordered_preferences, order: :value.desc, validate: false
+  belongs_to_many :user_accounts, validate: false
+  belongs_to_many :houses, validate: false
+  belongs_to_many :ordered_preferences, order: :value.desc, validate: false
 
   has_many :drugs, validate: false
   # Must not have dependent: :destroy
@@ -112,14 +112,14 @@ class Person
   has_one :book, autobuild: true, validate: false
   has_one :home, dependent: :delete_all, validate: false
 
-  has_and_belongs_to_many \
+  belongs_to_many \
     :administrated_events,
     class_name: 'Event',
     inverse_of: :administrators,
     dependent:  :nullify,
     validate: false
 
-  belongs_to :mother, class_name: 'Person'
+  belongs_to_one :mother, class_name: 'Person'
   has_many :children, class_name: 'Person'
 
   accepts_nested_attributes_for :addresses

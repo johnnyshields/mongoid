@@ -4,8 +4,8 @@
 class Vehicle
   include Mongoid::Document
 
-  belongs_to :shipping_container
-  belongs_to :driver
+  belongs_to_one :shipping_container
+  belongs_to_one :driver
 
   embeds_many :crates
   embeds_many :seats, cascade_callbacks: true

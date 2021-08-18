@@ -20,7 +20,7 @@ describe Mongoid::Association::Constrainable do
       end
 
       let(:constrainable) do
-        Post.belongs_to :person
+        Post.belongs_to_one :person
       end
 
       context "when provided an object id" do
@@ -49,7 +49,7 @@ describe Mongoid::Association::Constrainable do
     context "when the id's class does not store object ids" do
 
       let(:constrainable) do
-        Alert.belongs_to :account
+        Alert.belongs_to_one :account
       end
 
       it "returns the object" do

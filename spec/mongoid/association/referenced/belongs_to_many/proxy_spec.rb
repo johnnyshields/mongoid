@@ -3,13 +3,13 @@
 
 require "spec_helper"
 
-describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
+describe Mongoid::Association::Referenced::BelongsToMany::Proxy do
 
   around(:each) do |example|
     original_raise_not_found_error = Mongoid.raise_not_found_error
     original_preferences_association = Person.relations["preferences"]
     Mongoid.raise_not_found_error = true
-    Person.has_and_belongs_to_many :preferences, autosave: true
+    Person.belongs_to_many :preferences, autosave: true
     example.run
     Mongoid.raise_not_found_error = original_raise_not_found_error
     Person.relations["preferences"] = original_preferences_association
@@ -3034,7 +3034,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       end
     end
 
-    Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy.public_instance_methods.sort.each do |method|
+    Mongoid::Association::Referenced::BelongsToMany::Proxy.public_instance_methods.sort.each do |method|
 
       context "when checking Proxy##{method}" do
 
@@ -3715,7 +3715,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
         field :n, type: String, as: :name
 
-        has_and_belongs_to_many :distributors,
+        belongs_to_many :distributors,
                                 foreign_key: :d_ids,
                                 inverse_of: 'p'
       end
@@ -3725,7 +3725,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
         field :n, type: String, as: :name
 
-        has_and_belongs_to_many :projects,
+        belongs_to_many :projects,
                                 foreign_key: :p_ids,
                                 inverse_of: 'd'
       end

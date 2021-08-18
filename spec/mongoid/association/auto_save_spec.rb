@@ -320,14 +320,14 @@ describe Mongoid::Association::Referenced::AutoSave do
 
           class Peasant
             include Mongoid::Document
-            belongs_to :king
+            belongs_to_one :king
             has_one :harvest, autosave: true
           end
 
           class Harvest
             include Mongoid::Document
             field :season, type: String
-            belongs_to :peasant
+            belongs_to_one :peasant
           end
         end
 

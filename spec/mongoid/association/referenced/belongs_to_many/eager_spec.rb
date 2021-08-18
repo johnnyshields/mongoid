@@ -2,9 +2,9 @@
 # encoding: utf-8
 
 require "spec_helper"
-require_relative '../has_and_belongs_to_many_models'
+require_relative '../belongs_to_many_models'
 
-describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
+describe Mongoid::Association::Referenced::BelongsToMany::Eager do
 
   describe ".keys_from_docs" do
 
@@ -45,7 +45,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
       Person.create!(houses: 3.times.map { House.create! })
     end
 
-    context "when including the has_and_belongs_to_many association" do
+    context "when including the belongs_to_many association" do
       # Query count assertions require that all queries are sent using the
       # same connection object.
       require_no_multi_shard
@@ -144,7 +144,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
       end
     end
 
-    context "when all the values for the has_and_belongs_to_many association are empty" do
+    context "when all the values for the belongs_to_many association are empty" do
       # Query count assertions require that all queries are sent using the
       # same connection object.
       require_no_multi_shard

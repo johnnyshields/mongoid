@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 # encoding: utf-8
 
-require 'mongoid/association/referenced/has_and_belongs_to_many/binding'
-require 'mongoid/association/referenced/has_and_belongs_to_many/buildable'
-require 'mongoid/association/referenced/has_and_belongs_to_many/proxy'
-require 'mongoid/association/referenced/has_and_belongs_to_many/eager'
+require 'mongoid/association/referenced/belongs_to_many/binding'
+require 'mongoid/association/referenced/belongs_to_many/buildable'
+require 'mongoid/association/referenced/belongs_to_many/proxy'
+require 'mongoid/association/referenced/belongs_to_many/eager'
 
 module Mongoid
   module Association
     module Referenced
 
-      # The HasAndBelongsToMany type association.
+      # The BelongsToMany type association.
       #
       # @since 7.0
-      class HasAndBelongsToMany
+      class BelongsToMany
         include Relatable
         include Buildable
 
@@ -112,7 +112,7 @@ module Mongoid
 
         # Get the association proxy class for this association type.
         #
-        # @return [ Association::HasAndBelongsToMany::Proxy ] The proxy class.
+        # @return [ Association::BelongsToMany::Proxy ] The proxy class.
         #
         # @since 7.0
         def relation

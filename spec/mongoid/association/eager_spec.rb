@@ -23,7 +23,7 @@ describe Mongoid::Association::EagerLoadable do
 
     let(:doc) { criteria.first }
 
-    context "when belongs_to" do
+    context "when belongs_to_one" do
 
       let!(:account) do
         Account.create!(person: person, name: 'savings')
@@ -85,7 +85,7 @@ describe Mongoid::Association::EagerLoadable do
       end
     end
 
-    context "when has_and_belongs_to_many" do
+    context "when belongs_to_many" do
 
       let(:account) do
         Account.create!(name: 'savings')
@@ -180,8 +180,8 @@ describe Mongoid::Association::EagerLoadable do
         context.eager_load(docs)
       end
 
-      it "runs the has_and_belongs_to_many preload" do
-        expect(Mongoid::Association::Referenced::HasAndBelongsToMany::Eager).to receive(:new).with([houses_association], docs).once.and_call_original
+      it "runs the belongs_to_many preload" do
+        expect(Mongoid::Association::Referenced::BelongsToMany::Eager).to receive(:new).with([houses_association], docs).once.and_call_original
         context.eager_load(docs)
       end
 
@@ -198,14 +198,14 @@ describe Mongoid::Association::EagerLoadable do
 
           class Booking
             include Mongoid::Document
-            belongs_to :unit
+            belongs_to_one :unit
             has_many :vouchers
           end
 
           class Voucher
             include Mongoid::Document
-            belongs_to :booking
-            belongs_to :created_by, class_name: 'User'
+            belongs_to_one :booking
+            belongs_to_one :created_by, class_name: 'User'
           end
         end
 

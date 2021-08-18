@@ -42,8 +42,8 @@ module Mongoid
         embedded_in: Association::Embedded::EmbeddedIn,
         has_one: Association::Referenced::HasOne,
         has_many: Association::Referenced::HasMany,
-        has_and_belongs_to_many: Association::Referenced::HasAndBelongsToMany,
-        belongs_to: Association::Referenced::BelongsTo,
+        belongs_to_many: Association::Referenced::BelongsToMany,
+        belongs_to_one: Association::Referenced::BelongsToOne,
     }.freeze
 
     attr_accessor :_association

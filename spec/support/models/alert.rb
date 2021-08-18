@@ -4,7 +4,7 @@
 class Alert
   include Mongoid::Document
   field :message, type: String
-  belongs_to :account
+  belongs_to_one :account
   has_many :items
-  belongs_to :post
+  belongs_to_one :post
 end

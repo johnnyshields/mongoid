@@ -6,7 +6,7 @@ class Eye
 
   field :pupil_dilation, type: Integer
 
-  belongs_to :eyeable, polymorphic: true
+  belongs_to_one :eyeable, polymorphic: true
 
-  belongs_to :suspended_in, polymorphic: true
+  belongs_to_one :suspended_in, polymorphic: true
 end

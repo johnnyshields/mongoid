@@ -3,7 +3,7 @@
 
 require "spec_helper"
 
-describe Mongoid::Association::Referenced::HasAndBelongsToMany::Buildable do
+describe Mongoid::Association::Referenced::BelongsToMany::Buildable do
 
   let(:base) do
     double
@@ -20,7 +20,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Buildable do
     end
 
     let(:association) do
-      Mongoid::Association::Referenced::HasAndBelongsToMany.new(Person, :preferences, options)
+      Mongoid::Association::Referenced::BelongsToMany.new(Person, :preferences, options)
     end
 
     context "when provided ids" do

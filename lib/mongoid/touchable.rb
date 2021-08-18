@@ -7,7 +7,7 @@ module Mongoid
     module InstanceMethods
 
       # Touch the document, in effect updating its updated_at timestamp and
-      # optionally the provided field to the current time. If any belongs_to
+      # optionally the provided field to the current time. If any belongs_to_one
       # associations exist with a touch option, they will be updated as well.
       #
       # @example Update the updated_at timestamp.
@@ -84,7 +84,7 @@ module Mongoid
 
     private
 
-    # Define the method that will get called for touching belongs_to
+    # Define the method that will get called for touching belongs_to_one
     # associations.
     #
     # @api private

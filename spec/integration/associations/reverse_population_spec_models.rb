@@ -12,26 +12,26 @@ module ReversePopulationSpec
   class Email
     include Mongoid::Document
 
-    belongs_to :company, class_name: 'ReversePopulationSpec::Company'
+    belongs_to_one :company, class_name: 'ReversePopulationSpec::Company'
   end
 
   class Founder
     include Mongoid::Document
 
-    belongs_to :company, class_name: 'ReversePopulationSpec::Company'
+    belongs_to_one :company, class_name: 'ReversePopulationSpec::Company'
   end
 
   class Animal
     include Mongoid::Document
 
     field :a, type: String
-    has_and_belongs_to_many :zoos, class_name: 'ReversePopulationSpec::Zoo'
+    belongs_to_many :zoos, class_name: 'ReversePopulationSpec::Zoo'
   end
 
   class Zoo
     include Mongoid::Document
 
     field :z, type: String
-    has_and_belongs_to_many :animals, class_name: 'ReversePopulationSpec::Animal'
+    belongs_to_many :animals, class_name: 'ReversePopulationSpec::Animal'
   end
 end

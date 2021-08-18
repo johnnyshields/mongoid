@@ -38,7 +38,7 @@ album will remain in the database:
   class Album
     include Mongoid::Document
 
-    belongs_to :band
+    belongs_to_one :band
   end
   
   band = Band.create!

@@ -109,7 +109,7 @@ module Mongoid
         #
         #   class Game
         #     include Mongoid::Document
-        #     belongs_to :person
+        #     belongs_to_one :person
         #   end
         #
         #   class Person
@@ -120,9 +120,10 @@ module Mongoid
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
         # @param [ Proc ] block Optional block for defining extensions.
-        def belongs_to(name, options = {}, &block)
+        def belongs_to_one(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
+        alias :belongs_to :belongs_to_one
 
         # Adds a referenced association from a parent Document to many
         # Documents in another database or collection.
@@ -136,7 +137,7 @@ module Mongoid
         #
         #   class Game
         #     include Mongoid::Document
-        #     belongs_to :person
+        #     belongs_to_one :person
         #   end
         #
         # @param [ Symbol ] name The name of the association.
@@ -153,12 +154,12 @@ module Mongoid
         #
         #   class Person
         #     include Mongoid::Document
-        #     has_and_belongs_to_many :preferences
+        #     belongs_to_many :preferences
         #   end
         #
         #   class Preference
         #     include Mongoid::Document
-        #     has_and_belongs_to_many :people
+        #     belongs_to_many :people
         #   end
         #
         # @param [ Symbol ] name The name of the association.
@@ -166,9 +167,10 @@ module Mongoid
         # @param [ Proc ] block Optional block for defining extensions.
         #
         # @since 2.0.0.rc.1
-        def has_and_belongs_to_many(name, options = {}, &block)
+        def belongs_to_many(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
+        alias :has_and_belongs_to_many :belongs_to_one
 
         # Adds a referenced association from the child Document to a Document
         # in another database or collection.
@@ -177,7 +179,7 @@ module Mongoid
         #
         #   class Game
         #     include Mongoid::Document
-        #     belongs_to :person
+        #     belongs_to_one :person
         #   end
         #
         #   class Person

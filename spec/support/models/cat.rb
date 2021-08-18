@@ -6,6 +6,6 @@ class Cat
 
   field :name
 
-  belongs_to :person, primary_key: :username
+  belongs_to_one :person, primary_key: :username
 
 end

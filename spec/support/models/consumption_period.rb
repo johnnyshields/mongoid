@@ -4,7 +4,7 @@
 class ConsumptionPeriod
   include Mongoid::Document
 
-  belongs_to :account
+  belongs_to_one :account
 
   field :started_at, type: Time
 end

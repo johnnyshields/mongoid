@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 # encoding: utf-8
 
-require 'mongoid/association/referenced/belongs_to/binding'
-require 'mongoid/association/referenced/belongs_to/buildable'
-require 'mongoid/association/referenced/belongs_to/proxy'
-require 'mongoid/association/referenced/belongs_to/eager'
+require 'mongoid/association/referenced/belongs_to_one/binding'
+require 'mongoid/association/referenced/belongs_to_one/buildable'
+require 'mongoid/association/referenced/belongs_to_one/proxy'
+require 'mongoid/association/referenced/belongs_to_one/eager'
 
 module Mongoid
   module Association
     module Referenced
 
-      # The BelongsTo type association.
+      # The BelongsToOne type association.
       #
       # @since 7.0
-      class BelongsTo
+      class BelongsToOne
         include Relatable
         include Buildable
 
@@ -112,7 +112,7 @@ module Mongoid
 
         # Get the association proxy class for this association type.
         #
-        # @return [ Association::BelongsTo::Proxy ] The proxy class.
+        # @return [ Association::BelongsToOne::Proxy ] The proxy class.
         #
         # @since 7.0
         def relation
@@ -232,7 +232,7 @@ module Mongoid
         def require_association?
           required = @options[:required] if @options.key?(:required)
           required = !@options[:optional] if @options.key?(:optional) && required.nil?
-          required.nil? ? Mongoid.belongs_to_required_by_default : required
+          required.nil? ? Mongoid.belongs_to_one_required_by_default : required
         end
 
         def create_foreign_key_field!

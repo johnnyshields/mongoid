@@ -3,5 +3,5 @@
 
 class Explosion
   include Mongoid::Document
-  belongs_to :bomb
+  belongs_to_one :bomb
 end

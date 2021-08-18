@@ -5,7 +5,7 @@ class Server
   include Mongoid::Document
   field :name, type: String
   field :after, type: Mongoid::Boolean, default: false
-  belongs_to :node
+  belongs_to_one :node
   embeds_many :filesystems, validate: false
   accepts_nested_attributes_for :filesystems
   validates :name, presence: { allow_blank: false }

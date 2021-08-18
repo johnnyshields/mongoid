@@ -4,7 +4,7 @@
 module Mongoid
   module Association
     module Referenced
-      class BelongsTo
+      class BelongsToOne
 
         # This class handles all behavior for associations that are either
         # one-to-many or one-to-one, where the foreign key is stored on this side
@@ -13,10 +13,10 @@ module Mongoid
         class Proxy < Association::One
           include Evolvable
 
-          # Instantiate a new belongs_to association proxy.
+          # Instantiate a new belongs_to_one association proxy.
           #
           # @example Create the new proxy.
-          #   Association::BelongsTo::Proxy.new(game, person, association)
+          #   Association::BelongsToOne::Proxy.new(game, person, association)
           #
           # @param [ Document ] base The document this association hangs off of.
           # @param [ Document, Array<Document> ] target The target (parent) of the
@@ -72,7 +72,7 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def binding
-            BelongsTo::Binding.new(_base, _target, _association)
+            BelongsToOne::Binding.new(_base, _target, _association)
           end
 
           # Normalize the value provided as a replacement for substitution.
@@ -122,7 +122,7 @@ module Mongoid
             # always false.
             #
             # @example Is this association embedded?
-            #   Association::BelongsTo::Proxy.embedded?
+            #   Association::BelongsToOne::Proxy.embedded?
             #
             # @return [ false ] Always false.
             #

@@ -7,18 +7,18 @@ describe Mongoid::Association::Options do
 
   STORES_FOREIGN_KEY =
     [
-      Mongoid::Association::Referenced::HasAndBelongsToMany,
-      Mongoid::Association::Referenced::BelongsTo
+      Mongoid::Association::Referenced::BelongsToMany,
+      Mongoid::Association::Referenced::BelongsToOne
     ]
 
   [
     Mongoid::Association::Embedded::EmbeddedIn,
     Mongoid::Association::Embedded::EmbedsMany,
     Mongoid::Association::Embedded::EmbedsOne,
-    Mongoid::Association::Referenced::BelongsTo,
+    Mongoid::Association::Referenced::BelongsToOne,
     Mongoid::Association::Referenced::HasMany,
     Mongoid::Association::Referenced::HasOne,
-    Mongoid::Association::Referenced::HasAndBelongsToMany
+    Mongoid::Association::Referenced::BelongsToMany
   ].each do |association_class|
 
     context "when the association type is #{association_class}" do

@@ -6,5 +6,5 @@ class Ghost
 
   field :name, type: String
 
-  belongs_to :movie, autosave: true
+  belongs_to_one :movie, autosave: true
 end

@@ -4,9 +4,9 @@
 module Mongoid
   module Association
     module Referenced
-      class HasAndBelongsToMany
+      class BelongsToMany
 
-        # The Builder behavior for has_and_belongs_to_many associations.
+        # The Builder behavior for belongs_to_many associations.
         #
         # @since 7.0
         module Buildable

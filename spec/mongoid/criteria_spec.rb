@@ -1331,7 +1331,7 @@ describe Mongoid::Criteria do
         end
 
         class B < A
-          belongs_to :c
+          belongs_to_one :c
         end
 
         class C
@@ -1388,11 +1388,11 @@ describe Mongoid::Criteria do
           end
 
           class B < A
-            belongs_to :d
+            belongs_to_one :d
           end
 
           class C < A
-            belongs_to :d
+            belongs_to_one :d
           end
 
           class D
@@ -1459,11 +1459,11 @@ describe Mongoid::Criteria do
           end
 
           class B < A
-            belongs_to :d
+            belongs_to_one :d
           end
 
           class C < A
-            belongs_to :d
+            belongs_to_one :d
           end
 
           class D

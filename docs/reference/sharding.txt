@@ -65,7 +65,7 @@ be specified:
 
   shard_key :ssn, :country
 
-``shard_key`` macro can take the name of a ``belongs_to`` association in
+``shard_key`` macro can take the name of a ``belongs_to_one`` association in
 place of a field name, in which case Mongoid will use the foreign key
 configured in the association as the field name:
 
@@ -74,7 +74,7 @@ configured in the association as the field name:
   class Person
     include Mongoid::Document
 
-    belongs_to :country
+    belongs_to_one :country
 
     # Shards by country_id.
     shard_key country: 1

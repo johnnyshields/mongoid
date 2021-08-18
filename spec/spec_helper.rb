@@ -73,7 +73,7 @@ CONFIG = {
     }
   },
   options: {
-    belongs_to_required_by_default: false,
+    belongs_to_one_required_by_default: false,
     log_level: if SpecConfig.instance.client_debug?
       :debug
     else

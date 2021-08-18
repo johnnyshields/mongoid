@@ -8,12 +8,12 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   before :all do
     Mongoid.raise_not_found_error = true
 
-    Drug.belongs_to :person, primary_key: :username
+    Drug.belongs_to_one :person, primary_key: :username
     Person.has_many :drugs, validate: false, primary_key: :username
   end
 
   after :all do
-    Drug.belongs_to :person, counter_cache: true
+    Drug.belongs_to_one :person, counter_cache: true
     Person.has_many :drugs, validate: false
   end
 

@@ -3,7 +3,7 @@
 
 require "spec_helper"
 
-describe Mongoid::Association::Referenced::BelongsTo::Proxy do
+describe Mongoid::Association::Referenced::BelongsToOne::Proxy do
 
   before(:all) do
     Person.reset_callbacks(:validate)
@@ -498,14 +498,14 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
         end
 
         before do
-          Account.belongs_to :person, dependent: :destroy
+          Account.belongs_to_one :person, dependent: :destroy
           Person.has_one :account
           person.account = account
           person.save
         end
 
         after :all do
-          Account.belongs_to :person, dependent: :nullify
+          Account.belongs_to_one :person, dependent: :nullify
           Person.has_one :account, validate: false
         end
 
@@ -549,14 +549,14 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
         end
 
         before do
-          Drug.belongs_to :person, dependent: :destroy
+          Drug.belongs_to_one :person, dependent: :destroy
           Person.has_many :drugs
           person.drugs = [drug]
           person.save
         end
 
         after :all do
-          Drug.belongs_to :person, dependent: :nullify
+          Drug.belongs_to_one :person, dependent: :nullify
           Person.has_many :drugs, validate: false
         end
 
@@ -604,14 +604,14 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
         end
 
         before do
-          Account.belongs_to :person, dependent: :delete_all
+          Account.belongs_to_one :person, dependent: :delete_all
           Person.has_one :account
           person.account = account
           person.save
         end
 
         after :all do
-          Account.belongs_to :person, dependent: :nullify
+          Account.belongs_to_one :person, dependent: :nullify
           Person.has_one :account, validate: false
         end
 
@@ -644,14 +644,14 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
         end
 
         before do
-          Drug.belongs_to :person, dependent: :delete_all
+          Drug.belongs_to_one :person, dependent: :delete_all
           Person.has_many :drugs
           person.drugs = [drug]
           person.save
         end
 
         after :all do
-          Drug.belongs_to :person, dependent: :nullify
+          Drug.belongs_to_one :person, dependent: :nullify
           Person.has_many :drugs, validate: false
         end
 
@@ -699,7 +699,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
         end
 
         before do
-          Account.belongs_to :person, dependent: :nullify
+          Account.belongs_to_one :person, dependent: :nullify
           Person.has_one :account
           person.account = account
           person.save
@@ -738,7 +738,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
         end
 
         before do
-          Drug.belongs_to :person, dependent: :nullify
+          Drug.belongs_to_one :person, dependent: :nullify
           Person.has_many :drugs
           person.drugs = [drug]
           person.save
@@ -1103,8 +1103,8 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
 
       class B
         include Mongoid::Document
-        belongs_to :a, inverse_of: :bs
-        belongs_to :c, inverse_of: :b
+        belongs_to_one :a, inverse_of: :bs
+        belongs_to_one :c, inverse_of: :b
       end
 
       class C

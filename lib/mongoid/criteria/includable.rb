@@ -12,7 +12,7 @@ module Mongoid
       # ids.
       #
       # @note This will work for embedded associations that reference another
-      #   collection via belongs_to as well.
+      #   collection via belongs_to_one as well.
       #
       # @note Eager loading brings all the documents into memory, so there is a
       #   sweet spot on the performance gains. Internal benchmarks show that

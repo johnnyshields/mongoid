@@ -16,7 +16,7 @@ module ForeignKeySpec
     include Mongoid::Document
 
     field :c_ref, type: String
-    belongs_to :company, class_name: 'ForeignKeySpec::Company',
+    belongs_to_one :company, class_name: 'ForeignKeySpec::Company',
       foreign_key: 'c_ref', primary_key: 'c'
   end
 
@@ -24,7 +24,7 @@ module ForeignKeySpec
     include Mongoid::Document
 
     field :c_ref, type: String
-    belongs_to :company, class_name: 'ForeignKeySpec::Company',
+    belongs_to_one :company, class_name: 'ForeignKeySpec::Company',
       foreign_key: 'c_ref', primary_key: 'c'
   end
 
@@ -32,7 +32,7 @@ module ForeignKeySpec
     include Mongoid::Document
 
     field :a, type: String
-    has_and_belongs_to_many :zoos, class_name: 'ForeignKeySpec::Zoo',
+    belongs_to_many :zoos, class_name: 'ForeignKeySpec::Zoo',
       foreign_key: 'z_refs', primary_key: 'z'
   end
 
@@ -40,7 +40,7 @@ module ForeignKeySpec
     include Mongoid::Document
 
     field :z, type: String
-    has_and_belongs_to_many :animals, class_name: 'ForeignKeySpec::Animal',
+    belongs_to_many :animals, class_name: 'ForeignKeySpec::Animal',
       foreign_key: 'a_refs', primary_key: 'a'
   end
 
@@ -56,7 +56,7 @@ module ForeignKeySpec
     include Mongoid::Document
 
     field :c_ref, type: String
-    belongs_to :company, class_name: 'ForeignKeySpec::ScopedCompany',
+    belongs_to_one :company, class_name: 'ForeignKeySpec::ScopedCompany',
       foreign_key: 'c_ref', primary_key: 'c'
 
     field :s, type: String

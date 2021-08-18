@@ -27,7 +27,7 @@ To enable this for an association, simply provide the association name to the
    class Band
      include Mongoid::Document
      embeds_many :albums
-     belongs_to :producer
+     belongs_to_one :producer
      accepts_nested_attributes_for :albums, :producer
    end
 

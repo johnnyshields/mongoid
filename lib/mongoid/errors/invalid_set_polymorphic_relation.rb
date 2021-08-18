@@ -19,7 +19,7 @@ module Mongoid
     #   class Eye
     #     include Mongoid::Document
     #
-    #     belongs_to :eyeable, polymorphic: true
+    #     belongs_to_one :eyeable, polymorphic: true
     #   end
     #
     #   eye = Eye.new

@@ -3,7 +3,7 @@
 
 require "spec_helper"
 
-describe Mongoid::Association::Referenced::HasAndBelongsToMany do
+describe Mongoid::Association::Referenced::BelongsToMany do
 
   before do
     class HasManyLeftObject; include Mongoid::Document; end
@@ -24,7 +24,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
   end
 
   let(:association) do
-    has_many_left_class.has_and_belongs_to_many name, options
+    has_many_left_class.belongs_to_many name, options
   end
 
   let(:options) do
@@ -35,7 +35,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
     let(:expected_complements) do
       [
-          Mongoid::Association::Referenced::HasAndBelongsToMany,
+          Mongoid::Association::Referenced::BelongsToMany,
       ]
     end
 
@@ -122,7 +122,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
       let(:association) do
         # Note that it is necessary to create the association directly, otherwise the
-        # setup! method will be called by the :has_and_belongs_to_many macro
+        # setup! method will be called by the :belongs_to_many macro
         described_class.new(has_many_left_class, name, options)
       end
 
@@ -213,7 +213,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to_one macro
             described_class.new(has_many_left_class, name, options)
           end
 
@@ -233,7 +233,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to_one macro
             described_class.new(has_many_left_class, name, options)
           end
 
@@ -253,7 +253,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to_one macro
             described_class.new(has_many_left_class, name, options)
           end
 
@@ -273,7 +273,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to_one macro
             described_class.new(has_many_left_class, name, options)
           end
 
@@ -293,7 +293,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to_one macro
             described_class.new(has_many_left_class, name, options)
           end
 
@@ -427,8 +427,8 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
   describe '#relation' do
 
-    it 'returns Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy' do
-      expect(association.relation).to be(Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy)
+    it 'returns Mongoid::Association::Referenced::BelongsToMany::Proxy' do
+      expect(association.relation).to be(Mongoid::Association::Referenced::BelongsToMany::Proxy)
     end
   end
 
@@ -532,7 +532,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
   describe '#inverses' do
 
     before do
-      HasManyRightObject.has_and_belongs_to_many :has_many_left_objects
+      HasManyRightObject.belongs_to_many :has_many_left_objects
     end
 
     context 'when inverse_of is specified' do
@@ -564,7 +564,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
   describe '##inverse' do
 
       before do
-        HasManyRightObject.has_and_belongs_to_many :has_many_left_objects
+        HasManyRightObject.belongs_to_many :has_many_left_objects
       end
 
       context 'when inverse_of is specified' do
@@ -831,7 +831,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
     context 'when an inverse can be determined' do
 
       before do
-        HasManyRightObject.has_and_belongs_to_many :has_many_left_objects
+        HasManyRightObject.belongs_to_many :has_many_left_objects
       end
 
       it 'returns the name of the inverse followed by =' do
@@ -852,7 +852,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
     context 'when a block is passed' do
 
       let(:association) do
-        has_many_left_class.has_and_belongs_to_many name, options do; end
+        has_many_left_class.belongs_to_many name, options do; end
       end
 
       it 'defines an extension module' do
@@ -1005,11 +1005,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
     before do
       association
-      HasManyRightObject.has_and_belongs_to_many :has_many_left_objects
+      HasManyRightObject.belongs_to_many :has_many_left_objects
     end
 
     it 'returns an the target' do
-      expect(Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy).to receive(:new).and_call_original
+      expect(Mongoid::Association::Referenced::BelongsToMany::Proxy).to receive(:new).and_call_original
       expect(association.create_relation(left_object, target)).to be_a(Array)
     end
   end

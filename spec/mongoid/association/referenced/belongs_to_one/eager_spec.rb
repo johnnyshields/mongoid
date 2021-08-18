@@ -4,7 +4,7 @@
 require "spec_helper"
 require_relative '../has_many_models'
 
-describe Mongoid::Association::Referenced::BelongsTo::Eager do
+describe Mongoid::Association::Referenced::BelongsToOne::Eager do
 
   describe ".grouped_docs" do
 
@@ -77,7 +77,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
       3.times { |i| Account.create!(person: person, name: "savings#{i}") }
     end
 
-    context "when including the belongs_to association" do
+    context "when including the belongs_to_one association" do
       # Query count assertions require that all queries are sent using the
       # same connection object.
       require_no_multi_shard
@@ -226,7 +226,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
         end
 
         let!(:pull_request) do
-          Coding::PullRequest.create(title: "Add eager loading for polymorphic belongs_to associations")
+          Coding::PullRequest.create(title: "Add eager loading for polymorphic belongs_to_one associations")
         end
 
         let(:pull_request_review) do
@@ -353,7 +353,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
       end
     end
 
-    context "when all the values for the belongs_to association are nil" do
+    context "when all the values for the belongs_to_one association are nil" do
       # Query count assertions require that all queries are sent using the
       # same connection object.
       require_no_multi_shard

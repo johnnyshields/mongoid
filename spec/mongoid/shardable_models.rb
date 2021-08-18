@@ -41,7 +41,7 @@ end
 class SmDirector
   include Mongoid::Document
 
-  belongs_to :agency
+  belongs_to_one :agency
 
   index age: 1
   shard_key :agency
@@ -50,7 +50,7 @@ end
 class SmDriver
   include Mongoid::Document
 
-  belongs_to :agency
+  belongs_to_one :agency
 
   index age: 1, agency: 1
   shard_key age: 1, agency: :hashed

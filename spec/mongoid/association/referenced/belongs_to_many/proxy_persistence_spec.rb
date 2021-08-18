@@ -2,9 +2,9 @@
 # encoding: utf-8
 
 require "spec_helper"
-require_relative '../has_and_belongs_to_many_models'
+require_relative '../belongs_to_many_models'
 
-describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
+describe Mongoid::Association::Referenced::BelongsToMany::Proxy do
   context 'with primary_key and foreign_key given' do
     let(:company) { HabtmmCompany.create!(c_id: 123) }
     let(:employee) { HabtmmEmployee.create!(e_id: 456) }

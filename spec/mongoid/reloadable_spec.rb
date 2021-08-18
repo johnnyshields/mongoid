@@ -312,7 +312,7 @@ describe Mongoid::Reloadable do
         end
       end
 
-      context "for a belongs_to" do
+      context "for a belongs_to_one" do
 
         context "when the relation type does not change" do
 

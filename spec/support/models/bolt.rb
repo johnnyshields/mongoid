@@ -4,5 +4,5 @@
 class Bolt
   include Mongoid::Document
 
-  belongs_to :hole
+  belongs_to_one :hole
 end
