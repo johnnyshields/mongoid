@@ -202,9 +202,8 @@ describe Mongoid::Contextual::Aggregable::Memory do
         end
 
         it "coerces types to calculate max" do
-          puts max.inspect
           expect(max).to eq 11
-          expect(max).to be_a BigDecimal
+          expect(max).to be_a Float # BigDecimal stored as String
         end
       end
 
