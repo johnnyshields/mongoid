@@ -5,291 +5,466 @@ require "spec_helper"
 
 describe Mongoid::Contextual::Aggregable::Memory do
 
+  let(:context) do
+    Mongoid::Contextual::Memory.new(criteria)
+  end
+
   describe "#avg" do
 
-    context "when provided a single field" do
+    context "when the types are Integers" do
 
-      context "when there are matching documents" do
+      let!(:depeche) do
+        Band.create!(name: "Depeche Mode", likes: 1000)
+      end
 
-        context "when the types are integers" do
+      let!(:tool) do
+        Band.create!(name: "Tool", likes: 500)
+      end
 
-          let!(:depeche) do
-            Band.create(name: "Depeche Mode", likes: 1000)
-          end
-
-          let!(:tool) do
-            Band.create(name: "Tool", likes: 500)
-          end
-
-          let(:criteria) do
-            Band.all.tap do |criteria|
-              criteria.documents = [ depeche, tool ]
-            end
-          end
-
-          let(:context) do
-            Mongoid::Contextual::Memory.new(criteria)
-          end
-
-          let(:avg) do
-            context.avg(:likes)
-          end
-
-          it "returns the avg of the provided field" do
-            expect(avg).to eq(750)
-          end
-        end
-
-        context "when the types are floats" do
-
-          let!(:depeche) do
-            Band.create(name: "Depeche Mode", rating: 10)
-          end
-
-          let!(:tool) do
-            Band.create(name: "Tool", rating: 5)
-          end
-
-          let(:criteria) do
-            Band.all.tap do |criteria|
-              criteria.documents = [ depeche, tool ]
-            end
-          end
-
-          let(:context) do
-            Mongoid::Contextual::Memory.new(criteria)
-          end
-
-          let(:avg) do
-            context.avg(:rating)
-          end
-
-          it "returns the avg of the provided field" do
-            expect(avg).to eq(7.5)
-          end
+      let(:criteria) do
+        Band.all.tap do |criteria|
+          criteria.documents = [ depeche, tool ]
         end
       end
 
-      context "when no documents match" do
+      let(:avg) do
+        context.avg(:likes)
+      end
 
-        let!(:depeche) do
-          Band.create(name: "Depeche Mode", likes: 1000)
-        end
+      it "returns the avg of the provided field" do
+        expect(avg).to eq(750)
+      end
+    end
 
-        let(:criteria) do
-          Band.where(name: "New Order")
-        end
+    context "when the types are Floats" do
 
-        let(:context) do
-          Mongoid::Contextual::Memory.new(criteria)
-        end
+      let!(:depeche) do
+        Band.create!(name: "Depeche Mode", rating: 10)
+      end
 
-        let(:avg) do
-          context.avg(:likes)
-        end
+      let!(:tool) do
+        Band.create!(name: "Tool", rating: 5)
+      end
 
-        it "returns nil" do
-          expect(avg).to be_nil
+      let(:criteria) do
+        Band.all.tap do |criteria|
+          criteria.documents = [ depeche, tool ]
         end
+      end
+
+      let(:avg) do
+        context.avg(:rating)
+      end
+
+      it "returns the avg of the provided field" do
+        expect(avg).to eq(7.5)
+      end
+    end
+
+    context "when no documents match" do
+
+      let!(:depeche) do
+        Band.create!(name: "Depeche Mode", likes: 1000)
+      end
+
+      let(:criteria) do
+        Band.where(name: "New Order")
+      end
+
+      let(:avg) do
+        context.avg(:likes)
+      end
+
+      it "returns nil" do
+        expect(avg).to be_nil
+      end
+    end
+
+    context "when there are a mix of types" do
+
+      let!(:bands) do
+        [ Band.create!(name: "The Flaming Lips", mojo: 7.7),
+          Band.create!(name: "Spinal Tap", mojo: BigDecimal('11')),
+          Band.create!(name: "Spirit of the Beehive", mojo: 10),
+          Band.create!(name: "Burning Spear", mojo: '7.3'),
+          Band.create!(name: "Justin Bieber", mojo: nil),
+          Band.create!(name: "Alex G", mojo: "string") ]
+      end
+
+      let(:criteria) do
+        Band.all.tap do |criteria|
+          criteria.documents = bands
+        end
+      end
+
+      let(:avg) do
+        context.avg(:mojo)
+      end
+
+      it "coerces types to calculate avg" do
+        expect(avg).to eq(9.0)
+      end
+
+      it "database only averages Float and Integer types" do
+        expect(Band.all.avg(:mojo)).to eq(8.85)
+      end
+    end
+
+    context "when there no numeric values" do
+
+      let!(:bands) do
+        [ Band.create!(name: "Sheena Easton", mojo: 9..5),
+          Band.create!(name: "Justin Bieber", mojo: nil),
+          Band.create!(name: "The Beatles", mojo: Date.yesterday),
+          Band.create!(name: "Alex G", mojo: "string") ]
+      end
+
+      let(:criteria) do
+        Band.all.tap do |criteria|
+          criteria.documents = bands
+        end
+      end
+
+      let(:avg) do
+        context.avg(:mojo)
+      end
+
+      it "returns avg as nil" do
+        expect(avg).to be_nil
+      end
+
+      it "database returns avg as nil" do
+        expect(Band.all.avg(:mojo)).to eq(nil)
       end
     end
   end
 
   describe "#max" do
 
-    context "when provided a single field" do
+    let!(:depeche) do
+      Band.create!(name: "Depeche Mode", likes: 1000)
+    end
 
-      let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+    let!(:tool) do
+      Band.create!(name: "Tool", likes: 500)
+    end
+
+    let(:criteria) do
+      Band.all.tap do |crit|
+        crit.documents = [ depeche, tool ]
+      end
+    end
+
+    context "when provided a Symbol" do
+
+      let(:max) do
+        context.max(:likes)
       end
 
-      let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+      it "returns the max of the provided field" do
+        expect(max).to eq(1000)
       end
 
-      let(:criteria) do
-        Band.all.tap do |crit|
-          crit.documents = [ depeche, tool ]
+      context "when no documents match" do
+
+        let(:criteria) do
+          Band.where(name: "New Order")
         end
-      end
-
-      let(:context) do
-        Mongoid::Contextual::Memory.new(criteria)
-      end
-
-      context "when provided a symbol" do
 
         let(:max) do
           context.max(:likes)
         end
 
-        it "returns the max of the provided field" do
-          expect(max).to eq(1000)
-        end
-
-        context "when no documents match" do
-
-          let(:criteria) do
-            Band.where(name: "New Order")
-          end
-
-          let(:context) do
-            Mongoid::Contextual::Memory.new(criteria)
-          end
-
-          let(:max) do
-            context.max(:likes)
-          end
-
-          it "returns nil" do
-            expect(max).to be_nil
-          end
+        it "returns nil" do
+          expect(max).to be_nil
         end
       end
 
-      context "when provided a block" do
+      context "when there are a mix of types" do
 
-        let(:max) do
-          context.max do |a, b|
-            a.likes <=> b.likes
+        let!(:bands) do
+          [ Band.create!(name: "The Flaming Lips", mojo: 7.7),
+            Band.create!(name: "Spinal Tap", mojo: BigDecimal('11')),
+            Band.create!(name: "Spirit of the Beehive", mojo: 10),
+            Band.create!(name: "Burning Spear", mojo: '7.3'),
+            Band.create!(name: "Justin Bieber", mojo: nil),
+            Band.create!(name: "Alex G", mojo: "string") ]
+        end
+
+        let(:criteria) do
+          Band.all.tap do |criteria|
+            criteria.documents = bands
           end
         end
 
-        it "returns the document with the max value for the field" do
-          expect(max).to eq(depeche)
+        let(:max) do
+          context.max(:mojo)
         end
+
+        it "coerces types to calculate max" do
+          puts max.inspect
+          expect(max).to eq 11
+          expect(max).to be_a BigDecimal
+        end
+      end
+
+      context "when there no numeric values" do
+
+        let!(:bands) do
+          [ Band.create!(name: "Sheena Easton", mojo: 9..5),
+            Band.create!(name: "Justin Bieber", mojo: nil),
+            Band.create!(name: "The Beatles", mojo: Date.yesterday),
+            Band.create!(name: "Alex G", mojo: "string") ]
+        end
+
+        let(:criteria) do
+          Band.all.tap do |criteria|
+            criteria.documents = bands
+          end
+        end
+
+        let(:max) do
+          context.avg(:mojo)
+        end
+
+        it "returns max as nil" do
+          expect(max).to be_nil
+        end
+      end
+    end
+
+    context "when provided a block" do
+
+      let(:max) do
+        context.max do |a, b|
+          a.likes <=> b.likes
+        end
+      end
+
+      it "returns the document with the max value for the field" do
+        expect(max).to eq(depeche)
       end
     end
   end
 
   describe "#min" do
 
-    context "when provided a single field" do
+    let!(:depeche) do
+      Band.create!(name: "Depeche Mode", likes: 1000)
+    end
 
-      let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+    let!(:tool) do
+      Band.create!(name: "Tool", likes: 500)
+    end
+
+    let(:criteria) do
+      Band.all.tap do |crit|
+        crit.documents = [ depeche, tool ]
+      end
+    end
+
+    context "when provided a Symbol" do
+
+      let(:min) do
+        context.min(:likes)
       end
 
-      let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+      it "returns the min of the provided field" do
+        expect(min).to eq(500)
       end
 
-      let(:criteria) do
-        Band.all.tap do |crit|
-          crit.documents = [ depeche, tool ]
+      context "when no documents match" do
+
+        let(:criteria) do
+          Band.where(name: "New Order")
         end
-      end
-
-      let(:context) do
-        Mongoid::Contextual::Memory.new(criteria)
-      end
-
-      context "when provided a symbol" do
 
         let(:min) do
           context.min(:likes)
         end
 
-        it "returns the min of the provided field" do
-          expect(min).to eq(500)
-        end
-
-        context "when no documents match" do
-
-          let(:criteria) do
-            Band.where(name: "New Order")
-          end
-
-          let(:context) do
-            Mongoid::Contextual::Memory.new(criteria)
-          end
-
-          let(:min) do
-            context.min(:likes)
-          end
-
-          it "returns nil" do
-            expect(min).to be_nil
-          end
+        it "returns nil" do
+          expect(min).to be_nil
         end
       end
 
-      context "when provided a block" do
+      context "when there are a mix of types" do
 
-        let(:min) do
-          context.min do |a, b|
-            a.likes <=> b.likes
+        let!(:bands) do
+          [ Band.create!(name: "The Flaming Lips", mojo: 7.7),
+            Band.create!(name: "Spinal Tap", mojo: BigDecimal('11')),
+            Band.create!(name: "Spirit of the Beehive", mojo: 10),
+            Band.create!(name: "Burning Spear", mojo: '7.3'),
+            Band.create!(name: "Justin Bieber", mojo: nil),
+            Band.create!(name: "Alex G", mojo: "string") ]
+        end
+
+        let(:criteria) do
+          Band.all.tap do |criteria|
+            criteria.documents = bands
           end
         end
 
-        it "returns the document with the min value for the field" do
-          expect(min).to eq(tool)
+        let(:min) do
+          context.min(:mojo)
         end
+
+        it "coerces types to calculate min" do
+          expect(min).to eq 7.3
+          expect(min).to be_a Float
+        end
+      end
+
+      context "when there no numeric values" do
+
+        let!(:bands) do
+          [ Band.create!(name: "Sheena Easton", mojo: 9..5),
+            Band.create!(name: "Justin Bieber", mojo: nil),
+            Band.create!(name: "The Beatles", mojo: Date.yesterday),
+            Band.create!(name: "Alex G", mojo: "string") ]
+        end
+
+        let(:criteria) do
+          Band.all.tap do |criteria|
+            criteria.documents = bands
+          end
+        end
+
+        let(:min) do
+          context.min(:mojo)
+        end
+
+        it "returns min as nil" do
+          expect(min).to be_nil
+        end
+      end
+    end
+
+    context "when provided a block" do
+
+      let(:min) do
+        context.min do |a, b|
+          a.likes <=> b.likes
+        end
+      end
+
+      it "returns the document with the min value for the field" do
+        expect(min).to eq(tool)
       end
     end
   end
 
   describe "#sum" do
 
-    context "when provided a single field" do
+    let!(:depeche) do
+      Band.create!(name: "Depeche Mode", likes: 1000)
+    end
 
-      let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+    let!(:tool) do
+      Band.create!(name: "Tool", likes: 500)
+    end
+
+    let(:criteria) do
+      Band.all.tap do |crit|
+        crit.documents = [ depeche, tool ]
+      end
+    end
+
+    context "when provided a Symbol" do
+
+      let(:sum) do
+        context.sum(:likes)
       end
 
-      let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+      it "returns the sum of the provided field" do
+        expect(sum).to eq(1500)
       end
 
-      let(:criteria) do
-        Band.all.tap do |crit|
-          crit.documents = [ depeche, tool ]
+      context "when no documents match" do
+
+        let(:criteria) do
+          Band.where(name: "New Order")
         end
-      end
-
-      let(:context) do
-        Mongoid::Contextual::Memory.new(criteria)
-      end
-
-      context "when provided a symbol" do
 
         let(:sum) do
           context.sum(:likes)
         end
 
-        it "returns the sum of the provided field" do
-          expect(sum).to eq(1500)
-        end
-
-        context "when no documents match" do
-
-          let(:criteria) do
-            Band.where(name: "New Order")
-          end
-
-          let(:context) do
-            Mongoid::Contextual::Memory.new(criteria)
-          end
-
-          let(:sum) do
-            context.sum(:likes)
-          end
-
-          it "returns zero" do
-            expect(sum).to eq(0)
-          end
+        it "returns zero" do
+          expect(sum).to eq(0)
         end
       end
 
-      context "when provided a block" do
+      context "when there are a mix of types" do
+
+        let!(:bands) do
+          [ Band.create!(name: "The Flaming Lips", mojo: 7.7),
+            Band.create!(name: "Spinal Tap", mojo: BigDecimal('11')),
+            Band.create!(name: "Spirit of the Beehive", mojo: 10),
+            Band.create!(name: "Burning Spear", mojo: '7.3'),
+            Band.create!(name: "Justin Bieber", mojo: nil),
+            Band.create!(name: "Sheena Easton", mojo: 9..5),
+            Band.create!(name: "The Beatles", mojo: Date.yesterday),
+            Band.create!(name: "Alex G", mojo: "string") ]
+        end
+
+        let(:criteria) do
+          Band.all.tap do |criteria|
+            criteria.documents = bands
+          end
+        end
 
         let(:sum) do
-          context.sum(&:likes)
+          context.sum(:mojo)
         end
 
-        it "returns the sum for the provided block" do
-          expect(sum).to eq(1500)
+        it "coerces types to calculate sum" do
+          expect(sum).to eq 36
+          expect(sum).to be_a Float
         end
+
+        it "database only sums Float and Integer types" do
+          expect(Band.all.sum(:mojo)).to eq(17.7)
+        end
+      end
+
+      context "when there no numeric values" do
+
+        let!(:bands) do
+          [ Band.create!(name: "Sheena Easton", mojo: 9..5),
+            Band.create!(name: "Justin Bieber", mojo: nil),
+            Band.create!(name: "The Beatles", mojo: Date.yesterday),
+            Band.create!(name: "Alex G", mojo: "string") ]
+        end
+
+        let(:criteria) do
+          Band.all.tap do |criteria|
+            criteria.documents = bands
+          end
+        end
+
+        let(:sum) do
+          context.sum(:mojo)
+        end
+
+        it "returns sum as zero" do
+          expect(sum).to eq 0
+        end
+
+        it "database returns sum as zero" do
+          expect(Band.all.sum(:mojo)).to eq(0)
+        end
+      end
+    end
+
+    context "when provided a block" do
+
+      let(:sum) do
+        context.sum(&:likes)
+      end
+
+      it "returns the sum for the provided block" do
+        expect(sum).to eq(1500)
       end
     end
   end
