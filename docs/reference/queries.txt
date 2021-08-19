@@ -1472,192 +1472,6 @@ nonexistent field ``deregistered_at`` the date was interpreted to be in UTC
 and converted to a time, matching the behavior of querying a ``Date`` field.
 
 
-Queries + Persistence
-=====================
-
-Mongoid supports persistence operations off of criteria
-in a light capacity for when you want to expressively perform multi
-document inserts, updates, and deletion.
-
-.. warning::
-
-  Criteria ordering and pagination conditions, including ``order``, ``limit``,
-  ``offset``, and ``batch_size``, will be ignored on the following operations.
-
-.. list-table::
-   :header-rows: 1
-   :widths: 30 60
-
-   * - Operation
-     - Example
-
-   * - ``Criteria#create``
-
-       *Create a newly persisted document.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").create
-
-   * - ``Criteria#create!``
-
-       *Create a newly persisted document and raise an exception on validation failure.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").create!
-
-   * - ``Criteria#build|new``
-
-       *Create a new (unsaved) document.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").build
-          Band.where(name: "Photek").new
-
-   * - ``Criteria#update``
-
-       *Update attributes of the first matching document.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").update(label: "Mute")
-
-   * - ``Criteria#update_all``
-
-       *Update attributes of all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(members: 2).update_all(label: "Mute")
-
-   * - ``Criteria#add_to_set``
-
-       *Perform an $addToSet on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").add_to_set(label: "Mute")
-
-   * - ``Criteria#bit``
-
-       *Perform a $bit on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").bit(likes: { and: 14, or: 4 })
-
-   * - ``Criteria#inc``
-
-       *Perform an $inc on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").inc(likes: 123)
-
-   * - ``Criteria#pop``
-
-       *Perform a $pop on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").pop(members: -1)
-          Band.where(name: "Photek").pop(members: 1)
-
-   * - ``Criteria#pull``
-
-       *Perform a $pull on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").pull(members: "Maynard")
-
-   * - ``Criteria#pull_all``
-
-       *Perform a $pullAll on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").
-            pull_all(:members, [ "Maynard", "Danny" ])
-
-   * - ``Criteria#push``
-
-       *Perform a $push on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").push(members: "Maynard")
-
-   * - ``Criteria#push_all``
-
-       *Perform a $push with $each on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").
-            push_all(members: [ "Maynard", "Danny" ])
-
-   * - ``Criteria#rename``
-
-       *Perform a $rename on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").rename(name: :title)
-
-   * - ``Criteria#set``
-
-       *Perform a $set on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").set(likes: 10000)
-
-   * - ``Criteria#unset``
-
-       *Perform a $unset on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").unset(:likes)
-
-   * - ``Criteria#delete``
-
-       *Deletes all matching documents in the database.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(label: "Mute").delete
-
-   * - ``Criteria#destroy``
-
-       *Deletes all matching documents in the database while running callbacks for all.
-       This loads all documents into memory and can be an expensive operation.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(label: "Mute").destroy
-
 Scoping
 =======
 
@@ -1855,7 +1669,6 @@ that would affect its visibility within the scoped association.
   label.bands # [ band ] Must reload.
   label.reload.bands # []
 
-
 Class Methods
 -------------
 
@@ -1876,6 +1689,193 @@ treated like scopes, and can be chained as well.
 
   Band.active
 
+
+Queries + Persistence
+=====================
+
+Mongoid supports persistence operations off of criteria
+in a light capacity for when you want to expressively perform multi
+document inserts, updates, and deletion.
+
+.. warning::
+
+  Criteria ordering and pagination conditions, including ``order``, ``limit``,
+  ``offset``, and ``batch_size``, will be ignored on the following operations.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 60
+
+   * - Operation
+     - Example
+
+   * - ``Criteria#create``
+
+       *Create a newly persisted document.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").create
+
+   * - ``Criteria#create!``
+
+       *Create a newly persisted document and raise an exception on validation failure.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").create!
+
+   * - ``Criteria#build|new``
+
+       *Create a new (unsaved) document.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").build
+          Band.where(name: "Photek").new
+
+   * - ``Criteria#update``
+
+       *Update attributes of the first matching document.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").update(label: "Mute")
+
+   * - ``Criteria#update_all``
+
+       *Update attributes of all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(members: 2).update_all(label: "Mute")
+
+   * - ``Criteria#add_to_set``
+
+       *Perform an $addToSet on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").add_to_set(label: "Mute")
+
+   * - ``Criteria#bit``
+
+       *Perform a $bit on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").bit(likes: { and: 14, or: 4 })
+
+   * - ``Criteria#inc``
+
+       *Perform an $inc on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").inc(likes: 123)
+
+   * - ``Criteria#pop``
+
+       *Perform a $pop on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").pop(members: -1)
+          Band.where(name: "Photek").pop(members: 1)
+
+   * - ``Criteria#pull``
+
+       *Perform a $pull on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").pull(members: "Maynard")
+
+   * - ``Criteria#pull_all``
+
+       *Perform a $pullAll on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").
+            pull_all(:members, [ "Maynard", "Danny" ])
+
+   * - ``Criteria#push``
+
+       *Perform a $push on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").push(members: "Maynard")
+
+   * - ``Criteria#push_all``
+
+       *Perform a $push with $each on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").
+            push_all(members: [ "Maynard", "Danny" ])
+
+   * - ``Criteria#rename``
+
+       *Perform a $rename on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").rename(name: :title)
+
+   * - ``Criteria#set``
+
+       *Perform a $set on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").set(likes: 10000)
+
+   * - ``Criteria#unset``
+
+       *Perform a $unset on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").unset(:likes)
+
+   * - ``Criteria#delete``
+
+       *Deletes all matching documents in the database.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(label: "Mute").delete
+
+   * - ``Criteria#destroy``
+
+       *Deletes all matching documents in the database while running callbacks for all.
+       This loads all documents into memory and can be an expensive operation.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(label: "Mute").destroy
+
 .. _query-cache:
 
 Query Cache
@@ -1886,10 +1886,9 @@ results of all MongoDB read queries. The Query Cache is useful to avoid executin
 duplicate queries and reduce database load.
 
 .. warning::
-  If you wish to use the Query Cache, we strongly recommend to upgrade
-  to Ruby driver version 2.14.0 or newer. If it is not possible to upgrade,
-  please read the :ref:`Legacy Query Cache Limitations <legacy-query-cache-limitations>`
-  section carefully.
+  If you wish to use the Query Cache, please upgrade to Ruby driver version 2.14.0 or later.
+  If it is not possible to upgrade, please read the
+  :ref:`Legacy Query Cache Limitations <legacy-query-cache-limitations>` section carefully.
 
 Each thread has its own query cache store. Cached query results are not shared across
 threads.
@@ -1900,15 +1899,23 @@ collection that is being written to. Certain other operations will clear the ent
 query cache. Note that writes will not clear the Query Cache if performed
 while it is disabled.
 
-.. _enabling-the-query-cache:
+.. _enabling-the-query-cache-middleware:
 
-Enabling the Query Cache
-------------------------
+Enabling the Query Cache via Middleware
+---------------------------------------
 
-We recommended Rack-based web framework (Rails, etc.) users to install
-the :ref:`Query Cache Rack middleware <query-cache-middleware>`. This middleware
+We recommend Rack-based web framework (Rails, etc.) users to install
+the :ref:`Query Cache Rack Middleware <query-cache-middleware>`. This
 enables the query cache automatically on each web request, and clears
-it after the request completes.
+the cache after the request completes.
+
+Note that the Query Cache Middleware does not apply to code executed
+outside web requests.
+
+.. _enabling-the-query-cache-manually:
+
+Enabling the Query Cache Manually
+---------------------------------
 
 To enable the Query Cache manually for a code segment, use:
 
@@ -1967,9 +1974,6 @@ database commands issued by the application. Because of the difficulty of
 determining when the cached results for system collections should be expired,
 queries on system collections bypass the query cache.
 
-Neither the legacy query cache nor the driver query cache will cache query
-results from system collections.
-
 .. code-block:: ruby
 
   Band.all.to_a
@@ -1978,25 +1982,25 @@ results from system collections.
   Band.all.to_a.first
   #=> Returns the first cached result
 
-.. legacy-query-cache-limitations:
+.. _legacy-query-cache-limitations:
 
 Legacy Query Cache Limitations
 ------------------------------
 
-The Mongoid query cache has been reimplemented in version 2.14.0 of the MongoDB
-Ruby Driver. When version 2.14.0 or greater of the Ruby driver is installed,
+MongoDB Ruby Driver version 2.14.0 introduced a new and improved implementation
+of the Query Cache. When driver version 2.14.0 or greater is installed,
 Mongoid will automatically delegate all Query Cache methods to the driver.
 Note the the method interface of the `Mongoid::QueryCache` module remains consistent
 after upgrading. You may read more about the Ruby driver query cache
 `in the driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/query-cache/>`_.
 
-On older driver versions, Mongoid will use its legacy query cache functionality,
+On older driver versions, Mongoid will use its Legacy Query Cache functionality,
 and the following limitations apply:
 
-* The legacy query cache does not cache query results that exceed the batch size.
+* The Legacy Query Cache does not cache query results that exceed the batch size.
   The default batch size is 1000 documents (refer to :ref:`batch_size <batch-size>`.)
 
-* The legacy query cache does not take into account read preference or read concern
+* The Legacy Query Cache does not take into account read preference or read concern
   when deciding whether to return cached results. When performing the same
   query with a different read preference or read concern with the query cache
   enabled, incorrect results may be returned.
