@@ -116,7 +116,7 @@ class Transmogrifier
       on: %w[push pull_request],
       jobs: {
         build: {
-          name: "${{matrix.ruby}} ${{matrix.driver}} ${{matrix.mongodb}} ${{matrix.topology}}",
+          name: '${{matrix.ruby}} driver-${{matrix.driver}} mongodb-${{matrix.mongodb}} ${{matrix.topology}}',
           env: {
             CI: true,
             TESTOPTS: "-v"
@@ -175,10 +175,7 @@ class Transmogrifier
   end
 
   def extract_gemfile!(node)
-    driver = node.delete(:driver)
-    rails = node.delete(:rails)
-    i18n = node.delete(:i18n)
-    node[:gemfile] = get_gemfile(driver, rails, i18n)
+    node[:gemfile] = get_gemfile(*node.values_at(:driver, :rails, :i18n))
   end
 
   # Ported from run-tests.sh
@@ -217,8 +214,9 @@ class Transmogrifier
       name: "start mongodb",
       uses: "supercharge/mongodb-github-action@1.6.0",
       with: {
-        'mongodb-version': '${{toJSON(matrix.mongodb)}}',
-        'mongodb-replica-set': '${{toJSON(matrix.topology)}}'
+        'mongodb-version': '${{matrix.mongodb}}',
+        'mongodb-replica-set': 'rs0'
+        # 'mongodb-replica-set': '${{matrix.topology}}'
       }
     }
   end
@@ -229,7 +227,7 @@ class Transmogrifier
       uses: "ruby/setup-ruby@v1",
       env: step_ruby_env,
       with: {
-        'ruby-version': "${{toJSON(matrix.ruby)}}",
+        'ruby-version': "${{matrix.ruby}}",
         bundler: 2
       }
     }
@@ -237,7 +235,7 @@ class Transmogrifier
 
   def step_bundler
     { name: "bundle install",
-      run: "bundle install --jobs 4 --retry 3 --gemfile=${{toJSON(matrix.gemfile)}}",
+      run: "bundle install --jobs 4 --retry 3 --gemfile=${{matrix.gemfile}}",
       env: step_ruby_env }
   end
 
