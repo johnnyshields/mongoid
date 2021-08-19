@@ -237,7 +237,7 @@ class Transmogrifier
       bundle install --jobs 4 --retry 3 --gemfile=${{matrix.gemfile}}
       git submodule init
       git submodule update
-      bundle exec rake spec
+      bundle exec rake spec --gemfile=${{matrix.gemfile}}
     RUN
 
     { name: "test",
