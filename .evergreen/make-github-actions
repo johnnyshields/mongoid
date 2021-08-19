@@ -235,7 +235,7 @@ class Transmogrifier
 
   def step_bundler
     { name: "bundle install",
-      run: "bundle install --jobs 4 --retry 3 --gemfile=${{matrix.gemfile}}",
+      run: "bundle install --jobs 4 --retry 3 --gemfile=${{matrix.gemfile}} && git submodule init && git submodule update",
       env: step_ruby_env }
   end
 
