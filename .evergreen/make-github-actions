@@ -200,6 +200,7 @@ class Transmogrifier
     [ step_checkout,
       step_mongodb,
       step_ruby,
+      step_bundle,
       step_test ]
   end
 
@@ -232,23 +233,26 @@ class Transmogrifier
     }
   end
 
-  def step_test
-    run = <<~RUN
-      bundle install --jobs 4 --retry 3 --gemfile=${{matrix.gemfile}}
-      git submodule init
-      git submodule update
-      bundle exec rake spec
-    RUN
+  def step_bundle
+    { name: 'bundle',
+      run: [
+        'bundle install --jobs 4 --retry 3',
+        'git submodule init',
+        'git submodule update'
+      ].join("\n"),
+      env: step_ruby_env }
+  end
 
-    { name: "test",
+  def step_test
+    { name: 'test',
       "timeout-minutes": 60,
-      "continue-on-error": "${{matrix.experimental}}",
-      env: step_ruby_env,
-      run: run }
+      "continue-on-error": '${{matrix.experimental}}',
+      run: 'bundle exec rake spec',
+      env: step_ruby_env }
   end
 
   def step_ruby_env
-    {}
+    { 'BUNDLE_GEMFILE': '${{matrix.gemfile}}' }
   end
 end
 
