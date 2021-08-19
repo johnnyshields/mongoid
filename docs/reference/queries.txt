@@ -1050,141 +1050,6 @@ The default ``batch_size`` is 1000, however you may set it explicitly:
   #   embedded: false>
 
 
-.. _query-cache:
-
-Query Cache
-===========
-
-When the query cache is enabled, Mongoid will cache results for MongoDB queries
-when the entire result set is returned in a single batch (1000 documents by
-default).
-
-Each thread has its own query cache.
-
-When the query cache is enabled, performing most write operations (insert,
-update, replace or delete) clears the cache of the thread issuing the write.
-
-To enable the query cache manually for a code segment, use:
-
-.. code-block:: ruby
-
-  Mongoid::QueryCache.cache do
-    # ...
-  end
-
-The query cache can also be explicitly enabled and disabled, although it is
-recommended to use the block form described above:
-
-.. code-block:: ruby
-
-  Mongoid::QueryCache.enabled = true
-
-  # ...
-
-  Mongoid::QueryCache.enabled = false
-
-Mongoid also provides a :ref:`Rack middleware <query-cache-middleware>`
-to enable the query cache automatically for each web request.
-
-The Improved Driver Query Cache
--------------------------------
-
-The Mongoid query cache has been reimplemented in version 2.14.0 of the MongoDB
-Ruby Driver. The driver query cache is more correct and more effective, and it
-is recmomended that you upgrade to version 2.14.0 of the Ruby driver or newer.
-
-For the purposes of this tutorial, the Mongoid query cache will be called "the
-legacy query cache", and the driver query cache will be referred to as "the
-driver query cache."
-
-With driver versions 2.14.0 or newer, Mongoid will use the driver query cache
-instead of the legacy query cache. When used with older versions of the driver
-(that do not implement the query cache) Mongoid will fall back on the legacy
-query cache.
-
-Mongoid will retain the interface (described above) for enabling and disabling
-the query cache. When using driver versions 2.14.0 or newer, this interface
-will affect the driver query cache.
-
-Read more about the Ruby driver query cache
-`in the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
-
-.. warning::
-
-  The legacy Mongoid query cache has been deprecated in favor of the query cache
-  implemented in version 2.14.0 of the MongoDB Ruby driver. While the legacy
-  query cache will continue to function, the driver query cache is
-  more correct and more effective. If you plan on using the query cache, it is
-  recommended that you upgrade to Ruby driver version 2.14.0 or newer.
-
-  Read more about the Ruby driver query cache
-  `in the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
-
-Legacy Query Cache Limitations
-------------------------------
-
-The following is a list of limitations of the legacy query cache:
-
-* The legacy query cache does not cache query results that exceed the batch size.
-  The default batch size is 1000 documents.
-
-* The legacy query cache does not take into account read preference or read concern
-  when deciding whether to return cached results. When performing the same
-  query with a different read preference or read concern with the query cache
-  enabled, incorrect results may be returned.
-
-* Bulk writes, as well as ``$out`` and ``$merge`` aggregation pipeline stages
-  do not invalidate the query cache. Cached results may be stale after performing
-  any of these operations.
-
-* Aggregation results are not cached.
-
-A Note on using ``#first``
---------------------------
-
-Calling the ``first`` method on a model class imposes an ascending sort by
-the ``_id`` field on the underlying query. This may produce unexpected behavior
-with query caching.
-
-For example, when calling ``all`` on a model class and then ``first``,
-one would expect the second query to use the cached results from the first.
-However, because of the sort imposed on the second query, both methods
-will query the database and separately cache their results.
-
-.. code-block:: ruby
-
-  Band.all.to_a
-  #=> Queries the database and caches the results
-
-  Band.first
-  #=> Queries the database again because of the sort
-
-To use the cached results, call ``all.to_a.first`` on the model class.
-
-System Collections and the Query Cache
---------------------------------------
-
-MongoDB stores system information in collections that use the ``database.system.*``
-namespace pattern. These are called system collections.
-
-Data in system collections can change due to activity not triggered by the
-application (such as internal server processes) and as a result of a variety of
-database commands issued by the application. Because of the difficulty of
-determining when the cached results for system collections should be expired,
-queries on system collections bypass the query cache.
-
-Neither the legacy query cache nor the driver query cache will cache query
-results from system collections.
-
-.. code-block:: ruby
-
-  Band.all.to_a
-  #=> Queries the database and caches the results
-
-  Band.all.to_a.first
-  #=> Returns the first cached result
-
-
 Finding By ``_id``
 ==================
 
@@ -2010,3 +1875,147 @@ treated like scopes, and can be chained as well.
   end
 
   Band.active
+
+
+.. _query-cache:
+
+Query Cache
+===========
+
+Mongoid
+When the query cache is enabled, Mongoid will cache results for MongoDB queries
+when the entire result set is returned in a single batch (1000 documents by
+default).
+
+.. warning::
+  If you plan on using the Query Cache, we recommend that you upgrade
+  to Ruby driver version 2.14.0 or newer.
+
+  MongoDB Ruby driver version 2.14.0 implements new query cache functionality.
+  When using Ruby driver version 2.14.0 or greater, Mongoid will delegate
+  query caching to the driver.
+
+
+  The legacy Mongoid query cache has been deprecated in favor of the query cache
+  implemented in version 2.14.0 of the MongoDB Ruby driver. While the legacy
+  query cache will continue to function, the driver query cache is
+  more correct and more effective.
+
+  Read more about the Ruby driver query cache
+  `in the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
+
+
+Each thread has its own query cache.
+
+When the query cache is enabled, performing most write operations (insert,
+update, replace or delete) clears the cache of the thread issuing the write.
+
+To enable the query cache manually for a code segment, use:
+
+.. code-block:: ruby
+
+  Mongoid::QueryCache.cache do
+    # ...
+  end
+
+The query cache can also be explicitly enabled and disabled, although it is
+recommended to use the block form described above:
+
+.. code-block:: ruby
+
+  Mongoid::QueryCache.enabled = true
+
+  # ...
+
+  Mongoid::QueryCache.enabled = false
+
+Mongoid also provides a :ref:`Rack middleware <query-cache-middleware>`
+to enable the query cache automatically for each web request.
+
+The Improved Driver Query Cache
+-------------------------------
+
+The Mongoid query cache has been reimplemented in version 2.14.0 of the MongoDB
+Ruby Driver. The driver query cache is more correct and more effective, and it
+is recmomended that you upgrade to version 2.14.0 of the Ruby driver or newer.
+
+For the purposes of this tutorial, the Mongoid query cache will be called "the
+legacy query cache", and the driver query cache will be referred to as "the
+driver query cache."
+
+With driver versions 2.14.0 or newer, Mongoid will use the driver query cache
+instead of the legacy query cache. When used with older versions of the driver
+(that do not implement the query cache) Mongoid will fall back on the legacy
+query cache.
+
+Mongoid will retain the interface (described above) for enabling and disabling
+the query cache. When using driver versions 2.14.0 or newer, this interface
+will affect the driver query cache.
+
+Read more about the Ruby driver query cache
+`in the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
+
+Legacy Query Cache Limitations
+------------------------------
+
+The following is a list of limitations of the legacy query cache:
+
+* The legacy query cache does not cache query results that exceed the batch size.
+  The default batch size is 1000 documents.
+
+* The legacy query cache does not take into account read preference or read concern
+  when deciding whether to return cached results. When performing the same
+  query with a different read preference or read concern with the query cache
+  enabled, incorrect results may be returned.
+
+* Bulk writes, as well as ``$out`` and ``$merge`` aggregation pipeline stages
+  do not invalidate the query cache. Cached results may be stale after performing
+  any of these operations.
+
+* Aggregation results are not cached.
+
+A Note on using ``#first``
+--------------------------
+
+Calling the ``first`` method on a model class imposes an ascending sort by
+the ``_id`` field on the underlying query. This may produce unexpected behavior
+with query caching.
+
+For example, when calling ``all`` on a model class and then ``first``,
+one would expect the second query to use the cached results from the first.
+However, because of the sort imposed on the second query, both methods
+will query the database and separately cache their results.
+
+.. code-block:: ruby
+
+  Band.all.to_a
+  #=> Queries the database and caches the results
+
+  Band.first
+  #=> Queries the database again because of the sort
+
+To use the cached results, call ``all.to_a.first`` on the model class.
+
+System Collections and the Query Cache
+--------------------------------------
+
+MongoDB stores system information in collections that use the ``database.system.*``
+namespace pattern. These are called system collections.
+
+Data in system collections can change due to activity not triggered by the
+application (such as internal server processes) and as a result of a variety of
+database commands issued by the application. Because of the difficulty of
+determining when the cached results for system collections should be expired,
+queries on system collections bypass the query cache.
+
+Neither the legacy query cache nor the driver query cache will cache query
+results from system collections.
+
+.. code-block:: ruby
+
+  Band.all.to_a
+  #=> Queries the database and caches the results
+
+  Band.all.to_a.first
+  #=> Returns the first cached result
+
