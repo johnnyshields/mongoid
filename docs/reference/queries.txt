@@ -1886,7 +1886,7 @@ results of all MongoDB read queries. The Query Cache is useful to avoid executin
 duplicate queries and reduce database load.
 
 .. warning::
-  If you wish to use the Query Cache, we strongly recommend you upgrade
+  If you wish to use the Query Cache, we strongly recommend to upgrade
   to Ruby driver version 2.14.0 or newer. If it is not possible to upgrade,
   please read the :ref:`Legacy Query Cache Limitations <legacy-query-cache-limitations>`
   section carefully.
