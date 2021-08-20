@@ -368,32 +368,5 @@ module Mongoid
       mods.pull_all(doc.atomic_array_pulls)
     end
 
-    # Get the atomic updates for a touch operation. Should only include the
-    # updated_at field and the optional extra field.
-    #
-    # @api private
-    #
-    # @example Get the touch atomic updates.
-    #   document.touch_atomic_updates
-    #
-    # @param [ Symbol ] field The optional field.
-    #
-    # @return [ Hash ] The atomic updates.
-    #
-    # @since 3.0.6
-    def touch_atomic_updates(field = nil)
-      updates = atomic_updates
-      return {} unless atomic_updates.key?("$set")
-      touches = {}
-      wanted_keys = %w(updated_at u_at)
-      wanted_keys << field.to_s if field.present?
-
-      updates["$set"].each_pair do |key, value|
-        if wanted_keys.include?(key.split('.').last)
-          touches.update(key => value)
-        end
-      end
-      { "$set" => touches }
-    end
   end
 end

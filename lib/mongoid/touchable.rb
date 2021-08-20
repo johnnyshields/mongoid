@@ -43,7 +43,7 @@ module Mongoid
         write_attribute(:updated_at, current) if respond_to?("updated_at=")
         write_attribute(field, current) if field
 
-        touches = touch_atomic_updates(field)["$set"] || {}
+        touches = __touch_atomic_sets(field) || {}
         touches.merge!(_parent.__gather_touch_atomic_updates["$set"] || {}) if _parent
         { '$set' => touches }
       end
@@ -55,57 +55,30 @@ module Mongoid
         _parent.__run_touch_callbacks_from_root if _parent
         run_callbacks(:touch)
       end
+
+      # Get the atomic updates for a touch operation. Should only include the
+      # updated_at field and the optional extra field.
       #
+      # @api private
       #
+      # @example Get the touch atomic updates.
+      #   document.touch_atomic_updates
       #
-      #   touches = touch_atomic_updates(field)
+      # @param [ Symbol ] field The optional field.
       #
-      #
-      #
-      #   # unless _parent && !field
-      #   #   touches = touch_atomic_updates(field)
-      #   #   _root.atomic_sets.merge!(touches) unless touches["$set"].blank?
-      #   # end
-      #   #
-      #   # _root.send(:update_document) unless _parent
-      #
-      #
-      #   # If the document being touched is embedded, touch its parents
-      #   # all the way through the composition hierarchy to the root object,
-      #   # because when an embedded document is changed the write is actually
-      #   # performed by the composition root. See MONGOID-3468.
-      #   if _parent
-      #     # This will persist updated_at on this document as well as parents.
-      #     # TODO support passing the field name to the parent's touch method;
-      #     # I believe it should be read out of
-      #     # _association.inverse_association.options but inverse_association
-      #     # seems to not always/ever be set here. See MONGOID-5014.
-      #
-      #     _parent.touch
-      #
-      #     if field
-      #       # If we are told to also touch a field, perform a separate write
-      #       # for that field. See MONGOID-5136.
-      #       # In theory we should combine the writes, which would require
-      #       # passing the fields to be updated to the parents - MONGOID-5142.
-      #       selector = atomic_selector
-      #       _root.collection.find(selector).update_one(positionally(selector, touches), session: _session)
-      #     end
-      #   else
-      #     # If the current document is not embedded, it is composition root
-      #     # and we need to persist the write here.
-      #     touches = touch_atomic_updates(field)
-      #     unless touches["$set"].blank?
-      #       # apply_atomic_updates
-      #       selector = atomic_selector
-      #       _root.collection.find(selector).update_one(positionally(selector, touches), session: _session)
-      #
-      #       # _root.atomic_sets.merge!(touches) unless touches["$set"].blank?
-      #       # _root.send(:update_document)
-      #     end
-      #   end
-      #
-      # end
+      # @return [ Hash ] The atomic updates.
+      def __touch_atomic_sets(field = nil)
+        updates = atomic_updates['$set']
+        return {} unless updates
+
+        touchable_keys = %w(updated_at u_at)
+        touchable_keys << field.to_s if field.present?
+        updates.each_with_object({}) do |(key, value), touches|
+          if touchable_keys.include?(key.split('.').last)
+            touches[key] = value
+          end
+        end
+      end
     end
 
     extend self
