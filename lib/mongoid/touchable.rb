@@ -26,7 +26,8 @@ module Mongoid
       def touch(field = nil)
         return false if _root.new_record?
 
-        touches = __gather_touch_updates(field)
+        now = Time.now
+        touches = __gather_touch_updates(now, field)
         unless touches.blank?
           selector = _root.atomic_selector
           _root.collection.find(selector).update_one(positionally(selector, '$set' => touches), session: _session)
@@ -36,14 +37,13 @@ module Mongoid
         true
       end
 
-      def __gather_touch_updates(field = nil)
-        current = Time.now
+      def __gather_touch_updates(now, field = nil)
         field = database_field_name(field)
-        write_attribute(:updated_at, current) if respond_to?("updated_at=")
-        write_attribute(field, current) if field
+        write_attribute(:updated_at, now) if respond_to?("updated_at=")
+        write_attribute(field, now) if field
 
         touches = __touch_atomic_sets(field) || {}
-        touches.merge!(_parent.__gather_touch_updates || {}) if _parent
+        touches.merge!(_parent.__gather_touch_updates(now) || {}) if _parent
         touches
       end
 
