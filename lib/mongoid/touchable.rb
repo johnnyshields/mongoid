@@ -28,9 +28,9 @@ module Mongoid
 
         touches = __gather_touch_atomic_updates(field)
 
-        unless touches["$set"].blank?
+        unless touches.blank?
           selector = _root.atomic_selector
-          _root.collection.find(selector).update_one(positionally(selector, touches), session: _session)
+          _root.collection.find(selector).update_one(positionally(selector, '$set' => touches), session: _session)
         end
 
         __run_touch_callbacks_from_root
@@ -44,8 +44,8 @@ module Mongoid
         write_attribute(field, current) if field
 
         touches = __touch_atomic_sets(field) || {}
-        touches.merge!(_parent.__gather_touch_atomic_updates["$set"] || {}) if _parent
-        { '$set' => touches }
+        touches.merge!(_parent.__gather_touch_atomic_updates || {}) if _parent
+        touches
       end
 
       # Callbacks are invoked on the composition root first and on the
