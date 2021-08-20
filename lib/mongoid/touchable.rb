@@ -26,8 +26,7 @@ module Mongoid
       def touch(field = nil)
         return false if _root.new_record?
 
-        now = Time.now
-        touches = __gather_touch_updates(now, field)
+        touches = __gather_touch_updates(Time.now, field)
         unless touches.blank?
           selector = _root.atomic_selector
           _root.collection.find(selector).update_one(positionally(selector, '$set' => touches), session: _session)
@@ -37,44 +36,56 @@ module Mongoid
         true
       end
 
+      # Recursively sets touchable fields on the current document and each of its
+      # parents, including the root node. Returns the combined atomic $set
+      # operations to be performed on the root document.
+      #
+      # @param [ Time ] now The timestamp used for synchronizing the touched time.
+      # @param [ Symbol ] field The name of an additional field to update.
+      #
+      # @return [ Hash<String, Time> ] The touch operations to perform as an atomic $set.
+      #
+      # @api private
       def __gather_touch_updates(now, field = nil)
         field = database_field_name(field)
         write_attribute(:updated_at, now) if respond_to?("updated_at=")
         write_attribute(field, now) if field
 
-        touches = __touch_atomic_sets(field) || {}
+        touches = __extract_touches_from_atomic_sets(field) || {}
         touches.merge!(_parent.__gather_touch_updates(now) || {}) if _parent
         touches
       end
 
-      # Callbacks are invoked on the composition root first and on the
-      # leaf-most embedded document last.
+      # Recursively runs :touch callbacks for the document and its parents,
+      # beginning with the root document and cascading through each successive
+      # child document.
+      #
+      # @api private
+      #
       # TODO add tests, see MONGOID-5015.
       def __run_touch_callbacks_from_root
         _parent.__run_touch_callbacks_from_root if _parent
         run_callbacks(:touch)
       end
 
-      # Get the atomic updates for a touch operation. Should only include the
-      # updated_at field and the optional extra field.
+      # Extract and remove the atomic updates for the touch operation(s)
+      # from the currently enqueued atomic $set operations.
       #
       # @api private
       #
-      # @example Get the touch atomic updates.
-      #   document.touch_atomic_updates
-      #
       # @param [ Symbol ] field The optional field.
       #
-      # @return [ Hash ] The atomic updates.
-      def __touch_atomic_sets(field = nil)
+      # @return [ Hash ] The field-value pairs to update atomically.
+      def __extract_touches_from_atomic_sets(field = nil)
         updates = atomic_updates['$set']
         return {} unless updates
 
         touchable_keys = %w(updated_at u_at)
         touchable_keys << field.to_s if field.present?
-        updates.each_with_object({}) do |(key, value), touches|
+
+        updates.keys.each_with_object({}) do |key, touches|
           if touchable_keys.include?(key.split('.').last)
-            touches[key] = value
+            touches[key] = updates.delete(key)
           end
         end
       end
