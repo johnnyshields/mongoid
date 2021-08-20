@@ -385,9 +385,13 @@ module Mongoid
       updates = atomic_updates
       return {} unless atomic_updates.key?("$set")
       touches = {}
+      wanted_keys = %w(updated_at u_at)
+      wanted_keys << field.to_s if field.present?
+
       updates["$set"].each_pair do |key, value|
-        key_regex = /updated_at|u_at#{"|" + field if field.present?}/
-        touches.merge!({ key => value }) if key =~ key_regex
+        if wanted_keys.include?(key.split('.').last)
+          touches.update(key => value)
+        end
       end
       { "$set" => touches }
     end

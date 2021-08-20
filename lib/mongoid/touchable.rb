@@ -25,38 +25,87 @@ module Mongoid
       # @since 3.0.0
       def touch(field = nil)
         return false if _root.new_record?
+
+        touches = __gather_touch_atomic_updates(field)
+
+        unless touches["$set"].blank?
+          selector = _root.atomic_selector
+          _root.collection.find(selector).update_one(positionally(selector, touches), session: _session)
+        end
+
+        __run_touch_callbacks_from_root
+        true
+      end
+
+      def __gather_touch_atomic_updates(field = nil)
         current = Time.now
         field = database_field_name(field)
         write_attribute(:updated_at, current) if respond_to?("updated_at=")
         write_attribute(field, current) if field
 
-        # If the document being touched is embedded, touch its parents
-        # all the way through the composition hierarchy to the root object,
-        # because when an embedded document is changed the write is actually
-        # performed by the composition root. See MONGOID-3468.
-        if _parent
-          # This will persist updated_at on this document as well as parents.
-          # TODO support passing the field name to the parent's touch method;
-          # I believe it should be read out of
-          # _association.inverse_association.options but inverse_association
-          # seems to not always/ever be set here. See MONGOID-5014.
-          _parent.touch
-        else
-          # If the current document is not embedded, it is composition root
-          # and we need to persist the write here.
-          touches = touch_atomic_updates(field)
-          unless touches["$set"].blank?
-            selector = atomic_selector
-            _root.collection.find(selector).update_one(positionally(selector, touches), session: _session)
-          end
-        end
-
-        # Callbacks are invoked on the composition root first and on the
-        # leaf-most embedded document last.
-        # TODO add tests, see MONGOID-5015.
-        run_callbacks(:touch)
-        true
+        touches = touch_atomic_updates(field)["$set"] || {}
+        touches.merge!(_parent.__gather_touch_atomic_updates["$set"] || {}) if _parent
+        { '$set' => touches }
       end
+
+      # Callbacks are invoked on the composition root first and on the
+      # leaf-most embedded document last.
+      # TODO add tests, see MONGOID-5015.
+      def __run_touch_callbacks_from_root
+        _parent.__run_touch_callbacks_from_root if _parent
+        run_callbacks(:touch)
+      end
+      #
+      #
+      #
+      #   touches = touch_atomic_updates(field)
+      #
+      #
+      #
+      #   # unless _parent && !field
+      #   #   touches = touch_atomic_updates(field)
+      #   #   _root.atomic_sets.merge!(touches) unless touches["$set"].blank?
+      #   # end
+      #   #
+      #   # _root.send(:update_document) unless _parent
+      #
+      #
+      #   # If the document being touched is embedded, touch its parents
+      #   # all the way through the composition hierarchy to the root object,
+      #   # because when an embedded document is changed the write is actually
+      #   # performed by the composition root. See MONGOID-3468.
+      #   if _parent
+      #     # This will persist updated_at on this document as well as parents.
+      #     # TODO support passing the field name to the parent's touch method;
+      #     # I believe it should be read out of
+      #     # _association.inverse_association.options but inverse_association
+      #     # seems to not always/ever be set here. See MONGOID-5014.
+      #
+      #     _parent.touch
+      #
+      #     if field
+      #       # If we are told to also touch a field, perform a separate write
+      #       # for that field. See MONGOID-5136.
+      #       # In theory we should combine the writes, which would require
+      #       # passing the fields to be updated to the parents - MONGOID-5142.
+      #       selector = atomic_selector
+      #       _root.collection.find(selector).update_one(positionally(selector, touches), session: _session)
+      #     end
+      #   else
+      #     # If the current document is not embedded, it is composition root
+      #     # and we need to persist the write here.
+      #     touches = touch_atomic_updates(field)
+      #     unless touches["$set"].blank?
+      #       # apply_atomic_updates
+      #       selector = atomic_selector
+      #       _root.collection.find(selector).update_one(positionally(selector, touches), session: _session)
+      #
+      #       # _root.atomic_sets.merge!(touches) unless touches["$set"].blank?
+      #       # _root.send(:update_document)
+      #     end
+      #   end
+      #
+      # end
     end
 
     extend self
