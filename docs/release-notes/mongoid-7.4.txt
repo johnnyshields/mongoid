@@ -1,0 +1,55 @@
+***********
+Mongoid 7.4
+***********
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+This page describes significant changes and improvements in Mongoid 7.4.
+The complete list of releases is available `on GitHub
+<https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
+<https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`_;
+please consult GitHub releases for detailed release notes and JIRA for
+the complete list of issues fixed in each release, including bug fixes.
+
+
+Localized field ``*_translations.to_h`` now returns Symbol keys
+---------------------------------------------------------------
+
+**Breaking change:** When using fields with the ``localized: true`` option,
+Mongoid provides access to all translations using an ``*_translations``
+accessor. Beginning in Mongoid 7.4, this accessor returns a
+``Mongoid::SymbolizedHashWithIndifferentAccess``. It behaves identically
+to a HashWithDifferentAccess, except its underlying keys are Symbols rather
+than Strings. This creates consistency with ``I18n.locale``, which returns a Symbol.
+
+.. code-block:: ruby
+
+  I18n.locale = :de
+
+  Person.name = "Johannes Gutenberg"
+  Person.name_translations #=> { de: "Johannes Gutenberg" }
+                               (Mongoid::SymbolizedHashWithIndifferentAccess)
+
+  Person.name_translations.to_h.key?(I18n.locale) #=> true
+  Person.name_translations.to_h.key?(I18n.locale) #=> false
+
+In Mongoid 7.3 and prior, this accessor returned an
+``ActiveSupport::HashWithIndifferentAccess`` the uses Strings as its
+underlying keys.
+
+.. code-block:: ruby
+
+  I18n.locale = :de
+
+  Person.name = "Johannes Gutenberg"
+  Person.name_translations #=> { "de" => "Johannes Gutenberg" }
+                               (ActiveSupport::HashWithIndifferentAccess)
+
+  Person.name_translations.to_h.key?(I18n.locale) #=> false
+  Person.name_translations.to_h.key?(I18n.locale) #=> true

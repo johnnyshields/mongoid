@@ -4,6 +4,7 @@
 require "mongoid/positional"
 require "mongoid/evolvable"
 require "mongoid/extensions"
+require "mongoid/types"
 require "mongoid/errors"
 require "mongoid/threaded"
 require "mongoid/atomic"
