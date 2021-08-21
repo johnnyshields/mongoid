@@ -556,7 +556,7 @@ module Mongoid
         generated_methods.module_eval do
           re_define_method("#{meth}_translations") do
             attributes[name] ||= {}
-            attributes[name].with_indifferent_access
+            Mongoid::SymbolizedIndifferentHash(attributes[name])
           end
           alias_method :"#{meth}_t", :"#{meth}_translations"
         end

@@ -135,7 +135,7 @@ module Mongoid
       # @since 3.0.0
       def distinct(field)
         view.distinct(klass.database_field_name(field)).map do |value|
-          value.class.demongoize(value)
+          (get_field_object(field) || value.class).demongoize(value)
         end
       end
 
@@ -455,16 +455,38 @@ module Mongoid
       # @return [ Array<Object, Array> ] The plucked values.
       #
       # @since 3.1.0
+
       def pluck(*fields)
-        normalized_select = fields.inject({}) do |hash, f|
-          hash[klass.database_field_name(f)] = 1
-          hash
+        normalized_select = {}
+        field_objects = {}
+
+        cache = FieldCache.new(klass).get(*fields)
+
+        fields.each do |f|
+          db_name = klass.database_field_name(f)
+          normalized_select[db_name] = 1
+          # field_objects[db_name] = self.fields[db_name] if self.fields[db_name]
         end
 
-        view.projection(normalized_select).reduce([]) do |plucked, doc|
-          values = normalized_select.keys.map do |n|
-            n =~ /\./ ? doc[n.partition('.')[0]] : doc[n]
+        # if the key is an embedded document, we need to map all its fields as well
+        view.projection(normalized_select).each_with_object([]) do |doc, plucked|
+          values = normalized_select.keys.map do |key|
+
+            (get_field_object(field) || value.class).demongoize(value)
+
+            root = key.include?('.') ? key.partition('.')[0] : key
+            value = doc[root]
+
+            # orders
+
+              # demongoize object embedded
+
+              value.class.demongoize(value)
+            # else
+              (field_objects[db_name] || value.class).demongoize(value)
+            # end
           end
+
           plucked << (values.size == 1 ? values.first : values)
         end
       end
@@ -731,6 +753,21 @@ module Mongoid
       end
 
       private
+
+      # Recursive method
+      # make recursion separate
+      def extract_plucked_value(doc, key)
+        segment, remaining = key.split('.', 2)
+        value = doc[segment]
+        if remaining && value.is_a?(Hash)
+          extract_nested_values(value.values.first, remaining)
+        elsif remaining && value.is_a?(Array)
+          value.map {|i| extract_nested_values(i, remaining) }
+        else
+          # raise() if remaining
+          value
+        end
+      end
 
       def _session
         @criteria.send(:_session)

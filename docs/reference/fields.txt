@@ -12,6 +12,7 @@ Field Definition
    :depth: 2
    :class: singlecol
 
+.. _field-types:
 
 Field Types
 ===========
@@ -601,9 +602,13 @@ and from MongoDB friendly values.
      end
    end
 
+.. _mongoize:
+
 The instance method ``mongoize`` takes an instance of your object, and converts it
 into how it will be stored in the database. In our example above, we want to store our
 point object as an array in the form ``[ x, y ]``.
+
+.. _demongoize:
 
 The class method ``demongoize`` takes an object as how it was stored in the database,
 and is responsible for instantiating an object of your custom type. In this case, we
