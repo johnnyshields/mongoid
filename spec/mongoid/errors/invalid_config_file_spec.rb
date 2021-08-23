@@ -3,29 +3,29 @@
 
 require "spec_helper"
 
-describe Mongoid::Errors::UnknownAttribute do
+describe Mongoid::Errors::InvalidConfigFile do
 
   describe "#message" do
 
     let(:error) do
-      described_class.new(Person, :gender)
+      described_class.new('/my/path')
     end
 
     it "contains the problem in the message" do
       expect(error.message).to include(
-        "Attempted to set a value for 'gender' which is not allowed on"
+        "Invalid configuration file: /my/path."
       )
     end
 
     it "contains the summary in the message" do
       expect(error.message).to include(
-        "Person#gender= was called but there is no 'gender'"
+        "Your mongoid.yml configuration file does not contain the"
       )
     end
 
     it "contains the resolution in the message" do
       expect(error.message).to include(
-        "Define the field 'gender' in Person, or include"
+        "Ensure your configuration file contains the correct contents."
       )
     end
   end
