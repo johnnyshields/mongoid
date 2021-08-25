@@ -59,12 +59,34 @@ module Mongoid
         #
         # @return [ Hash ] The object mongoized.
         def mongoize(object)
-          return nil if object.nil?
-          return object if object.is_a?(::Hash)
-          return object if object.is_a?(String)
-          hash = { "min" => object.first, "max" => object.last }
+          mongoized = case object
+                      when NilClass then nil
+                      when String then object
+                      when Hash then __mongoize_hash__(object)
+                      else __mongoize_range__(object)
+                      end
+
+          raise InvalidRange unless mongoized['min'] && mongoized['max']
+
+          mongoized
+        end
+
+        private
+
+        def __mongoize_hash__(object)
+          hash = object.stringify_keys
+          hash.slice!('min', 'max', 'exclude_end')
+          hash.compact!
+          hash.transform_values!(&:mongoize)
+          hash
+        end
+
+        def __mongoize_range__(object)
+          hash = {}
+          hash['min'] = object.begin.mongoize if object.begin
+          hash['max'] = object.end.mongoize if object.end
           if object.respond_to?(:exclude_end?) && object.exclude_end?
-            hash.merge!("exclude_end" => true)
+            hash['exclude_end'] = true
           end
           hash
         end
