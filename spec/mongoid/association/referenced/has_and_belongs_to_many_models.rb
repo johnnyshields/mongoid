@@ -47,3 +47,21 @@ class HabtmmPerson
 
   has_and_belongs_to_many :tickets, class_name: 'HabtmmTicket'
 end
+
+class HabtmmTrainer
+  include Mongoid::Document
+
+  field :name, type: String
+
+  has_and_belongs_to_many :animals, :reptile, inverse_of: :trainers, class_name: 'HabtmmAnimal'
+end
+
+class HabtmmAnimal
+  include Mongoid::Document
+
+  field :taxonomy, type: String
+
+  scope :reptile, -> { where(taxonomy: 'reptile') }
+
+  has_and_belongs_to_many :trainers, -> { where(name: 'Dave') }, inverse_of: :animals, class_name: 'HabtmmTrainer'
+end
