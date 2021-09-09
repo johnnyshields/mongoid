@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Contextual
@@ -15,8 +14,6 @@ module Mongoid
         # @param [ Symbol ] field The field to average.
         #
         # @return [ Float ] The average.
-        #
-        # @since 3.0.0
         def avg(field)
           total = count {|doc| doc.send(field).numeric? }
           return nil unless total > 0
@@ -40,8 +37,6 @@ module Mongoid
         #
         # @return [ Float, Document ] The max value or document with the max
         #   value.
-        #
-        # @since 3.0.0
         def max(field = nil)
           return super() if block_given?
 
@@ -64,8 +59,6 @@ module Mongoid
         #
         # @return [ Float, Document ] The min value or document with the min
         #   value.
-        #
-        # @since 3.0.0
         def min(field = nil)
           return super() if block_given?
 
@@ -84,8 +77,6 @@ module Mongoid
         # @param [ Symbol ] field The field to sum.
         #
         # @return [ Float ] The sum value.
-        #
-        # @since 3.0.0
         def sum(field = nil)
           return super() if block_given?
           return 0 unless count > 0
@@ -106,8 +97,6 @@ module Mongoid
         # @param [ Symbol ] method The method (min_by or max_by).
         #
         # @return [ Integer ] The aggregate.
-        #
-        # @since 3.0.0
         def aggregate_by(field, method)
           return nil unless count > 0
 
