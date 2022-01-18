@@ -1307,9 +1307,9 @@ describe Mongoid::Criteria do
       end
 
       before do
-        p = Post.create(alerts: [ Alert.create ])
+        p = Post.create!(alerts: [ Alert.create! ])
         user.posts = [ p ]
-        user.save
+        user.save!
       end
 
       let(:result) do
@@ -1660,8 +1660,8 @@ describe Mongoid::Criteria do
         before do
           address_one.band = depeche
           address_two.band = tool
-          address_one.save
-          address_two.save
+          address_one.save!
+          address_two.save!
         end
 
         context "when calling first" do
@@ -3015,10 +3015,10 @@ describe Mongoid::Criteria do
 
       before do
         I18n.locale = :en
-        d = Dictionary.create(description: 'english-text')
+        d = Dictionary.create!(description: 'english-text')
         I18n.locale = :de
         d.description = 'deutsch-text'
-        d.save
+        d.save!
       end
 
       after do
@@ -3422,20 +3422,139 @@ describe Mongoid::Criteria do
 
       context "when querying on a big decimal" do
 
-        let(:sales) do
-          BigDecimal('0.1')
+        context 'when map_big_decimal_to_decimal128 is false' do
+
+          around do |example|
+            current = Mongoid.map_big_decimal_to_decimal128
+            Mongoid.map_big_decimal_to_decimal128 = false
+            example.run
+            Mongoid.map_big_decimal_to_decimal128 = current
+          end
+
+          let(:sales) do
+            BigDecimal('0.1')
+          end
+
+          let!(:band) do
+            Band.create!(name: "Boards of Canada", sales: sales)
+          end
+
+          let(:from_db) do
+            Band.where(sales: sales).first
+          end
+
+          it "finds the document by the big decimal value" do
+            expect(from_db).to eq(band)
+          end
         end
 
-        let!(:band) do
-          Band.create!(name: "Boards of Canada", sales: sales)
+        context 'when map_big_decimal_to_decimal128 is true' do
+
+          around do |example|
+            current = Mongoid.map_big_decimal_to_decimal128
+            Mongoid.map_big_decimal_to_decimal128 = true
+            example.run
+            Mongoid.map_big_decimal_to_decimal128 = current
+          end
+
+          let(:sales) do
+            BigDecimal('0.1')
+          end
+
+          let!(:band) do
+            Band.create!(name: "Boards of Canada", sales: sales)
+          end
+
+          let(:from_db) do
+            Band.where(sales: sales).first
+          end
+
+          it "finds the document by the big decimal value" do
+            expect(from_db).to eq(band)
+          end
         end
 
-        let(:from_db) do
-          Band.where(sales: sales).first
+        context 'when map_big_decimal_to_decimal128 was false and is now true' do
+
+          around do |example|
+            current = Mongoid.map_big_decimal_to_decimal128
+            Mongoid.map_big_decimal_to_decimal128 = false
+            example.run
+            Mongoid.map_big_decimal_to_decimal128 = current
+          end
+
+          let(:sales) do
+            BigDecimal('0.1')
+          end
+
+          let!(:band) do
+            Mongoid.map_big_decimal_to_decimal128 = false
+            Band.create!(name: "Boards of Canada", sales: sales)
+          end
+
+          let(:from_db) do
+            Mongoid.map_big_decimal_to_decimal128 = true
+            Band.where(sales: sales.to_s).first
+          end
+
+          it "finds the document by the big decimal value" do
+            expect(from_db).to eq(band)
+          end
+        end
+      end
+
+      context "when querying on a big decimal from a dynamic field" do
+
+        context 'when map_big_decimal_to_decimal128 is false' do
+
+          around do |example|
+            current = Mongoid.map_big_decimal_to_decimal128
+            Mongoid.map_big_decimal_to_decimal128 = false
+            example.run
+            Mongoid.map_big_decimal_to_decimal128 = current
+          end
+
+          let(:fans) do
+            BigDecimal('139432.0002')
+          end
+
+          let!(:band) do
+            Band.create!(name: "Boards of Canada", fans: fans)
+          end
+
+          let(:from_db) do
+            Band.where(fans: fans.to_s).first
+          end
+
+          it "finds the document by the big decimal value" do
+            expect(from_db).to eq(band)
+          end
         end
 
-        it "finds the document by the big decimal value" do
-          expect(from_db).to eq(band)
+        context 'when map_big_decimal_to_decimal128 is true' do
+
+          around do |example|
+            current = Mongoid.map_big_decimal_to_decimal128
+            Mongoid.map_big_decimal_to_decimal128 = true
+            example.run
+            Mongoid.map_big_decimal_to_decimal128 = current
+          end
+
+          let(:fans) do
+            BigDecimal('139432.0002')
+          end
+
+          let!(:band) do
+            Band.create!(name: "Boards of Canada", fans: fans)
+          end
+
+          let(:from_db) do
+            Band.where(fans: fans).first
+          end
+
+          it "only finds the document by the string value" do
+            expect(from_db).to eq(band)
+          end
         end
       end
 

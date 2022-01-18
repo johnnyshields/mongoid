@@ -659,12 +659,12 @@ describe Mongoid::Scopable do
                 where(:author_id.in => author_ids)
               })
 
-              Author.create(author: true, id: 1)
-              Author.create(author: true, id: 2)
-              Author.create(author: true, id: 3)
-              Article.create(author_id: 1, public: true)
-              Article.create(author_id: 2, public: true)
-              Article.create(author_id: 3, public: false)
+              Author.create!(author: true, id: 1)
+              Author.create!(author: true, id: 2)
+              Author.create!(author: true, id: 3)
+              Article.create!(author_id: 1, public: true)
+              Article.create!(author_id: 2, public: true)
+              Article.create!(author_id: 3, public: false)
             end
 
             after do
@@ -1124,6 +1124,26 @@ describe Mongoid::Scopable do
       it "pops the criteria off the stack" do
         Band.with_scope(criteria) do;end
         expect(Mongoid::Threaded.current_scope(Band)).to be_nil
+      end
+    end
+
+    context 'when nesting with_scope calls' do
+      let(:c1) { Band.where(active: true) }
+      let(:c2) { Band.where(active: false) }
+
+      it 'restores previous scope' do
+        Band.with_scope(c1) do |crit|
+          Band.with_scope(c2) do |crit2|
+            Mongoid::Threaded.current_scope(Band).selector.should == {
+              'active' => true,
+              '$and' => ['active' => false],
+            }
+          end
+
+          Mongoid::Threaded.current_scope(Band).selector.should == {
+            'active' => true,
+          }
+        end
       end
     end
   end
