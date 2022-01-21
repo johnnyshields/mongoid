@@ -95,7 +95,7 @@ module Mongoid
           return super() if block_given?
           return 0 unless count > 0
 
-          super(0) {|doc| __coerce_numeric(doc.public_send(field)) }
+          aggregate_by(field, :sum_by)
         end
 
         private
@@ -114,9 +114,10 @@ module Mongoid
         def aggregate_by(field, method)
           return nil unless count > 0
 
-          default = method == :min_by ? Float::INFINITY : 0
-          obj = send(method) {|doc| __coerce_numeric(doc.public_send(field), default) }
-          __coerce_numeric(obj.public_send(field), nil)
+          values = map { |doc|
+            __coerce_numeric(doc.public_send(field))
+          }.compact
+          values.send(method.to_s.sub(/_by\z/, ''))
         end
 
         # Returns the given value if it is numeric, otherwise returns
@@ -126,16 +127,18 @@ module Mongoid
         # @api private
         #
         # @param [ Object ] value The value to return if numeric.
-        # @param [ Integer, Float ] default The return value if not numeric.
         #
-        # @return [ Integer, Float ] The coerced value.
-        def __coerce_numeric(value, default = 0)
-          if !value.numeric?
-            default
-          elsif value.is_a?(String)
-            value.match(/[^\s\d]/) ? Float(value) : Integer(value)
+        # @return [ Integer | Float | nil ] The coerced value or nil if the
+        #   original value was not numeric.
+        def __coerce_numeric(value)
+          if value.numeric?
+            if value =~ /\A\d+\z/
+              Integer(value)
+            else
+              Float(value)
+            end
           else
-            value
+            nil
           end
         end
       end
