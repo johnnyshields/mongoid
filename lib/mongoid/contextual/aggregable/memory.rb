@@ -95,7 +95,6 @@ module Mongoid
           return super() if block_given?
           return 0 unless count > 0
 
-byebug
           aggregate_by(field, :sum)
         end
 
