@@ -132,10 +132,14 @@ module Mongoid
         #   original value was not numeric.
         def __coerce_numeric(value)
           if value.numeric?
-            if value =~ /\A\d+\z/
-              Integer(value)
+            if String === value
+              if value =~ /\A-?\d+\z/
+                Integer(value)
+              else
+                Float(value)
+              end
             else
-              Float(value)
+              value
             end
           else
             nil

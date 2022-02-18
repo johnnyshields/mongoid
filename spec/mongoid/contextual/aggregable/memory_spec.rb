@@ -69,6 +69,25 @@ describe Mongoid::Contextual::Aggregable::Memory do
       it "returns the avg of the provided field" do
         expect(avg).to eq(750)
       end
+
+      it 'returns a float' do
+        avg.should be_a(Float)
+      end
+
+      context 'when integers are negative' do
+
+        let!(:depeche) do
+          Band.create!(name: "Depeche Mode", likes: -1000)
+        end
+
+        it "returns the avg of the provided field" do
+          expect(avg).to eq(-250)
+        end
+
+        it 'returns a float' do
+          avg.should be_a(Float)
+        end
+      end
     end
 
     context "when the types are Floats" do
@@ -401,6 +420,81 @@ describe Mongoid::Contextual::Aggregable::Memory do
     let(:criteria) do
       Band.all.tap do |crit|
         crit.documents = [ depeche, tool ]
+      end
+    end
+
+    context 'when values are integers' do
+
+      let(:sum) do
+        context.sum(:likes)
+      end
+
+      shared_examples 'sums and returns an integer' do
+        it 'sums' do
+          sum.should == 1500
+        end
+
+        it 'returns integer' do
+          sum.should be_a(Integer)
+        end
+      end
+
+      include_examples 'sums and returns an integer'
+
+      context 'when values are numeric strings' do
+
+        let!(:depeche) do
+          Band.create!(name: "Depeche Mode", likes: '1000')
+        end
+
+        include_examples 'sums and returns an integer'
+      end
+
+      context 'when values are negative integers' do
+
+        let!(:depeche) do
+          Band.create!(name: "Depeche Mode", likes: -1000)
+        end
+
+        shared_examples 'sums and returns an integer' do
+          it 'sums' do
+            sum.should == -500
+          end
+
+          it 'returns integer' do
+            sum.should be_a(Integer)
+          end
+        end
+
+        include_examples 'sums and returns an integer'
+
+        context 'when values are negative numeric strings' do
+
+          let!(:depeche) do
+            Band.create!(name: "Depeche Mode", likes: '-1000')
+          end
+
+          include_examples 'sums and returns an integer'
+        end
+      end
+    end
+
+    context 'when values are floats' do
+
+      let!(:depeche) do
+        Band.create!(name: "Depeche Mode", likes: 1000.0)
+      end
+
+      let(:sum) do
+        context.sum(:likes)
+      end
+
+      it 'sums' do
+        sum.should == 1500
+      end
+
+      it 'returns integer' do
+        sum.should be_a(Integer)
       end
     end
 
