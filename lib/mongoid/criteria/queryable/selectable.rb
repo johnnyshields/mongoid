@@ -10,6 +10,8 @@ module Mongoid
       module Selectable
         extend Macroable
 
+        Mongoid.deprecate(self, :geo_spacial)
+
         # Constant for a LineString $geometry.
         LINE_STRING = "LineString"
 
@@ -679,16 +681,7 @@ module Mongoid
                 end]
               end
             end
-            # Should be able to do:
-            #where('$or' => exprs)
-            # But since that is broken do instead:
-            clone.tap do |query|
-              if query.selector['$or']
-                query.selector.store('$or', query.selector['$or'] + exprs)
-              else
-                query.selector.store('$or', exprs)
-              end
-            end
+            self.and('$or' => exprs)
           end
         end
 

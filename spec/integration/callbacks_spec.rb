@@ -148,7 +148,7 @@ describe 'callbacks integration tests' do
       end
     end
 
-    context 'when updating top-level document via #update_attributes' do
+    context 'when updating top-level document via #update_attributes!' do
       let!(:instance) do
         Galaxy.create!
       end
@@ -166,7 +166,7 @@ describe 'callbacks integration tests' do
 
         context 'set as a document instance' do
           before do
-            instance.update_attributes(stars: [Star.new])
+            instance.update_attributes!(stars: [Star.new])
           end
 
           include_examples 'persists the attribute value'
@@ -174,7 +174,7 @@ describe 'callbacks integration tests' do
 
         context 'set as attributes on parent' do
           before do
-            instance.update_attributes(stars: [{}])
+            instance.update_attributes!(stars: [{}])
           end
 
           include_examples 'persists the attribute value'
@@ -188,15 +188,13 @@ describe 'callbacks integration tests' do
           end
 
           it 'persists the attribute value' do
-            pending 'MONGOID-4476'
-
             Galaxy.find(instance.id).stars.first.planets.first.age.should == 2_000
           end
         end
 
         context 'set as a document instance' do
           before do
-            instance.update_attributes(stars: [Star.new(planets: [Planet.new])])
+            instance.update_attributes!(stars: [Star.new(planets: [Planet.new])])
           end
 
           include_examples 'persists the attribute value'
@@ -204,7 +202,69 @@ describe 'callbacks integration tests' do
 
         context 'set as attributes on parent' do
           before do
-            instance.update_attributes(stars: [planets: [{}]])
+            instance.update_attributes!(stars: [planets: [{}]])
+          end
+
+          include_examples 'persists the attribute value'
+        end
+      end
+    end
+
+    context 'when updating top-level embeds_one document via #update_attributes!' do
+      let!(:instance) do
+        Country.create!
+      end
+
+      context 'embedded document' do
+        shared_examples 'persists the attribute value' do
+          it 'writes the attribute value into the model' do
+            instance.president.age.should == 79
+          end
+
+          it 'persists the attribute value' do
+            Country.find(instance.id).president.age.should == 79
+          end
+        end
+
+        context 'set as a document instance' do
+          before do
+            instance.update_attributes!(president: President.new)
+          end
+
+          include_examples 'persists the attribute value'
+        end
+
+        context 'set as attributes on parent' do
+          before do
+            instance.update_attributes!(president: { name: "Abraham Lincoln" })
+          end
+
+          include_examples 'persists the attribute value'
+        end
+      end
+
+      context 'nested embedded document' do
+        shared_examples 'persists the attribute value' do
+          it 'writes the attribute value into the model' do
+            instance.president.first_spouse.age.should == 70
+          end
+
+          it 'persists the attribute value' do
+            Country.find(instance.id).president.first_spouse.age.should == 70
+          end
+        end
+
+        context 'set as a document instance' do
+          before do
+            instance.update_attributes!(president: President.new(first_spouse: FirstSpouse.new))
+          end
+
+          include_examples 'persists the attribute value'
+        end
+
+        context 'set as attributes on parent' do
+          before do
+            instance.update_attributes!(president: { first_spouse: { name: "Mary Todd Lincoln" } })
           end
 
           include_examples 'persists the attribute value'
@@ -221,6 +281,55 @@ describe 'callbacks integration tests' do
       obj.save!
 
       obj.previous.should == 2
+    end
+  end
+
+  context 'atomic_selector in after_save callback' do
+    let(:name) do
+      'Alice'
+    end
+
+    let(:new_name) do
+      'Bob'
+    end
+
+    class CBIntSpecProfile
+      include Mongoid::Document
+      field :name, type: String
+      shard_key :name
+
+      attr_reader :atomic_selector_in_after_save
+
+      after_save do |document|
+        @atomic_selector_in_after_save = document.atomic_selector
+      end
+    end
+
+    it 'has updated attributes' do
+      profile = CBIntSpecProfile.create!(name: name)
+      profile.name = new_name
+      profile.save!
+      expect(
+        profile.atomic_selector_in_after_save['name']
+      ).to eq(new_name)
+    end
+  end
+
+  context "When touching an embedded document" do
+    let(:planet) { Planet.new }
+    let(:star) { Star.new }
+    let(:galaxy) { Galaxy.create! }
+
+    before do
+      star.planets << planet
+      galaxy.stars << star
+    end
+
+    it "the parent document touch callback gets called before the child" do
+      planet.touch
+      expect(galaxy.was_touched).to be true
+      expect(star.was_touched_after_parent).to be true
+      expect(planet.was_touched_after_parent).to be true
     end
   end
 end

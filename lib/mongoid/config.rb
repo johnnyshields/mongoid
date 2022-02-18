@@ -77,6 +77,36 @@ module Mongoid
     # Store BigDecimals as Decimal128s instead of strings in the db.
     option :map_big_decimal_to_decimal128, default: false
 
+    # Update embedded documents correctly when setting it, unsetting it
+    # and resetting it. See MONGOID-5206 and MONGOID-5240 for more details.
+    option :update_embedded_after_nil, default: false
+
+    # Update the triple equals operator to use only is_a? in alignment with
+    # ruby behavior. See the following PR for an explanation: https://github.com/mongodb/mongoid/pull/5013
+    option :triple_equals_uses_is_a, default: false
+
+    # Restore previous scope after with_scope returns.
+    option :restore_previous_scope, default: false
+
+    # Returns zeros when doing a sum with a field on a null context.
+    option :return_zero_on_sum_none, default: false
+
+    # Respect aliased fields in pluck/distinct by recursively considering
+    # embedded documents.
+    option :fix_embedded_alias_pluck_distinct, default: false
+
+    # Fixes add_logical_operator_expression when attempting to add multiple
+    # clauses that use the same operator on the same field.
+    option :fix_multiple_ands, default: false
+
+    # Use millisecond precision when comparing Time objects with the _matches?
+    # function.
+    option :compare_time_by_ms, default: false
+
+    # Use bson-ruby's implementation of as_json for BSON::ObjectId instead of
+    # the one monkey-patched into Mongoid.
+    option :use_bson_ruby_as_json, default: false
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #

@@ -110,6 +110,17 @@ describe Mongoid::Scopable do
         expect(Band).to be_default_scoping
       end
     end
+
+    context "when parent class has default scope" do
+
+      let (:selector) do
+        AudibleSound.all.selector
+      end
+
+      it "the subclass doesn't duplicate the default scope in the selector" do
+        expect(selector).to eq({'active' => true})
+      end
+    end
   end
 
   describe ".default_scopable?" do
@@ -780,9 +791,11 @@ describe Mongoid::Scopable do
             "$or" => [
               { "ccc" => nil },
               { "ccc" => { "$gt" => 1.0 }},
+            ],
+            '$and' => ['$or' => [
               { "aaa" => { "$gt" => 0.0 }},
               { "bbb" => { "$gt" => 0.0 }}
-            ]
+            ]],
           })
         end
       end
@@ -1131,18 +1144,55 @@ describe Mongoid::Scopable do
       let(:c1) { Band.where(active: true) }
       let(:c2) { Band.where(active: false) }
 
-      it 'restores previous scope' do
-        Band.with_scope(c1) do |crit|
-          Band.with_scope(c2) do |crit2|
+      context "when the restore_previous_scope is set" do
+        around do |example|
+          saved_flag = Mongoid.restore_previous_scope
+          Mongoid.restore_previous_scope = true
+          begin
+            example.run
+          ensure
+            Mongoid.restore_previous_scope = saved_flag
+          end
+        end
+
+        it 'restores previous scope' do
+          Band.with_scope(c1) do |crit|
+            Band.with_scope(c2) do |crit2|
+              Mongoid::Threaded.current_scope(Band).selector.should == {
+                'active' => true,
+                '$and' => ['active' => false],
+              }
+            end
+
             Mongoid::Threaded.current_scope(Band).selector.should == {
               'active' => true,
-              '$and' => ['active' => false],
             }
           end
+        end
+      end
 
-          Mongoid::Threaded.current_scope(Band).selector.should == {
-            'active' => true,
-          }
+      context "when the restore_previous_scope is not set" do
+        around do |example|
+          saved_flag = Mongoid.restore_previous_scope
+          Mongoid.restore_previous_scope = false
+          begin
+            example.run
+          ensure
+            Mongoid.restore_previous_scope = saved_flag
+          end
+        end
+
+        it 'does not restore previous scope' do
+          Band.with_scope(c1) do |crit|
+            Band.with_scope(c2) do |crit2|
+              Mongoid::Threaded.current_scope(Band).selector.should == {
+                'active' => true,
+                '$and' => ['active' => false],
+              }
+            end
+
+            Mongoid::Threaded.current_scope(Band).should be_nil
+          end
         end
       end
     end

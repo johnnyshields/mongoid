@@ -290,24 +290,136 @@ describe Mongoid::Reloadable do
 
     context "when embedded documents are unasssigned and reassigned" do
 
-      let(:palette) do
-        Palette.new
+      context "when update_embedded_after_nil feature flag is set" do
+        around do |example|
+          saved_flag = Mongoid.update_embedded_after_nil
+          Mongoid.update_embedded_after_nil = true
+          begin
+            example.run
+          ensure
+            Mongoid.update_embedded_after_nil = saved_flag
+          end
+        end
+
+        let(:palette) do
+          Palette.new
+        end
+
+        let(:canvas) do
+          Canvas.create!
+        end
+
+        before do
+          canvas.palette = palette
+          canvas.palette = nil
+          canvas.palette = palette
+          canvas.save!
+          canvas.reload
+        end
+
+        it "reloads the embedded document correctly" do
+          expect(canvas.palette).to eq(palette)
+        end
       end
 
-      let(:canvas) do
-        Canvas.create!
+      context "when update_embedded_after_nil feature flag is not set" do
+
+        around do |example|
+          saved_flag = Mongoid.update_embedded_after_nil
+          Mongoid.update_embedded_after_nil = false
+          begin
+            example.run
+          ensure
+            Mongoid.update_embedded_after_nil = saved_flag
+          end
+        end
+
+        let(:palette) do
+          Palette.new
+        end
+
+        let(:canvas) do
+          Canvas.create!
+        end
+
+        before do
+          canvas.palette = palette
+          canvas.palette = nil
+          canvas.palette = palette
+          canvas.save!
+          canvas.reload
+        end
+
+        it "does not reload the embedded document correctly" do
+          expect(canvas.palette).to be_nil
+        end
+      end
+    end
+
+    context "when embeds_many documents are cleared and reassigned" do
+
+      context "when update_embedded_after_nil feature flag is set" do
+        around do |example|
+          saved_flag = Mongoid.update_embedded_after_nil
+          Mongoid.update_embedded_after_nil = true
+          begin
+            example.run
+          ensure
+            Mongoid.update_embedded_after_nil = saved_flag
+          end
+        end
+
+        let(:contractor) do
+          Contractor.new(name: 'contractor')
+        end
+
+        let(:building) do
+          Building.create!
+        end
+
+        it "persists an embedded document correctly the second time" do
+          building.contractors << contractor
+          expect(building.contractors).to eq([contractor])
+
+          building.contractors.clear
+          expect(building.contractors).to eq([])
+
+          building.contractors << contractor
+          building.reload
+          expect(building.contractors).to eq([contractor])
+        end
       end
 
-      before do
-        canvas.palette = palette
-        canvas.palette = nil
-        canvas.palette = palette
-        canvas.save!
-        canvas.reload
-      end
+      context "when update_embedded_after_nil feature flag is not set" do
+        around do |example|
+          saved_flag = Mongoid.update_embedded_after_nil
+          Mongoid.update_embedded_after_nil = false
+          begin
+            example.run
+          ensure
+            Mongoid.update_embedded_after_nil = saved_flag
+          end
+        end
 
-      it "reloads the embedded document correctly" do
-        expect(canvas.palette).to eq(palette)
+        let(:contractor) do
+          Contractor.new(name: 'contractor')
+        end
+
+        let(:building) do
+          Building.create!
+        end
+
+        it "doesn't persist the embedded document correctly the second time" do
+          building.contractors << contractor
+          expect(building.contractors).to eq([contractor])
+
+          building.contractors.clear
+          expect(building.contractors).to eq([])
+
+          building.contractors << contractor
+          building.reload
+          expect(building.contractors).to eq([])
+        end
       end
     end
 
@@ -487,6 +599,66 @@ describe Mongoid::Reloadable do
           event = find_events.first
           expect(event.command['filter'].keys).to include('name')
         end
+      end
+    end
+
+    context 'when raise_not_found_error is false' do
+      config_override :raise_not_found_error, false
+
+      let!(:band) { Band.create!(name: 'Sun Project') }
+
+      context 'when document exists in the database' do
+        before do
+          band.name = 'test'
+        end
+
+        it 'reloads the document' do
+          band.name.should == 'test'
+
+          band.reload
+
+          band.name.should == 'Sun Project'
+        end
+      end
+
+      context 'when document does not exist in the database' do
+        before do
+          band.name = 'test'
+
+          band.destroy
+        end
+
+        it 'creates a new document with default values' do
+          original_id = band.id
+          band.name.should == 'test'
+
+          band.reload
+
+          band.name.should be nil
+          band.id.should_not be nil
+          # _id changes
+          band.id.should_not == original_id
+        end
+      end
+    end
+
+    context 'when document has referenced associations' do
+      let!(:church) do
+        Church.create!(name: 'Test', acolytes: [Acolyte.new(name: 'Borg')])
+      end
+
+      before do
+        church.acolytes.first.name = 'test'
+      end
+
+      it 'resets the associations' do
+        church.acolytes.first.name.should == 'test'
+
+        church.reload
+
+        church.acolytes._loaded?.should be false
+
+        church.acolytes.first.name.should == 'Borg'
       end
     end
   end

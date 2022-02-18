@@ -224,10 +224,10 @@ describe Mongoid::Config do
     end
   end
 
-  context 'when the map_big_decimal_to_decimal128 option is set in the config' do
-
+  shared_examples "a config option" do
 
     before do
+      Mongoid::Config.reset
       Mongoid.configure do |config|
         config.load_configuration(conf)
       end
@@ -236,38 +236,96 @@ describe Mongoid::Config do
     context 'when the value is false' do
 
       let(:conf) do
-        CONFIG.merge(options: { map_big_decimal_to_decimal128: false })
+        CONFIG.merge(options: { option => false })
       end
 
-      it 'sets the Mongoid.map_big_decimal_to_decimal128 option to the provided value' do
-        expect(Mongoid.map_big_decimal_to_decimal128).to be(false)
+      it "is set to false" do
+        expect(Mongoid.send(option)).to be(false)
       end
     end
 
     context 'when the value is true' do
 
       let(:conf) do
-        CONFIG.merge(options: { map_big_decimal_to_decimal128: true })
+        CONFIG.merge(options: { option => true })
       end
 
-      it 'sets the Mongoid.map_big_decimal_to_decimal128 option to the provided value' do
-        expect(Mongoid.map_big_decimal_to_decimal128).to be(true)
+      it "is set to true" do
+        expect(Mongoid.send(option)).to be(true)
+      end
+    end
+
+    context "when it is not set in the config" do
+
+      let(:conf) { CONFIG }
+
+      it "it is set to its default" do
+        expect(Mongoid.send(option)).to be(default)
       end
     end
   end
 
-  context 'when the map_big_decimal_to_decimal128 option is not set in the config' do
+  context 'when setting the map_big_decimal_to_decimal128 option in the config' do
+    let(:option) { :map_big_decimal_to_decimal128 }
+    let(:default) { false }
 
-    before do
-      Mongoid::Config.reset
-      Mongoid.configure do |config|
-        config.load_configuration(CONFIG)
-      end
-    end
+    it_behaves_like "a config option"
+  end
 
-    it 'does not set the Mongoid.map_big_decimal_to_decimal128 option' do
-      expect(Mongoid.map_big_decimal_to_decimal128).to be(false)
-    end
+  context 'when setting the update_embedded_after_nil option in the config' do
+    let(:option) { :update_embedded_after_nil }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the triple_equals_uses_is_a option in the config' do
+    let(:option) { :triple_equals_uses_is_a }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the restore_previous_scope option in the config' do
+    let(:option) { :restore_previous_scope }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the return_zero_on_sum_none option in the config' do
+    let(:option) { :return_zero_on_sum_none }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the fix_embedded_alias_pluck_distinct option in the config' do
+    let(:option) { :fix_embedded_alias_pluck_distinct }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the fix_multiple_ands option in the config' do
+    let(:option) { :fix_multiple_ands }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the compare_time_by_ms option in the config' do
+    let(:option) { :compare_time_by_ms }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the use_bson_ruby_as_json option in the config' do
+    let(:option) { :use_bson_ruby_as_json }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
   end
 
   describe "#load!" do
