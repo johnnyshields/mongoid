@@ -1,0 +1,111 @@
+avg-integer:
+  documents:
+    - {name: Sun, likes: 100}
+  method: :avg
+  field: :likes
+  result: 100.0
+
+avg-integer-str:
+  documents:
+    - {name: Sun, likes: '100'}
+  method: :avg
+  field: :likes
+  result: 100.0
+
+avg-negative-integer:
+  documents:
+    - {name: Sun, likes: -100}
+  method: :avg
+  field: :likes
+  result: -100.0
+
+avg-negative-integer-str:
+  documents:
+    - {name: Sun, likes: '-100'}
+  method: :avg
+  field: :likes
+  result: -100.0
+
+min-integer:
+  documents:
+    - {name: Sun, likes: 100}
+  method: :min
+  field: :likes
+  result: 100
+
+min-integer-str:
+  documents:
+    - {name: Sun, likes: '100'}
+  method: :min
+  field: :likes
+  result: 100
+
+min-negative-integer:
+  documents:
+    - {name: Sun, likes: -100}
+  method: :min
+  field: :likes
+  result: -100
+
+min-negative-integer-str:
+  documents:
+    - {name: Sun, likes: '-100'}
+  method: :min
+  field: :likes
+  result: -100
+
+max-integer:
+  documents:
+    - {name: Sun, likes: 100}
+  method: :max
+  field: :likes
+  result: 100
+
+max-integer-str:
+  documents:
+    - {name: Sun, likes: '100'}
+  method: :max
+  field: :likes
+  result: 100
+
+max-negative-integer:
+  documents:
+    - {name: Sun, likes: -100}
+  method: :max
+  field: :likes
+  result: -100
+
+max-negative-integer-str:
+  documents:
+    - {name: Sun, likes: '-100'}
+  method: :max
+  field: :likes
+  result: -100
+
+sum-integer:
+  documents:
+    - {name: Sun, likes: 100}
+  method: :sum
+  field: :likes
+  result: 100
+
+sum-integer-str:
+  documents:
+    - {name: Sun, likes: '100'}
+  method: :sum
+  field: :likes
+  result: 100
+
+sum-negative-integer:
+  documents:
+    - {name: Sun, likes: -100}
+  method: :sum
+  field: :likes
+  result: -100
+
+sum-negative-integer-str:
+  documents:
+    - {name: Sun, likes: '-100'}
+  method: :sum
+  field: :likes
+  result: -100
