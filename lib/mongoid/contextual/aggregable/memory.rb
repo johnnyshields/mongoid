@@ -29,7 +29,10 @@ module Mongoid
         #
         # @return [ Float ] The average.
         def avg(field)
-          count > 0 ? sum(field).to_f / count.to_f : nil
+          total = count { |doc| doc.send(field).numeric? }
+          return nil unless total > 0
+
+          sum(field).to_f / total.to_f
         end
 
         # Get the max value of the provided field. If provided a block, will
@@ -49,7 +52,9 @@ module Mongoid
         # @return [ Float, Document ] The max value or document with the max
         #   value.
         def max(field = nil)
-          block_given? ? super() : aggregate_by(field, :max_by)
+          return super() if block_given?
+
+          aggregate_by(field, :max)
         end
 
         # Get the min value of the provided field. If provided a block, will
@@ -69,7 +74,9 @@ module Mongoid
         # @return [ Float, Document ] The min value or document with the min
         #   value.
         def min(field = nil)
-          block_given? ? super() : aggregate_by(field, :min_by)
+          return super() if block_given?
+
+          aggregate_by(field, :min)
         end
 
         # Get the sum value of the provided field. If provided a block, will
@@ -85,11 +92,10 @@ module Mongoid
         #
         # @return [ Float ] The sum value.
         def sum(field = nil)
-          if block_given?
-            super()
-          else
-            count > 0 ? super(0) { |doc| doc.public_send(field) } : 0
-          end
+          return super() if block_given?
+          return 0 unless count > 0
+
+          aggregate_by(field, :sum)
         end
 
         private
@@ -99,14 +105,45 @@ module Mongoid
         # @api private
         #
         # @example Aggregate by the field and method.
-        #   aggregable.aggregate_by(:name, :min_by)
+        #   aggregable.aggregate_by(:likes, :min_by)
         #
         # @param [ Symbol ] field The field to aggregate on.
         # @param [ Symbol ] method The method (min_by or max_by).
         #
         # @return [ Integer ] The aggregate.
         def aggregate_by(field, method)
-          count > 0 ? send(method) { |doc| doc.public_send(field) }.public_send(field) : nil
+          return nil unless count > 0
+
+          map { |doc| __coerce_numeric(doc.public_send(field)) }.compact.send(method)
+        end
+
+        # Returns the given value if it is numeric, otherwise returns
+        # a given default value. Strings will be coerced to either
+        # Float or Integer depending on format.
+        #
+        # @api private
+        #
+        # @param [ Object ] value The value to return if numeric.
+        #
+        # @return [ Integer | Float | nil ] The coerced value or nil if the
+        #   original value was not numeric.
+        def __coerce_numeric(value)
+          if value.numeric?
+            case value
+            when BSON::Decimal128
+              value.to_big_decimal
+            when String
+              if value =~ /\A-?\d+\z/
+                Integer(value)
+              else
+                Float(value)
+              end
+            else
+              value
+            end
+          else
+            nil
+          end
         end
       end
     end
