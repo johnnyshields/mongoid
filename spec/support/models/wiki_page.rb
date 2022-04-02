@@ -8,6 +8,7 @@ class WikiPage
   field :transient_property, type: String
   field :author, type: String
   field :description, type: String, localize: true
+  field :last_viewed_at, type: Time
 
   embeds_many :edits, validate: false
   # Must have dependent: :destroy

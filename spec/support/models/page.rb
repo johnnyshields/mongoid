@@ -2,6 +2,8 @@
 
 class Page
   include Mongoid::Document
+  include Mongoid::Timestamps::Short
+
   embedded_in :quiz
   embeds_many :page_questions
 
