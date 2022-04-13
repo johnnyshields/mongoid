@@ -47,7 +47,6 @@ module Mongoid
       around do |example|
         old_backend = I18n.backend
         I18n.backend = I18nBackendWithFallbacks.new
-        I18n.eager_load!
         example.run
       ensure
         I18n.backend = old_backend
