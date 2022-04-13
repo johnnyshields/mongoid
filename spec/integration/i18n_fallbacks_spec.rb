@@ -7,7 +7,6 @@ describe 'i18n fallbacks' do
 
   context 'when fallbacks are enabled with a locale list' do
     before do
-      I18n.default_locale = :en
       I18n.fallbacks[:de] = [ :en ]
     end
 

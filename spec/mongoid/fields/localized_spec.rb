@@ -83,12 +83,7 @@ describe Mongoid::Fields::Localized do
       context "when a locale is provided" do
 
         before do
-          I18n.enforce_available_locales = false
           ::I18n.locale = :de
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         context "when the value exists" do
@@ -430,12 +425,7 @@ describe Mongoid::Fields::Localized do
       context 'when the type is Boolean' do
 
         before do
-          I18n.enforce_available_locales = false
           ::I18n.locale = :de
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         context "when the value is false" do

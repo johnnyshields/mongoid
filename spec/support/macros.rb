@@ -45,12 +45,12 @@ module Mongoid
 
     def with_i18n_fallbacks
       around do |example|
-        old_i18n_backend = I18n.backend
+        old_backend = I18n.backend
         I18n.backend = I18nBackendWithFallbacks.new
         I18n.eager_load!
         example.run
       ensure
-        I18n.backend = old_i18n_backend
+        I18n.backend = old_backend
       end
     end
   end

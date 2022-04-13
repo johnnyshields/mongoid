@@ -691,11 +691,8 @@ describe Mongoid::Contextual::Mongo do
       context 'when fallbacks are enabled with a locale list' do
         with_i18n_fallbacks
 
-        around(:all) do |example|
-          prev_fallbacks = I18n.fallbacks.dup
+        before do
           I18n.fallbacks[:he] = [ :en ]
-          example.run
-          I18n.fallbacks = prev_fallbacks
         end
 
         let(:distinct) do
