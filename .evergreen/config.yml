@@ -696,20 +696,6 @@ buildvariants:
   tasks:
      - name: "test"
 
-- matrix_name: "i18n-fallbacks"
-  matrix_spec:
-    ruby: "ruby-2.6"
-    driver: ["current"]
-    mongodb-version: "4.2"
-    topology: "standalone"
-    i18n: '*'
-    test-i18n-fallbacks: yes
-  display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}, ${i18n}"
-  run_on:
-    - rhel70-small
-  tasks:
-     - name: "test"
-
 # https://jira.mongodb.org/browse/MONGOID-5216
 # - matrix_name: app-tests-ruby-3
 #   matrix_spec:
