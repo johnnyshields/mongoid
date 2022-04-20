@@ -53,6 +53,7 @@ Gem::Specification.new do |s|
   s.add_dependency("ruby2_keywords", "~> 0.0.5")
 
   s.add_development_dependency("bson", ['>=4.14.0', '<5.0.0'])
+  s.add_development_dependency("rubocop", '~> 1.27.0')
 
   s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG.md LICENSE README.md Rakefile)
   s.test_files   = Dir.glob("spec/**/*")
