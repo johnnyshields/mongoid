@@ -18,7 +18,7 @@ module Mongoid
       def process_attributes(attrs = nil)
         attrs ||= {}
         if !attrs.empty?
-          attrs = sanitize_for_mass_assignment(attrs)
+          attrs = sanitize_forbidden_attributes(attrs)
           attrs.each_pair do |key, value|
             next if pending_attribute?(key, value)
             process_attribute(key, value)
@@ -83,6 +83,7 @@ module Mongoid
       # @param [ Symbol ] name The name of the field.
       # @param [ Object ] value The value of the field.
       def process_attribute(name, value)
+        value = sanitize_forbidden_attributes(value)
         if !respond_to?("#{name}=", true) && store_as = aliased_fields.invert[name.to_s]
           name = store_as
         end
@@ -98,6 +99,7 @@ module Mongoid
       #   document.process_nested
       def process_nested
         pending_nested.each_pair do |name, value|
+          value = sanitize_forbidden_attributes(value)
           send("#{name}=", value)
         end
       end
@@ -119,6 +121,7 @@ module Mongoid
       def process_relations
         pending_relations.each_pair do |name, value|
           association = relations[name]
+          value = sanitize_forbidden_attributes(value)
           if value.is_a?(Hash)
             association.nested_builder(value, {}).build(self)
           else

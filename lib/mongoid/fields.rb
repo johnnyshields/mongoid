@@ -574,7 +574,7 @@ module Mongoid
           re_define_method("#{meth}_translations=") do |value|
             attribute_will_change!(name)
             if value
-              value.update_values do |_value|
+              value = Hash.evolve(value.dup).transform_values! do |_value|
                 field.type.mongoize(_value)
               end
             end
