@@ -104,14 +104,7 @@ module Mongoid
       #   document.process_nested
       def process_nested
         pending_nested.each_pair do |name, value|
-
-          # MONGOID-5308: To handle nested ActionController::Parameters,
-          # we use #sanitize_forbidden_attributes which resolves
-          # Strong Parameters permitted attributes.
-          #
-          # TODO: need to explore if we need recursion here
-          value = value.is_a?(Array) ? value.map(&method(:sanitize_forbidden_attributes)) : sanitize_forbidden_attributes(value)
-
+          value = sanitize_nested_forbidden_attributes(value)
           send("#{name}=", value)
         end
       end
@@ -133,17 +126,26 @@ module Mongoid
       def process_relations
         pending_relations.each_pair do |name, value|
           association = relations[name]
-
-          # MONGOID-5308: To handle nested ActionController::Parameters,
-          # we use #sanitize_forbidden_attributes which resolves
-          # Strong Parameters permitted attributes.
-          value = sanitize_forbidden_attributes(value)
-
+          value = sanitize_nested_forbidden_attributes(value)
           if value.is_a?(Hash)
             association.nested_builder(value, {}).build(self)
           else
             send("#{name}=", value)
           end
+        end
+      end
+
+      # Sanitize nested ActionController::Parameter objects, including
+      # Array of ActionController::Parameter.
+      #
+      # MONGOID-5308: Here we intentionally use #sanitize_forbidden_attributes
+      # instead of #sanitize_for_mass_assignment. The former only resolves
+      # Strong Parameters permitted attributes.
+      def sanitize_nested_forbidden_attributes(attrs)
+        if attrs.is_a?(Array)
+          attrs.map(&method(:sanitize_forbidden_attributes))
+        else
+          sanitize_forbidden_attributes(attrs)
         end
       end
     end
