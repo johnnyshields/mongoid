@@ -108,7 +108,9 @@ module Mongoid
           # MONGOID-5308: To handle nested ActionController::Parameters,
           # we use #sanitize_forbidden_attributes which resolves
           # Strong Parameters permitted attributes.
-          value = sanitize_forbidden_attributes(value)
+          #
+          # TODO: need to explore if we need recursion here
+          value = value.is_a?(Array) ? value.map(&method(:sanitize_forbidden_attributes)) : sanitize_forbidden_attributes(value)
 
           send("#{name}=", value)
         end
