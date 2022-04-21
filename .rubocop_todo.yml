@@ -1539,6 +1539,7 @@ Layout/SpaceAroundOperators:
 # SupportedStyles: space, no_space
 # SupportedStylesForEmptyBraces: space, no_space
 Layout/SpaceBeforeBlockBraces:
+  Enabled: false
   EnforcedStyleForEmptyBraces: no_space
 
 # Offense count: 1
@@ -2617,6 +2618,7 @@ Naming/MethodParameterName:
 # AllowedMethods: is_a?
 # MethodDefinitionMacros: define_method, define_singleton_method
 Naming/PredicateName:
+  Enabled: false
   Exclude:
     - 'lib/mongoid/association/macros.rb'
     - 'lib/mongoid/attributes.rb'
@@ -5377,6 +5379,7 @@ Style/NumericLiterals:
 # Configuration parameters: EnforcedStyle, IgnoredMethods.
 # SupportedStyles: predicate, comparison
 Style/NumericPredicate:
+  Enabled: false
   Exclude:
     - 'lib/mongoid/association/accessors.rb'
     - 'lib/mongoid/association/eager_loadable.rb'
