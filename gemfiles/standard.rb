@@ -15,6 +15,11 @@ def standard_dependencies
 
   group :development, :test do
     gem 'rspec-core', '~> 3.10'
+    gem 'rubocop', '~> 1.27.0'
+    gem 'rubocop-performance', '~> 1.13.3'
+    gem 'rubocop-rails', '~> 2.14.2'
+    gem 'rubocop-rake', '~> 0.6.0'
+    gem 'rubocop-rspec', '~> 2.9.0'
 
     platform :mri do
       gem 'byebug'
