@@ -103,3 +103,6 @@ namespace :release do
     end
   end
 end
+
+require 'rubocop/rake_task'
+RuboCop::RakeTask.new

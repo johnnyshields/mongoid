@@ -285,6 +285,18 @@ functions:
             TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
             ./egos .evergreen/run-tests.sh
 
+  "run static analysis":
+    - command: shell.exec
+      type: test
+      params:
+        shell: bash
+        working_dir: "src"
+        script: |
+          ${PREPARE_SHELL}
+          env \
+            TEST_CMD="bundle exec rake rubocop" \
+            ./egos .evergreen/run-tests.sh
+
   "fix absolute paths":
     - command: shell.exec
       params:
@@ -322,6 +334,9 @@ tasks:
     - name: "test"
       commands:
         - func: "run tests"
+    - name: "rubocop"
+      commands:
+        - func: "run static analysis"
 
 axes:
   - id: "mongodb-version"
@@ -764,3 +779,15 @@ buildvariants:
     - ubuntu1804-small
   tasks:
      - name: "test"
+
+- matrix_name: "rubocop"
+  matrix_spec:
+    driver: ["current"]
+    ruby: ["ruby-3.0"]
+    mongodb-version: "5.0"
+    topology: "standalone"
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - ubuntu1804-small
+  tasks:
+    - name: "rubocop"
