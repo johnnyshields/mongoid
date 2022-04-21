@@ -2947,6 +2947,7 @@ RSpec/BeforeAfterAll:
     - 'spec/rails/mongoid_spec.rb'
     - 'spec/shared/lib/mrss/constraints.rb'
     - 'spec/shared/lib/mrss/lite_constraints.rb'
+    - 'spec/support/constraints.rb'
 
 # Offense count: 34
 # This cop supports safe auto-correction (--auto-correct).
@@ -4485,6 +4486,7 @@ Style/DocumentDynamicEvalDefinition:
 # Offense count: 135
 # Configuration parameters: AllowedConstants.
 Style/Documentation:
+  Enabled: false
   Exclude:
     - 'examples/mongoid_test.rb'
     - 'lib/mongoid.rb'
