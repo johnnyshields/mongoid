@@ -269,7 +269,7 @@ Layout/SpaceAroundOperators:
 # SupportedStyles: space, no_space
 # SupportedStylesForEmptyBraces: space, no_space
 Layout/SpaceBeforeBlockBraces:
-  EnforcedStyleForEmptyBraces: no_space
+  Enabled: false
 
 # Offense count: 1
 # This cop supports safe auto-correction (--auto-correct).
