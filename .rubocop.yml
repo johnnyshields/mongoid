@@ -13,6 +13,18 @@ AllCops:
     - 'spec/shared/lib/mrss/**/*'
     - 'vendor/**/*'
 
+Layout:
+  Enabled: false
+
+Metrics:
+  Enabled: false
+
+RSpec:
+  Enabled: false
+
+Style:
+  Enabled: false
+
 Bundler/OrderedGems:
   Enabled: false
 
@@ -25,43 +37,7 @@ Gemspec/RequiredRubyVersion:
 Gemspec/RequireMFA:
   Enabled: false
 
-Layout/EmptyLineAfterGuardClause:
-  Enabled: false
-
-Layout/EmptyLinesAroundBlockBody:
-  Enabled: false
-
-Layout/EmptyLinesAroundClassBody:
-  Enabled: false
-
-Layout/EmptyLinesAroundExceptionHandlingKeywords:
-  Enabled: false
-
-Layout/EmptyLinesAroundModuleBody:
-  Enabled: false
-
-Layout/SpaceInsideArrayLiteralBrackets:
-  Enabled: false
-
-Layout/SpaceInsideBlockBraces:
-  SpaceBeforeBlockParameters: false
-
-Metrics/BlockLength:
-  Enabled: false
-
-Metrics/BlockNesting:
-  Enabled: false
-
-Metrics/ClassLength:
-  Enabled: false
-
-Metrics/MethodLength:
-  Enabled: false
-
-Metrics/ModuleLength:
-  Enabled: false
-
-Metrics/ParameterLists:
+Rake/Desc:
   Enabled: false
 
 # Not used by Mongoid
