@@ -58,7 +58,7 @@ describe Mongoid::Touchable do
           update_time
           entrance.touch
 
-          entrance.updated_at.should == update_time
+          expect(entrance.updated_at).to eq update_time
         end
 
         it "persists the changes" do
@@ -66,7 +66,7 @@ describe Mongoid::Touchable do
           update_time
           entrance.touch
 
-          entrance.reload.updated_at.should == update_time
+          expect(entrance.reload.updated_at).to eq update_time
         end
       end
 
@@ -77,7 +77,7 @@ describe Mongoid::Touchable do
           update_time
           floor.touch
 
-          building.updated_at.should == update_time
+          expect(building.updated_at).to eq update_time
         end
 
         it 'persists updated updated_at on parent' do
@@ -85,7 +85,7 @@ describe Mongoid::Touchable do
           update_time
           floor.touch
 
-          building.reload.updated_at.should == update_time
+          expect(building.reload.updated_at).to eq update_time
         end
       end
 
@@ -619,8 +619,8 @@ describe Mongoid::Touchable do
         end
 
         it "updates the parent's timestamp" do
-          building.updated_at.should == update_time
-          building.reload.updated_at.should == update_time
+          expect(building.updated_at).to eq update_time
+          expect(building.reload.updated_at).to eq update_time
         end
       end
 

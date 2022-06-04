@@ -102,16 +102,12 @@ module Mongoid
       name = association.name
       method_name = define_relation_touch_method(name, association)
       association.inverse_class.tap do |klass|
-        if association.embedded?
-          klass.before_save method_name
-          klass.before_destroy method_name
-          # before_touch is intentionally omitted. Embedded docs handle
-          # touch updates recursively within the #touch method itself
-        else
-          klass.after_save method_name
-          klass.after_destroy method_name
-          klass.after_touch method_name
-        end
+        klass.after_save method_name
+        klass.after_destroy method_name
+
+        # Embedded docs handle touch updates recursively within
+        # the #touch method itself
+        klass.after_touch method_name unless association.embedded?
       end
     end
 
@@ -138,8 +134,7 @@ module Mongoid
                          end
 
       relation_classes.each { |c| c.send(:include, InstanceMethods) }
-
-      method_name = "touch_#{name}_on_save_or_destroy"
+      method_name = "touch_#{name}_after_create_or_destroy"
       association.inverse_class.class_eval do
         define_method(method_name) do
           without_autobuild do
