@@ -89,13 +89,13 @@ describe Mongoid::Touchable do
         end
       end
 
-      shared_examples 'updates the parent when :touch is not set' do
+      shared_examples 'does not update the parent when :touch is false' do
         it 'does not update updated_at on parent' do
           entrance
           update_time
           entrance.touch
 
-          building.updated_at.should == update_time
+          expect(building.updated_at).to eq start_time
         end
 
         it 'does not persist updated updated_at on parent' do
@@ -103,25 +103,7 @@ describe Mongoid::Touchable do
           update_time
           entrance.touch
 
-          building.reload.updated_at.should == update_time
-        end
-      end
-
-      shared_examples 'does not update the parent when :touch is not set' do
-        it 'does not update updated_at on parent' do
-          entrance
-          update_time
-          entrance.touch
-
-          building.updated_at.should == start_time
-        end
-
-        it 'does not persist updated updated_at on parent' do
-          entrance
-          update_time
-          entrance.touch
-
-          building.reload.updated_at.should == start_time
+          expect(building.reload.updated_at).to eq start_time
         end
       end
 
@@ -130,9 +112,9 @@ describe Mongoid::Touchable do
 
         include_examples 'updates the child'
         include_examples 'updates the parent when :touch is true'
-        include_examples 'updates the parent when :touch is not set'
+        include_examples 'does not update the parent when :touch is false'
 
-        context 'when also updating an additional field' do
+        context 'when also updating an additional field when :touch is true' do
           it 'persists the update to the additional field' do
             entrance
             update_time
@@ -146,6 +128,24 @@ describe Mongoid::Touchable do
 
             # Check other timestamps for good measure.
             expect(entrance.updated_at).to eq update_time
+            expect(building.updated_at).to eq start_time
+          end
+        end
+
+        context 'when also updating an additional field when :touch is false' do
+          it 'persists the update to the additional field' do
+            floor
+            update_time
+            floor.touch(:last_used_at)
+
+            floor.reload
+            building.reload
+
+            # This is the assertion we want.
+            expect(floor.last_used_at).to eq update_time
+
+            # Check other timestamps for good measure.
+            expect(floor.updated_at).to eq update_time
             expect(building.updated_at).to eq update_time
           end
         end
@@ -156,7 +156,7 @@ describe Mongoid::Touchable do
 
         include_examples 'updates the child'
         include_examples 'updates the parent when :touch is true'
-        include_examples 'does not update the parent when :touch is not set'
+        include_examples 'does not update the parent when :touch is false'
       end
     end
 
@@ -644,12 +644,8 @@ describe Mongoid::Touchable do
     context "when the touch option is false" do
 
       shared_examples "does not update the parent" do
-
         let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
-
-        let(:update_time) do
-          Timecop.freeze(Time.at(Time.now.to_i) + 2)
-        end
+        let(:update_time) { Timecop.freeze(Time.at(Time.now.to_i) + 2) }
 
         after do
           Timecop.return
@@ -670,13 +666,13 @@ describe Mongoid::Touchable do
         end
 
         it "updates the child's timestamp" do
-          entrance.updated_at.should == update_time
-          entrance.reload.updated_at.should == update_time
+          expect(entrance.updated_at).to eq update_time
+          expect(entrance.reload.updated_at).to eq update_time
         end
 
         it "does not update the parent's timestamp" do
-          building.updated_at.should == start_time
-          building.reload.updated_at.should == start_time
+          expect(building.updated_at).to eq start_time
+          expect(building.reload.updated_at).to eq start_time
         end
       end
 
@@ -691,10 +687,6 @@ describe Mongoid::Touchable do
         context "with #{meth} on embedded_in" do
           let(:meth) { meth }
           let(:parent_cls) { TouchableSpec::Embedded::Building }
-
-          before do
-            skip "MONGOID-5274"
-          end
 
           include_examples "does not update the parent"
         end

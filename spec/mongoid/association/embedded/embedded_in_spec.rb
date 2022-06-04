@@ -148,17 +148,12 @@ describe Mongoid::Association::Embedded::EmbeddedIn do
     end
   end
 
-  describe '#merge!' do
-
-  end
-
-
   describe '#touchable?' do
 
-    context 'when :touch is in the options' do
+    context 'when :touch is true in the options' do
 
       let(:options) do
-        { touch: true}
+        { touch: true }
       end
 
       it 'returns true' do
@@ -166,10 +161,21 @@ describe Mongoid::Association::Embedded::EmbeddedIn do
       end
     end
 
+    context 'when :touch is false in the options' do
+
+      let(:options) do
+        { touch: false }
+      end
+
+      it 'returns false' do
+        expect(association.send(:touchable?)).to be(false)
+      end
+    end
+
     context 'when :touch is not in the options' do
 
-      it 'return false' do
-        expect(association.send(:touchable?)).to be(false)
+      it 'return true' do
+        expect(association.send(:touchable?)).to be(true)
       end
     end
   end

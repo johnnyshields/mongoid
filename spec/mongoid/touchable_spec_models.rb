@@ -14,9 +14,9 @@ module TouchableSpec
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :building, class_name: "TouchableSpec::Embedded::Building"
-
       field :last_used_at, type: Time
+
+      embedded_in :building, touch: false, class_name: "TouchableSpec::Embedded::Building"
     end
 
     class Floor
@@ -24,8 +24,9 @@ module TouchableSpec
       include Mongoid::Timestamps
 
       field :level, type: Integer
+      field :last_used_at, type: Time
 
-      embedded_in :building, touch: true, class_name: "TouchableSpec::Embedded::Building"
+      embedded_in :building, class_name: "TouchableSpec::Embedded::Building"
     end
   end
 

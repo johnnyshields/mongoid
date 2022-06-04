@@ -90,6 +90,14 @@ module Mongoid
           Nested::One.new(self, attributes, options)
         end
 
+        # Whether the association object should be automatically touched
+        # when its inverse object is updated.
+        #
+        # @return [ true, false ] Default is true.
+        def touchable?
+          @options[:touch] != false
+        end
+
         private
 
         def setup_instance_methods!

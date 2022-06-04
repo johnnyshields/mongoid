@@ -45,11 +45,10 @@ module Mongoid
         write_attribute(:updated_at, now) if respond_to?("updated_at=")
         write_attribute(field, now) if field
 
-        touches = __extract_touches_from_atomic_sets(field) || {}
+        touch_parent = _association&.inverse_association&.touchable?
 
-        # TODO: this needs to a guard `... if _parent && _association_to_parent.options[:touch]`
-        # However, the `_association_to_parent` method doesn't exist!
-        touches.merge!(_parent.__gather_touch_updates(now) || {}) if _parent
+        touches = __extract_touches_from_atomic_sets(field) || {}
+        touches.merge!(_parent.__gather_touch_updates(now) || {}) if _parent && touch_parent
         touches
       end
 
@@ -103,14 +102,16 @@ module Mongoid
       name = association.name
       method_name = define_relation_touch_method(name, association)
       association.inverse_class.tap do |klass|
-        # TODO: for EMBEDDED docs, to ensure synchronized timestamps,
-        # we should call .touch within the save/destroy
-        # action rather than as a callback 
-        klass.after_save(method_name)
-        klass.after_destroy(method_name)
-
-        # Embedded docs recursively handle touch updates within the #touch method itself
-        klass.after_touch(method_name) unless association.embedded?
+        if association.embedded?
+          klass.before_save method_name
+          klass.before_destroy method_name
+          # before_touch is intentionally omitted. Embedded docs handle
+          # touch updates recursively within the #touch method itself
+        else
+          klass.after_save method_name
+          klass.after_destroy method_name
+          klass.after_touch method_name
+        end
       end
     end
 
@@ -137,7 +138,8 @@ module Mongoid
                          end
 
       relation_classes.each { |c| c.send(:include, InstanceMethods) }
-      method_name = "touch_#{name}_after_create_or_destroy"
+
+      method_name = "touch_#{name}_on_save_or_destroy"
       association.inverse_class.class_eval do
         define_method(method_name) do
           without_autobuild do
