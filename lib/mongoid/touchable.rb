@@ -45,10 +45,10 @@ module Mongoid
         write_attribute(:updated_at, now) if respond_to?("updated_at=")
         write_attribute(field, now) if field
 
-        touch_parent = _association&.inverse_association&.touchable?
+        touch_parent = _parent && _association&.inverse_association&.touchable?
 
         touches = __extract_touches_from_atomic_sets(field) || {}
-        touches.merge!(_parent.__gather_touch_updates(now) || {}) if _parent && touch_parent
+        touches.merge!(_parent.__gather_touch_updates(now) || {}) if touch_parent
         touches
       end
 
