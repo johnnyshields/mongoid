@@ -142,11 +142,11 @@ describe Mongoid::Touchable do
             building.reload
 
             # This is the assertion we want.
-            entrance.last_used_at.should == update_time
+            expect(entrance.last_used_at).to eq update_time
 
             # Check other timestamps for good measure.
-            entrance.updated_at.should == update_time
-            building.updated_at.should == update_time
+            expect(entrance.updated_at).to eq update_time
+            expect(building.updated_at).to eq update_time
           end
         end
       end
