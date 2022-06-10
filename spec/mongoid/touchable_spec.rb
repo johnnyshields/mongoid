@@ -107,12 +107,16 @@ describe Mongoid::Touchable do
         end
       end
 
+      shared_examples 'does not update the parent when :touch is not set' do
+        it_behaves_like 'does not update the parent when :touch is false'
+      end
+
       context "when the document is embedded" do
         let(:parent_cls) { TouchableSpec::Embedded::Building }
 
         include_examples 'updates the child'
         include_examples 'updates the parent when :touch is true'
-        include_examples 'does not update the parent when :touch is false'
+        include_examples 'does not update the parent when :touch is not set'
 
         context 'when also updating an additional field when :touch is true' do
           it 'persists the update to the additional field' do
@@ -132,7 +136,7 @@ describe Mongoid::Touchable do
           end
         end
 
-        context 'when also updating an additional field when :touch is false' do
+        context 'when also updating an additional field when :touch is not set' do
           it 'persists the update to the additional field' do
             floor
             update_time
