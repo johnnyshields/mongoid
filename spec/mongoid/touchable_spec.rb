@@ -696,5 +696,80 @@ describe Mongoid::Touchable do
         end
       end
     end
+
+    describe 'multi-level: parent > embedded child > embedded grandchild' do
+
+      context 'child touch: true' do
+
+        context 'grandchild touch: true' do
+
+        end
+
+        context 'grandchild touch: false' do
+
+        end
+      end
+
+      context 'child touch: false' do
+
+        context 'grandchild touch: true' do
+
+        end
+
+        context 'grandchild touch: false' do
+
+        end
+      end
+    end
+
+    describe 'multi-level: parent > referenced child > embedded grandchild' do
+
+      context 'child touch: true' do
+
+        context 'grandchild touch: true' do
+
+        end
+
+        context 'grandchild touch: false' do
+
+        end
+      end
+
+      context 'child touch: false' do
+
+        context 'grandchild touch: true' do
+
+        end
+
+        context 'grandchild touch: false' do
+
+        end
+      end
+    end
+
+    describe 'multi-level: parent > referenced child > referenced grandchild' do
+
+      context 'child touch: true' do
+
+        context 'grandchild touch: true' do
+
+        end
+
+        context 'grandchild touch: false' do
+
+        end
+      end
+
+      context 'child touch: false' do
+
+        context 'grandchild touch: true' do
+
+        end
+
+        context 'grandchild touch: false' do
+
+        end
+      end
+    end
   end
 end
