@@ -697,79 +697,279 @@ describe Mongoid::Touchable do
       end
     end
 
-    describe 'multi-level: parent > embedded child > embedded grandchild' do
+    describe 'multi-level' do
 
-      context 'child touch: true' do
+      let(:child_name) do
+        child_cls.name.demodulize.underscore
+      end
 
-        context 'grandchild touch: true' do
+      let(:grandchild_name) do
+        grandchild_cls.name.demodulize.underscore
+      end
 
-        end
+      let(:parent) do
+        parent_cls.create!
+      end
 
-        context 'grandchild touch: false' do
+      let(:child) do
+        parent.send(child_name.pluralize).create!
+      end
 
+      let(:grandchild) do
+        grandchild = child.send(grandchild_name.pluralize).create!
+        grandchild.created_at = Time.now + 1.day # arbitrary change so save! works
+        grandchild
+      end
+
+      shared_examples "updates the parent" do
+        it "updates the parent's timestamp" do
+          expect(parent.updated_at).to eq update_time
+          expect(parent.reload.updated_at).to eq update_time
         end
       end
 
-      context 'child touch: false' do
-
-        context 'grandchild touch: true' do
-
-        end
-
-        context 'grandchild touch: false' do
-
-        end
-      end
-    end
-
-    describe 'multi-level: parent > referenced child > embedded grandchild' do
-
-      context 'child touch: true' do
-
-        context 'grandchild touch: true' do
-
-        end
-
-        context 'grandchild touch: false' do
-
+      shared_examples "does not update the parent" do
+        it "does not update the parent's timestamp" do
+          expect(parent.updated_at).to eq start_time
+          expect(parent.reload.updated_at).to eq start_time
         end
       end
 
-      context 'child touch: false' do
-
-        context 'grandchild touch: true' do
-
-        end
-
-        context 'grandchild touch: false' do
-
-        end
-      end
-    end
-
-    describe 'multi-level: parent > referenced child > referenced grandchild' do
-
-      context 'child touch: true' do
-
-        context 'grandchild touch: true' do
-
-        end
-
-        context 'grandchild touch: false' do
-
+      shared_examples "updates the child" do
+        it "updates the child's timestamp" do
+          expect(child.updated_at).to eq update_time
+          expect(child.reload.updated_at).to eq update_time
         end
       end
 
-      context 'child touch: false' do
-
-        context 'grandchild touch: true' do
-
-        end
-
-        context 'grandchild touch: false' do
-
+      shared_examples "does not update the child" do
+        it "does not update the child's timestamp" do
+          expect(child.updated_at).to eq start_time
+          expect(child.reload.updated_at).to eq start_time
         end
       end
+
+      shared_examples "updates the grandchild" do
+        it "updates the grandchild's timestamp" do
+          expect(grandchild.updated_at).to eq update_time
+          expect(grandchild.reload.updated_at).to eq update_time unless grandchild.destroyed?
+        end
+      end
+
+      shared_examples "does not update the grandchild" do
+        it "does not update the grandchild's timestamp" do
+          expect(grandchild.updated_at).to eq start_time
+          expect(grandchild.reload.updated_at).to eq start_time unless grandchild.destroyed?
+        end
+      end
+
+      let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+      let(:update_time) { Timecop.freeze(Time.at(Time.now.to_i) + 2) }
+
+      before do
+        grandchild
+        update_time
+        puts meth
+        puts "start_time:  #{update_time}"
+        puts "update_time: #{update_time}"
+        grandchild.send(meth)
+        puts "--------"
+        puts "p            #{parent.updated_at}"
+        puts "p reload     #{parent.reload.updated_at}"
+        puts "c            #{child.updated_at}"
+        puts "c reload     #{child.reload.updated_at}"
+        puts "g            #{grandchild.updated_at}"
+        puts "g reload     #{grandchild.reload.updated_at unless grandchild.destroyed?}"
+      end
+
+      after do
+        Timecop.return
+      end
+
+      context 'parent > embedded child > embedded grandchild' do
+
+        let(:parent_cls) { TouchableSpec::Referenced::Building }
+
+        context 'child touch: true' do
+
+          let(:child_cls) do
+            TouchableSpec::Embedded::Floor
+          end
+
+          context 'grandchild touch: true' do
+
+            let(:grandchild_cls) do
+              TouchableSpec::Embedded::Sofa
+            end
+
+            [ :save!, :destroy, :touch ].each do |meth|
+              context "when calling #{meth} method" do
+                let(:meth) { meth }
+
+                it_behaves_like "updates the parent"
+                it_behaves_like "updates the child"
+                it_behaves_like "updates the grandchild"
+              end
+            end
+          end
+
+          context 'grandchild touch: false' do
+
+            let(:grandchild_cls) do
+              TouchableSpec::Embedded::Chair
+            end
+
+            [ :save!, :destroy, :touch ].each do |meth|
+              context "when calling #{meth} method" do
+                let(:meth) { meth }
+
+                it_behaves_like "does not update the parent"
+                it_behaves_like "does not update the child"
+                it_behaves_like "updates the grandchild"
+              end
+            end
+          end
+        end
+
+        context 'child touch: false' do
+
+          let(:child_cls) do
+            TouchableSpec::Embedded::Entrance
+          end
+
+          context 'grandchild touch: true' do
+
+            let(:grandchild_cls) do
+              TouchableSpec::Embedded::Sofa
+            end
+
+            [ :save!, :destroy, :touch ].each do |meth|
+              context "when calling #{meth} method" do
+                let(:meth) { meth }
+
+                it_behaves_like "does not update the parent"
+                it_behaves_like "updates the child"
+                it_behaves_like "updates the grandchild"
+              end
+            end
+          end
+
+          context 'grandchild touch: false' do
+
+            let(:grandchild_cls) do
+              TouchableSpec::Embedded::Chair
+            end
+
+            [ :save!, :destroy, :touch ].each do |meth|
+              context "when calling #{meth} method" do
+                let(:meth) { meth }
+
+                it_behaves_like "does not update the parent"
+                it_behaves_like "does not update the child"
+                it_behaves_like "updates the grandchild"
+              end
+            end
+          end
+        end
+      end
+
+      # describe 'parent > referenced child > embedded grandchild' do
+      #
+      #   context 'child touch: true' do
+      #
+      #     let(:child_cls) do
+      #       TouchableSpec::Referenced::Floor
+      #     end
+      #
+      #     context 'grandchild touch: true' do
+      #
+      #       let(:grandchild_cls) do
+      #         TouchableSpec::Embedded::Sofa
+      #       end
+      #
+      #     end
+      #
+      #     context 'grandchild touch: false' do
+      #
+      #       let(:grandchild_cls) do
+      #         TouchableSpec::Embedded::Chair
+      #       end
+      #
+      #     end
+      #   end
+      #
+      #   context 'child touch: false' do
+      #
+      #     let(:child_cls) do
+      #       TouchableSpec::Referenced::Entrance
+      #     end
+      #
+      #     context 'grandchild touch: true' do
+      #
+      #       let(:grandchild_cls) do
+      #         TouchableSpec::Embedded::Sofa
+      #       end
+      #
+      #     end
+      #
+      #     context 'grandchild touch: false' do
+      #
+      #       let(:grandchild_cls) do
+      #         TouchableSpec::Embedded::Chair
+      #       end
+      #
+      #     end
+      #   end
+      # end
+      #
+      # describe 'parent > referenced child > referenced grandchild' do
+      #
+      #   context 'child touch: true' do
+      #
+      #     let(:child_cls) do
+      #       TouchableSpec::Referenced::Floor
+      #     end
+      #
+      #     context 'grandchild touch: true' do
+      #
+      #       let(:grandchild_cls) do
+      #         TouchableSpec::Embedded::Window
+      #       end
+      #
+      #     end
+      #
+      #     context 'grandchild touch: false' do
+      #
+      #       let(:grandchild_cls) do
+      #         TouchableSpec::Embedded::Plant
+      #       end
+      #
+      #     end
+      #   end
+      #
+      #   context 'child touch: false' do
+      #
+      #     let(:child_cls) do
+      #       TouchableSpec::Referenced::Entrance
+      #     end
+      #
+      #     context 'grandchild touch: true' do
+      #
+      #       let(:grandchild_cls) do
+      #         TouchableSpec::Embedded::Window
+      #       end
+      #
+      #     end
+      #
+      #     context 'grandchild touch: false' do
+      #
+      #       let(:grandchild_cls) do
+      #         TouchableSpec::Embedded::Plant
+      #       end
+      #
+      #     end
+      #   end
+      # end
     end
   end
 end
