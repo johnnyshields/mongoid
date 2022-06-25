@@ -751,8 +751,12 @@ describe Mongoid::Touchable do
 
       shared_examples "updates the grandchild" do
         it "updates the grandchild's timestamp" do
-          expect(grandchild.updated_at).to eq update_time
-          expect(grandchild.reload.updated_at).to eq update_time unless grandchild.destroyed?
+          if grandchild.destroyed?
+            expect(grandchild.updated_at).to eq start_time
+          else
+            expect(grandchild.updated_at).to eq update_time
+            expect(grandchild.reload.updated_at).to eq update_time
+          end
         end
       end
 
@@ -788,7 +792,7 @@ describe Mongoid::Touchable do
 
       context 'parent > embedded child > embedded grandchild' do
 
-        let(:parent_cls) { TouchableSpec::Referenced::Building }
+        let(:parent_cls) { TouchableSpec::Embedded::Building }
 
         context 'child touch: true' do
 
