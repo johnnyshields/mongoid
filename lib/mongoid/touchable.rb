@@ -47,6 +47,10 @@ module Mongoid
 
         touch_parent = _parent && _association&.inverse_association&.touchable?
 
+        puts 'xxx'
+        puts self.class.name
+        puts _association&.inverse_association.inspect
+
         touches = __extract_touches_from_atomic_sets(field) || {}
         touches.merge!(_parent.__gather_touch_updates(now) || {}) if touch_parent
         touches

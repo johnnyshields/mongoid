@@ -699,6 +699,27 @@ describe Mongoid::Touchable do
 
     describe 'multi-level' do
 
+      before do
+        class Parent
+          include Mongoid::Document
+          include Mongoid::Timestamps
+          embeds_many :kids
+        end
+
+        class Kid
+          include Mongoid::Document
+          include Mongoid::Timestamps
+          embedded_in :parent
+          embeds_many :grandkids
+        end
+
+        class Grandkid
+          include Mongoid::Document
+          include Mongoid::Timestamps
+          embedded_in :kid
+        end
+      end
+
       let(:child_name) do
         child_cls.name.demodulize.underscore
       end
@@ -717,6 +738,11 @@ describe Mongoid::Touchable do
 
       let(:grandchild) do
         grandchild = child.send(grandchild_name.pluralize).create!
+
+        puts 'ZZZZZZZZZZ'
+        puts grandchild._association.inverse_class.inspect
+        puts grandchild._association.inverse_association.inspect
+
         grandchild.created_at = Time.now + 1.day # arbitrary change so save! works
         grandchild
       end
@@ -792,18 +818,18 @@ describe Mongoid::Touchable do
 
       context 'parent > embedded child > embedded grandchild' do
 
-        let(:parent_cls) { TouchableSpec::Embedded::Building }
+        let(:parent_cls) { Parent }
 
         context 'child touch: true' do
 
           let(:child_cls) do
-            TouchableSpec::Embedded::Floor
+            Kid
           end
 
           context 'grandchild touch: true' do
 
             let(:grandchild_cls) do
-              TouchableSpec::Embedded::Sofa
+              Grandkid
             end
 
             [ :save!, :destroy, :touch ].each do |meth|

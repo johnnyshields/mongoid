@@ -1,0 +1,62 @@
+
+
+
+# WITH MODULE - inverse_association BROKEN
+
+module Bad
+  class Parent
+    include Mongoid::Document
+    embeds_many :kids
+  end
+
+  class Kid
+    include Mongoid::Document
+    embedded_in :parent
+    embeds_many :grandkids
+  end
+
+  class Grandkid
+    include Mongoid::Document
+    embedded_in :kid, polymorphic: true
+  end
+end
+
+parent = Bad::Parent.create!
+kid = parent.kids.create!
+grandkid = kid.grandkids.create!
+
+kid._association.inverse_class #=> Bad::Parent - OK
+kid._association.inverse_association #=> nil
+
+grandkid._association.inverse_class #=> Bad::Kid
+grandkid._association.inverse_association #=> nil
+
+
+# WITHOUT MODULE - WORK FINE
+
+class Parent
+  include Mongoid::Document
+  embeds_many :kids
+end
+
+class Kid
+  include Mongoid::Document
+  embedded_in :parent
+  embeds_many :grandkids
+end
+
+class Grandkid
+  include Mongoid::Document
+  embedded_in :kid, polymorphic: true
+end
+
+parent = Parent.create!
+kid = parent.kids.create!
+grandkid = kid.grandkids.create!
+
+kid._association.inverse_class #=> Parent - OK
+kid._association.inverse_association #=> <Parent> - OK
+
+grandkid._association.inverse_class #=> Kid - OK
+grandkid._association.inverse_association #=> <Kid> - OK
+
