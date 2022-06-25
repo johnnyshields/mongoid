@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative "../has_and_belongs_to_many_models"
 
 describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
@@ -2394,6 +2395,10 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
           it "removes the ids from the foreign key" do
             expect(person.preference_ids).to eq([ preference_two.id ])
           end
+
+          it "sets the association locally" do
+            expect(person.preferences).to eq([preference_two])
+          end
         end
 
         context "when conditions are not provided" do
@@ -2419,6 +2424,10 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
           it "returns the number of documents deleted" do
             expect(deleted).to eq(2)
+          end
+
+          it "sets the association locally" do
+            expect(person.preferences).to eq([])
           end
         end
       end
@@ -3768,6 +3777,60 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       d2.projects << p2
       expect(d2.p_ids).to match_array([p2.id])
       expect(p2.d_ids).to match_array([d2.id])
+    end
+  end
+
+  context "when accesing own _id from parent's foreign key in default" do
+    let!(:contract) { HabtmmContract.create! }
+    let!(:signature) { contract.signatures.create! }
+
+    it "is nil" do
+      expect(signature.favorite_signature).to be nil
+    end
+  end
+
+  context "when setting an association on a model that uses the class_name option" do
+    let!(:contract) { HabtmmContract.create! }
+    let!(:signature) { HabtmmSignature.create!(contracts: [contract]) }
+
+    it "populates the inverse foreign key" do
+      expect(signature.contracts.first.signature_ids).to eq([signature.id])
+    end
+  end
+
+  context "when there is a foreign key in the aliased associations" do
+    it "has the correct aliases" do
+      expect(Dog.aliased_associations["breed_ids"]).to eq("breeds")
+      expect(Breed.aliased_associations["dog_ids"]).to eq("dogs")
+    end
+  end
+
+  # This test is for MONGOID-5344 which tests that the initial call to
+  # signature_ids refers to the same array as subsequent calls to signature_ids.
+  # Prior to the change in that ticket, this test broke because the array
+  # returned from write_attribute (which is triggered the first time the
+  # foreign key array is referenced, to set the default), refers to a different
+  # array to the one stored in the attributes hash. This happened because,
+  # when retrieving a document from the database, the attributes hash is actually
+  # a BSON::Document, which applies a transformation to the array before
+  # storing it.
+  context "when executing concat on foreign key array from the db" do
+    config_override :legacy_attributes, false
+
+    before do
+      HabtmmContract.create!
+      HabtmmSignature.create!
+    end
+
+    let!(:contract) { HabtmmContract.first }
+    let!(:signature) { HabtmmSignature.first }
+
+    before do
+      contract.signature_ids.concat([signature.id])
+    end
+
+    it "works on the first attempt" do
+      expect(contract.signature_ids).to eq([signature.id])
     end
   end
 end

@@ -224,11 +224,12 @@ module Mongoid
         process_attributes(attrs) do
           yield(self) if block_given?
         end
-        apply_post_processed_defaults
 
         if execute_callbacks
+          apply_post_processed_defaults
           run_callbacks(:initialize) unless _initialize_callbacks.empty?
         else
+          pending_callbacks << :apply_post_processed_defaults
           pending_callbacks << :initialize
         end
       end
@@ -308,7 +309,12 @@ module Mongoid
       #
       # @api private
       def instantiate_document(attrs = nil, selected_fields = nil, execute_callbacks: true)
-        attributes = attrs || {}
+        attributes = if Mongoid.legacy_attributes
+          attrs
+        else
+          attrs&.to_h
+        end || {}
+
         doc = allocate
         doc.__selected_fields = selected_fields
         doc.instance_variable_set(:@attributes, attributes)
@@ -320,7 +326,7 @@ module Mongoid
           doc.run_callbacks(:initialize) unless doc._initialize_callbacks.empty?
         else
           yield(doc) if block_given?
-          doc.pending_callbacks.push(:apply_defaults, :find, :initialize)
+          doc.pending_callbacks += [:apply_defaults, :find, :initialize]
         end
 
         doc

@@ -42,6 +42,11 @@ module Mongoid
     # @api private
     IDS = [ :_id, '_id', ].freeze
 
+    # BSON classes that are not supported as field types
+    #
+    # @api private
+    INVALID_BSON_CLASSES = [ BSON::Decimal128, BSON::Int32, BSON::Int64 ].freeze
+
     module ClassMethods
       # Returns the list of id fields for this model class, as both strings
       # and symbols.
@@ -156,6 +161,7 @@ module Mongoid
     #
     # @return [ Array<String ] The names of the proc defaults.
     def apply_post_processed_defaults
+      pending_callbacks.delete(:apply_post_processed_defaults)
       post_processed_defaults.each do |name|
         apply_default(name)
       end
@@ -184,6 +190,7 @@ module Mongoid
     # @example Apply all the defaults.
     #   model.apply_defaults
     def apply_defaults
+      pending_callbacks.delete(:apply_defaults)
       apply_pre_processed_defaults
       apply_post_processed_defaults
     end
@@ -237,6 +244,32 @@ module Mongoid
     # @return [ true, false ] Using object ids.
     def using_object_ids?
       self.class.using_object_ids?
+    end
+
+    # Does this field start with a dollar sign ($) or contain a dot/period (.)?
+    #
+    # @api private
+    #
+    # @param [ String ] name The field name.
+    #
+    # @return [ true, false ] If this field is dotted or dollared.
+    def dot_dollar_field?(name)
+      n = aliased_fields[name] || name
+      fields.key?(n) && (n.include?('.') || n.start_with?('$'))
+    end
+
+    # Validate whether or not the field starts with a dollar sign ($) or
+    # contains a dot/period (.).
+    #
+    # @api private
+    #
+    # @raise [ InvalidDotDollarAssignment ] If contains dots or starts with a dollar.
+    #
+    # @param [ String ] name The field name.
+    def validate_writable_field_name!(name)
+      if dot_dollar_field?(name)
+        raise Errors::InvalidDotDollarAssignment.new(self.class, name)
+      end
     end
 
     class << self
@@ -335,6 +368,12 @@ module Mongoid
       # finds aliases for embedded documents and fields, delimited with
       # period "." character.
       #
+      # Note that this method returns the name of associations as they're
+      # stored in the database, whereas the `relations` hash uses their in-code
+      # aliases. In order to check for membership in the relations hash, you
+      # would first have to look up the string returned from this method in
+      # the aliased_associations hash.
+      #
       # This method will not expand the alias of a belongs_to association that
       # is not the last item. For example, if we had a School that has_many
       # Students, and the field name passed was (from the Student's perspective):
@@ -428,14 +467,14 @@ module Mongoid
       # added as an instance method to the Document.
       #
       # @example Define a field.
-      #   field :score, :type => Integer, :default => 0
+      #   field :score, type: Integer, default: 0
       #
       # @param [ Symbol ] name The name of the field.
       # @param [ Hash ] options The options to pass to the field.
       #
-      # @option options [ Class ] :type The type of the field.
+      # @option options [ Class | Symbol | String ] :type The type of the field.
       # @option options [ String ] :label The label for the field.
-      # @option options [ Object, Proc ] :default The field's default
+      # @option options [ Object | Proc ] :default The field's default.
       #
       # @return [ Field ] The generated field
       def field(name, options = {})
@@ -597,6 +636,7 @@ module Mongoid
             if lazy_settable?(field, raw)
               write_attribute(name, field.eval_default(self))
             else
+              # Keep this code consistent with Mongoid::Attributes#read_attribute
               value = field.demongoize(raw)
               attribute_will_change!(name) if value.resizable?
               value
@@ -691,10 +731,8 @@ module Mongoid
         generated_methods.module_eval do
           re_define_method("#{meth}_translations=") do |value|
             attribute_will_change!(name)
-            if value
-              value.update_values do |_value|
-                field.type.mongoize(_value)
-              end
+            value&.transform_values! do |_value|
+              field.type.mongoize(_value)
             end
             attributes[name] = value
           end
@@ -731,6 +769,19 @@ module Mongoid
         opts = options.merge(klass: self)
         type_mapping = TYPE_MAPPINGS[options[:type]]
         opts[:type] = type_mapping || unmapped_type(options)
+        if !opts[:type].is_a?(Class)
+          raise Errors::InvalidFieldType.new(self, name, options[:type])
+        else
+          if INVALID_BSON_CLASSES.include?(opts[:type])
+            warn_message = "Using #{opts[:type]} as the field type is not supported. "
+            if opts[:type] == BSON::Decimal128
+              warn_message += "In BSON <= 4, the BSON::Decimal128 type will work as expected for both storing and querying, but will return a BigDecimal on query in BSON 5+."
+            else
+              warn_message += "Saving values of this type to the database will work as expected, however, querying them will return a value of the native Ruby Integer type."
+            end
+            Mongoid.logger.warn(warn_message)
+          end
+        end
         return Fields::Localized.new(name, opts) if options[:localize]
         return Fields::ForeignKey.new(name, opts) if options[:identity]
         Fields::Standard.new(name, opts)

@@ -2173,6 +2173,7 @@ describe Mongoid::Criteria do
 
         context 'when value is stored as decimal128' do
           config_override :map_big_decimal_to_decimal128, true
+          max_bson_version '4.99.99'
 
           it "does not demongoize the field" do
             expect(plucked.first).to be_a(BSON::Decimal128)
@@ -2213,6 +2214,7 @@ describe Mongoid::Criteria do
       context "when legacy_pluck_distinct is set" do
         config_override :legacy_pluck_distinct, true
         config_override :map_big_decimal_to_decimal128, true
+        max_bson_version '4.99.99'
 
         it "returns a hash with a non-demongoized field" do
           expect(plucked.first).to eq({ 'sales' => BSON::Decimal128.new('1E+2') })
@@ -2237,6 +2239,7 @@ describe Mongoid::Criteria do
       context "when legacy_pluck_distinct is set" do
         config_override :legacy_pluck_distinct, true
         config_override :map_big_decimal_to_decimal128, true
+        max_bson_version '4.99.99'
 
         it "returns a hash with a non-demongoized field" do
           expect(plucked.first).to eq([{ 'sales' => BSON::Decimal128.new('1E+2') }])

@@ -23,7 +23,8 @@ module Mongoid
     # database name is not explicitly defined.
     option :app_name, default: nil
 
-    # Create indexes in background by default.
+    # (Deprecated) In MongoDB 4.0 and earlier, set whether to create
+    # indexes in the background by default. (default: false)
     option :background_indexing, default: false
 
     # Mark belongs_to associations as required by default, so that saving a
@@ -113,6 +114,16 @@ module Mongoid
     # Maintain legacy behavior of pluck and distinct, which does not
     # demongoize the values on returning them.
     option :legacy_pluck_distinct, default: false
+
+    # Combine chained operators, which use the same field and operator,
+    # using and's instead of overwriting them.
+    option :overwrite_chained_operators, default: false
+
+    # When this flag is true, the attributes method on a document will return
+    # a BSON::Document when that document is retrieved from the database, and
+    # a Hash otherwise. When this flag is false, the attributes method will
+    # always return a Hash.
+    option :legacy_attributes, default: false
 
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
