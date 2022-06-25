@@ -246,6 +246,32 @@ module Mongoid
       self.class.using_object_ids?
     end
 
+    # Does this field start with a dollar sign ($) or contain a dot/period (.)?
+    #
+    # @api private
+    #
+    # @param [ String ] name The field name.
+    #
+    # @return [ true, false ] If this field is dotted or dollared.
+    def dot_dollar_field?(name)
+      n = aliased_fields[name] || name
+      fields.key?(n) && (n.include?('.') || n.start_with?('$'))
+    end
+
+    # Validate whether or not the field starts with a dollar sign ($) or
+    # contains a dot/period (.).
+    #
+    # @api private
+    #
+    # @raise [ InvalidDotDollarAssignment ] If contains dots or starts with a dollar.
+    #
+    # @param [ String ] name The field name.
+    def validate_writable_field_name!(name)
+      if dot_dollar_field?(name)
+        raise Errors::InvalidDotDollarAssignment.new(self.class, name)
+      end
+    end
+
     class << self
 
       # Stores the provided block to be run when the option name specified is
@@ -341,6 +367,12 @@ module Mongoid
       # Used in determining if the field is aliased or not. Recursively
       # finds aliases for embedded documents and fields, delimited with
       # period "." character.
+      #
+      # Note that this method returns the name of associations as they're
+      # stored in the database, whereas the `relations` hash uses their in-code
+      # aliases. In order to check for membership in the relations hash, you
+      # would first have to look up the string returned from this method in
+      # the aliased_associations hash.
       #
       # This method will not expand the alias of a belongs_to association that
       # is not the last item. For example, if we had a School that has_many
@@ -604,6 +636,7 @@ module Mongoid
             if lazy_settable?(field, raw)
               write_attribute(name, field.eval_default(self))
             else
+              # Keep this code consistent with Mongoid::Attributes#read_attribute
               value = field.demongoize(raw)
               attribute_will_change!(name) if value.resizable?
               value

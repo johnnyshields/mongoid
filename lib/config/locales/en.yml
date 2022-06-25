@@ -1,4 +1,8 @@
 en:
+  errors:
+    messages:
+      taken: "has already been taken"
+
   mongoid:
     errors:
       messages:
@@ -128,6 +132,17 @@ en:
             allowed."
           resolution: "Try setting the discriminator key on %{superclass} or one of %{class_name}'s
             ancestors."
+        invalid_dot_dollar_assignment:
+          message: "Cannot set the %{attr} attribute on the %{klass} class."
+          summary: "Calling the setters for fields that start with a dollar
+            sign ($) or contain a dot/period (.) is prohibited. See the
+            Mongoid documentation on Field Names with Dots/Periods (.) and
+            Dollar Signs ($) for more information."
+          resolution: "In order to set fields that start with a dollar
+            sign ($) or contain a dot/period (.), the aggregation pipeline can
+            be used. MongoDB provides specific operators for working with these
+            fields. Refer to the MongoDB documentation here:
+            https://www.mongodb.com/docs/manual/core/dot-dollar-considerations/"
         invalid_elem_match_operator:
           message: "Invalid $elemMatch operator '%{operator}'."
           summary: "You misspelled an operator or are using an operator that
@@ -549,11 +564,9 @@ en:
             server versions 3.6 and higher."
           resolution: "Verify that all servers in your deployment are at least
             version 3.6 or don't attempt to use sessions with older server versions."
-        taken:
-          "has already been taken"
         too_many_nested_attribute_records:
           message: "Accepting nested attributes for %{association} is limited
-            to %{limit} records."
+            to %{limit} documents."
           summary: "More documents were sent to be processed than the allowed
             limit."
           resolution: "The limit is set as an option to the macro, for example:
