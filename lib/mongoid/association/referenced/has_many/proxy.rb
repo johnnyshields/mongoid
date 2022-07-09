@@ -25,7 +25,7 @@ module Mongoid
           # @example Concat with other documents.
           #   person.posts.concat([ post_one, post_two ])
           #
-          # @param [ Document | Array<Document> ] args Any number of documents.
+          # @param [ Document ] *args Any number of documents.
           #
           # @return [ Array<Document> ] The loaded docs.
           def <<(*args)
@@ -196,7 +196,7 @@ module Mongoid
           # @note This will keep matching documents in memory for iteration
           #   later.
           #
-          # @param [ BSON::ObjectId | Array<BSON::ObjectId> ] args The ids.
+          # @param [ BSON::ObjectId ] *args The ids.
           # @param [ Proc ] block Optional block to pass.
           #
           # @return [ Document | Array<Document> | nil ] A document or matching documents.
@@ -411,7 +411,7 @@ module Mongoid
           # If the method exists on the array, use the default proxy behavior.
           #
           # @param [ Symbol | String ] name The name of the method.
-          # @param [ Array ] args The method args
+          # @param [ Array ] *args The method args
           # @param [ Proc ] block Optional block to pass.
           #
           # @return [ Criteria | Object ] A Criteria or return value from the target.

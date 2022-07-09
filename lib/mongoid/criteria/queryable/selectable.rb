@@ -31,7 +31,7 @@ module Mongoid
         # @example Execute an $all in a where query.
         #   selectable.where(:field.all => [ 1, 2 ])
         #
-        # @param [ Hash ] criterion The key value pairs for $all matching.
+        # @param [ Hash ] *criteria The key value pair(s) for $all matching.
         #
         # @return [ Selectable ] The cloned selectable.
         def all(*criteria)
@@ -69,8 +69,9 @@ module Mongoid
         # @example Add the criterion.
         #   selectable.and({ field: value }, { other: value })
         #
-        # @param [ Array<Hash | Criteria> ] criteria Multiple key/value pair
-        #   matches or Criteria objects that all must match to return results.
+        # @param [ Hash | Criteria | Array<Hash | Criteria> ] *criteria
+        #   Multiple key/value pair matches or Criteria objects that all must
+        #   match to return results.
         #
         # @return [ Selectable ] The new selectable.
         def and(*criteria)
@@ -516,7 +517,7 @@ module Mongoid
         # @example Add the $nor selection.
         #   selectable.nor(field: 1, field: 2)
         #
-        # @param [ Array<Hash | Criteria> ] criteria Multiple key/value pair
+        # @param [ Hash | Criteria ] *criteria Multiple key/value pair
         #   matches or Criteria objects.
         #
         # @return [ Selectable ] The new selectable.
