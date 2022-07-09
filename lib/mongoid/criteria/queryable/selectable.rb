@@ -606,7 +606,7 @@ module Mongoid
         # @example Same as previous example, also deprecated.
         #   selectable.or([{field: 1}], [{field: 2}])
         #
-        # @param [ Hash | Criteria | Array<Hash | Criteria>] *criteria
+        # @param [ Hash | Criteria | Array<Hash | Criteria>, ... ] *criteria
         #   Multiple key/value pair matches or Criteria objects, or arrays
         #   thereof. Passing arrays is deprecated.
         #
@@ -636,7 +636,7 @@ module Mongoid
         # @example Same as previous example, also deprecated.
         #   selectable.any_of([{field: 1}], [{field: 2}])
         #
-        # @param [ Hash | Criteria | Array<Hash | Criteria>] *criteria
+        # @param [ Hash | Criteria | Array<Hash | Criteria>, ... ] *criteria
         #   Multiple key/value pair matches or Criteria objects, or arrays
         #   thereof. Passing arrays is deprecated.
         #
