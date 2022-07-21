@@ -553,7 +553,7 @@ module Mongoid
       # @option opts [ Array ] :array_filters A set of filters specifying to which array elements
       #   an update should apply.
       #
-      # @return [ nil, false ] False if no attributes were provided.
+      # @return [ nil | false ] False if no attributes were provided.
       def update(attributes = nil, opts = {})
         update_documents(attributes, :update_one, opts)
       end
@@ -569,7 +569,7 @@ module Mongoid
       # @option opts [ Array ] :array_filters A set of filters specifying to which array elements
       #   an update should apply.
       #
-      # @return [ nil, false ] False if no attributes were provided.
+      # @return [ nil | false ] False if no attributes were provided.
       def update_all(attributes = nil, opts = {})
         update_documents(attributes, :update_many, opts)
       end

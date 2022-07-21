@@ -433,7 +433,7 @@ module Mongoid
           # @param [ Array ] args The method args
           # @param [ Proc ] block Optional block to pass.
           #
-          # @return [ Criteria, Object ] A Criteria or return value from the target.
+          # @return [ Criteria | Object ] A Criteria or return value from the target.
           ruby2_keywords def method_missing(name, *args, &block)
             return super if _target.respond_to?(name)
             klass.send(:with_scope, criteria) do
