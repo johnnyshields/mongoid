@@ -245,7 +245,7 @@ module Mongoid
         # @example Limit the results to the fields not provided.
         #   optional.without(:name, :dob)
         #
-        # @param [ Symbol... ] *args The fields to ignore.
+        # @param [ Symbol... ] *args The field(s) to ignore.
         #
         # @return [ Optional ] The cloned optional.
         def without(*args)

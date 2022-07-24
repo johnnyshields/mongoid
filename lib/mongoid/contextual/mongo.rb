@@ -397,7 +397,7 @@ module Mongoid
       # @example Pluck a field.
       #   context.pluck(:_id)
       #
-      # @param [ String | Symbol ] *fields Field(s) to pluck.
+      # @param [ [ String | Symbol ]... ] *fields Field(s) to pluck.
       #
       # @return [ Array<Object> | Array<Array<Object>> ] The plucked values.
       def pluck(*fields)
@@ -434,7 +434,7 @@ module Mongoid
       # @example Pick a field.
       #   context.pick(:_id)
       #
-      # @param [ String | Symbol ] *fields Field(s) to pick.
+      # @param [ [ String | Symbol ]... ] *fields Field(s) to pick.
       #
       # @return [ Object | Array<Object> ] The picked values.
       def pick(*fields)

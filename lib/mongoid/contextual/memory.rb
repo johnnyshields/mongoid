@@ -242,7 +242,7 @@ module Mongoid
       # @example Get the values in memory.
       #   context.pluck(:name)
       #
-      # @param [ String | Symbol ] *fields Field(s) to pluck.
+      # @param [ [ String | Symbol ]... ] *fields Field(s) to pluck.
       #
       # @return [ Array<Object> | Array<Array<Object>> ] The plucked values.
       def pluck(*fields)
@@ -260,7 +260,7 @@ module Mongoid
       # @example Get the values in memory.
       #   context.pick(:name)
       #
-      # @param [ String | Symbol ] *fields Field(s) to pick.
+      # @param [ [ String | Symbol ]... ] *fields Field(s) to pick.
       #
       # @return [ Object | Array<Object> ] The picked values.
       def pick(*fields)
@@ -561,7 +561,7 @@ module Mongoid
       # Pluck the field values from the given document.
       #
       # @param [ Document ] doc The document to pluck from.
-      # @param [ String | Symbol ] *fields Field(s) to pluck.
+      # @param [ [ String | Symbol ]... ] *fields Field(s) to pluck.
       #
       # @return [ Object | Array<Object> ] The plucked values.
       def pluck_from_doc(doc, *fields)

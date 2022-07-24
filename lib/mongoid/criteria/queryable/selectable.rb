@@ -546,7 +546,7 @@ module Mongoid
         # @example Execute a $not in a where query.
         #   selectable.where(:field.not => /Bob/)
         #
-        # @param [ Array<Hash | Criteria> ] criteria Multiple key/value pair
+        # @param [ [ Hash | Criteria ]... ] *criteria The key/value pair
         #   matches or Criteria objects to negate.
         #
         # @return [ Selectable ] The new selectable.
@@ -775,7 +775,8 @@ module Mongoid
         # @example Add a javascript selection.
         #   selectable.where("this.name == 'syd'")
         #
-        # @param [ String | Hash ] criterion The javascript or standard selection.
+        # @param [ [ Hash | String ]... ] *criterion The standard selection
+        #   or javascript string.
         #
         # @return [ Selectable ] The cloned selectable.
         def where(*criteria)
