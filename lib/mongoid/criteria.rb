@@ -89,7 +89,7 @@ module Mongoid
     #   enumerator = criteria.find(-> { "Default Band" })
     #
     # @param [ Object... ] *args The id(s).
-    # @param [ Proc ] block Optional block to pass.
+    # @yield &block Optional block to pass.
     #
     # @return [ Document | Array<Document> | nil ] A document or matching documents.
     #
