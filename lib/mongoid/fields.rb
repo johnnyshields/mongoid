@@ -287,8 +287,7 @@ module Mongoid
       #   end
       #
       # @param [ Symbol ] option_name the option name to match against
-      # @yield &block the handler to execute when the option is
-      #   provided.
+      # @yield &block the handler to execute when the option is provided.
       def option(option_name, &block)
         options[option_name] = block
       end
