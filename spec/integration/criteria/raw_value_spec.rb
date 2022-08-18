@@ -17,96 +17,197 @@ describe 'Queries with Mongoid::RawValue criteria' do
   let!(:band4) { Band.create!(name: '3', likes: 2, rating: 3.1, decibels: 50..120, founded: today + 1.days, updated_at: now_utc + 3.days) }
   let!(:band5) { Band.create!(name: '4', likes: 3, rating: 3.1, decibels: 60..150, founded: today + 2.days, updated_at: now_utc + 3.days, labels: labels) }
 
-  context 'Mongoid::RawValue<String> criteria vs Integer field' do
-    it 'does not match objects' do
-      expect(Band.where(likes: Mongoid::RawValue('1')).to_a).to eq []
-    end
+  context 'Mongoid::RawValue<String> criteria' do
 
-    it 'matches objects without raw value' do
-      expect(Band.where(likes: '1').to_a).to eq [band2, band3]
+    context 'Integer field' do
+      it 'does not match objects' do
+        expect(Band.where(likes: Mongoid::RawValue('1')).to_a).to eq []
+      end
+  
+      it 'matches objects without raw value' do
+        expect(Band.where(likes: '1').to_a).to eq [band2, band3]
+      end
     end
-  end
-
-  context 'Mongoid::RawValue<String> criteria vs Float field' do
-    it 'does not match objects' do
-      expect(Band.where(rating: Mongoid::RawValue('3.1')).to_a).to eq []
+  
+    context 'Float field' do
+      it 'does not match objects' do
+        expect(Band.where(rating: Mongoid::RawValue('3.1')).to_a).to eq []
+      end
+  
+      it 'matches objects without raw value' do
+        expect(Band.where(rating: '3.1').to_a).to eq [band4, band5]
+      end
     end
-
-    it 'matches objects without raw value' do
-      expect(Band.where(rating: '3.1').to_a).to eq [band4, band5]
+  
+    context 'String field' do
+      it 'matches objects' do
+        expect(Band.where(name: Mongoid::RawValue('3')).to_a).to eq [band3, band4]
+      end
+  
+      it 'matches objects without raw value' do
+        expect(Band.where(name: '3').to_a).to eq [band3, band4]
+      end
     end
-  end
-
-  context 'Mongoid::RawValue<String> criteria vs String field' do
-    it 'matches objects' do
-      expect(Band.where(name: Mongoid::RawValue('3')).to_a).to eq [band3, band4]
+  
+    context 'Range field' do
+      it 'does not match objects' do
+        expect(Band.where(decibels: Mongoid::RawValue('90')).to_a).to eq []
+      end
+  
+      it 'does not match objects without raw value' do
+        expect(Band.where(name: '90').to_a).to eq []
+      end
     end
-
-    it 'matches objects without raw value' do
-      expect(Band.where(name: '3').to_a).to eq [band3, band4]
+  
+    context 'Date field' do
+      it 'does not match objects' do
+        expect(Band.where(founded: Mongoid::RawValue('2020-01-02')).to_a).to eq []
+      end
+  
+      it 'matches objects without raw value' do
+        expect(Band.where(founded: '2020-01-02').to_a).to eq [band3, band4]
+      end
     end
-  end
-
-  context 'Mongoid::RawValue<String> criteria vs Range field' do
-    it 'does not match objects' do
-      expect(Band.where(decibels: Mongoid::RawValue('90')).to_a).to eq []
-    end
-
-    it 'does not match objects without raw value' do
-      expect(Band.where(name: '90').to_a).to eq []
-    end
-  end
-
-  context 'Mongoid::RawValue<String> criteria vs Date field' do
-    it 'does not match objects' do
-      expect(Band.where(founded: Mongoid::RawValue('2020-01-02')).to_a).to eq []
-    end
-
-    it 'matches objects without raw value' do
-      expect(Band.where(founded: '2020-01-02').to_a).to eq [band3, band4]
-    end
-  end
-
-  context 'Mongoid::RawValue<String> criteria vs Time field' do
-    it 'does not match objects' do
-      expect(Band.where(updated_at: Mongoid::RawValue('2020-01-04 16:00:00 UTC')).to_a).to eq []
-    end
-
-    # TODO: this isn't working for some reason
-    xit 'matches objects without raw value' do
-      expect(Band.where(updated_at: '2020-01-04 16:00:00 UTC').to_a).to eq [band4, band5]
-    end
-  end
-
-  context 'Mongoid::RawValue<Integer> criteria vs Integer field' do
-    it 'does not match objects' do
-      expect(Band.where(likes: Mongoid::RawValue(1)).to_a).to eq [band2, band3]
-    end
-
-    it 'matches objects without raw value' do
-      expect(Band.where(likes: 1).to_a).to eq [band2, band3]
+  
+    context 'Time field' do
+      it 'does not match objects' do
+        expect(Band.where(updated_at: Mongoid::RawValue('2020-01-04 16:00:00 UTC')).to_a).to eq []
+      end
+  
+      # TODO: this isn't working for some reason
+      xit 'matches objects without raw value' do
+        expect(Band.where(updated_at: '2020-01-04 16:00:00 UTC').to_a).to eq [band4, band5]
+      end
     end
   end
 
-  context 'Mongoid::RawValue<Integer> criteria vs Float field' do
-    it 'does not match objects' do
-      expect(Band.where(rating: Mongoid::RawValue(1)).to_a).to eq [band2]
-      expect(Band.where(rating: Mongoid::RawValue(3)).to_a).to eq []
-    end
+  context 'Mongoid::RawValue<Integer>' do
 
-    it 'matches objects without raw value' do
-      expect(Band.where(rating: 1).to_a).to eq [band2]
-      expect(Band.where(rating: 3).to_a).to eq []
+    context 'Integer field' do
+      it 'does not match objects' do
+        expect(Band.where(likes: Mongoid::RawValue(1)).to_a).to eq [band2, band3]
+      end
+  
+      it 'matches objects without raw value' do
+        expect(Band.where(likes: 1).to_a).to eq [band2, band3]
+      end
+    end
+  
+    context 'Float field' do
+      it 'does not match objects' do
+        expect(Band.where(rating: Mongoid::RawValue(1)).to_a).to eq [band2]
+        expect(Band.where(rating: Mongoid::RawValue(3)).to_a).to eq []
+      end
+  
+      it 'matches objects without raw value' do
+        expect(Band.where(rating: 1).to_a).to eq [band2]
+        expect(Band.where(rating: 3).to_a).to eq []
+      end
+    end
+  
+    context 'String field' do
+      it 'matches objects' do
+        expect(Band.where(name: Mongoid::RawValue(3)).to_a).to eq []
+      end
+  
+      it 'matches objects without raw value' do
+        expect(Band.where(name: 3).to_a).to eq [band3, band4]
+      end
+    end
+  
+    context 'Range field' do
+      it 'does not match objects' do
+        expect(Band.where(decibels: Mongoid::RawValue(90)).to_a).to eq []
+      end
+  
+      it 'does not match objects without raw value' do
+        expect(Band.where(name: 90).to_a).to eq []
+      end
+    end
+  
+    context 'Date field' do
+      it 'does not match objects' do
+        expect(Band.where(founded: Mongoid::RawValue(1577923200)).to_a).to eq []
+      end
+  
+      it 'matches objects without raw value' do
+        expect(Band.where(founded: 1577923200).to_a).to eq [band3, band4]
+      end
+    end
+  
+    context 'Time field' do
+      it 'does not match objects' do
+        expect(Band.where(updated_at: Mongoid::RawValue(1578153600)).to_a).to eq []
+      end
+  
+      # TODO: this isn't working for some reason
+      xit 'matches objects without raw value' do
+        expect(Band.where(updated_at: 1578153600).to_a).to eq [band4, band5]
+      end
     end
   end
 
-  context 'Mongoid::RawValue<Integer> criteria vs String field' do
-    it 'matches objects' do
-      expect(Band.where(name: Mongoid::RawValue(3)).to_a).to eq []
+  context 'Mongoid::RawValue<Float>' do
+
+    context 'Integer field' do
+      it 'does not match objects' do
+        expect(Band.where(likes: Mongoid::RawValue(1.0)).to_a).to eq [band2, band3]
+      end
+  
+      it 'matches objects without raw value' do
+        expect(Band.where(likes: 1.0).to_a).to eq [band2, band3]
+      end
+    end
+  
+    context 'Float field' do
+      it 'does not match objects' do
+        expect(Band.where(rating: Mongoid::RawValue(3.1)).to_a).to eq [band4, band5]
+      end
+  
+      it 'matches objects without raw value' do
+        expect(Band.where(rating: 3.1).to_a).to eq [band4, band5]
+      end
+    end
+  
+    context 'String field' do
+      it 'matches objects' do
+        expect(Band.where(name: Mongoid::RawValue(3.0)).to_a).to eq []
+      end
+  
+      it 'matches objects without raw value' do
+        expect(Band.where(name: 3.0).to_a).to eq []
+      end
+    end
+  
+    context 'Range field' do
+      it 'does not match objects' do
+        expect(Band.where(decibels: Mongoid::RawValue(90.0)).to_a).to eq []
+      end
+
+      it 'does not match objects without raw value' do
+        expect(Band.where(name: 90.0).to_a).to eq []
+      end
     end
 
-    it 'matches objects without raw value' do
-      expect(Band.where(name: 3).to_a).to eq [band3, band4]
+    context 'Date field' do
+      it 'does not match objects' do
+        expect(Band.where(founded: Mongoid::RawValue(1577923200.0)).to_a).to eq []
+      end
+
+      it 'matches objects without raw value' do
+        expect(Band.where(founded: 1577923200.0).to_a).to eq [band3, band4]
+      end
+    end
+
+    context 'Time field' do
+      it 'does not match objects' do
+        expect(Band.where(updated_at: Mongoid::RawValue(1578153600.0)).to_a).to eq []
+      end
+
+      # TODO: this isn't working for some reason
+      xit 'matches objects without raw value' do
+        expect(Band.where(updated_at: 1578153600.0).to_a).to eq [band4, band5]
+      end
     end
   end
 end
