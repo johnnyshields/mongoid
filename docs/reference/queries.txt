@@ -189,8 +189,8 @@ when constructing the query:
   #   class:    Band
   #   embedded: false>
 
-Raw Values
-----------
+Querying for Raw Values
+-----------------------
 
 If you'd like to bypass Mongoid's query type coercion behavior and query
 directly for the raw-typed value in the database, wrap the query value in
@@ -205,8 +205,8 @@ directly for the raw-typed value in the database, wrap the query value in
   #   class:    Band
   #   embedded: false>
 
-Aliases
--------
+Field Aliases
+-------------
 
 Queries take into account :ref:`storage field names <storage-field-names>`
 and :ref:`field aliases <field-aliases>`:
