@@ -55,7 +55,7 @@ describe 'Queries with Mongoid::RawValue criteria' do
       end
   
       it 'does not match objects without raw value' do
-        expect(Band.where(name: '90').to_a).to eq []
+        expect(Band.where(decibels: '90').to_a).to eq []
       end
     end
   
@@ -121,7 +121,7 @@ describe 'Queries with Mongoid::RawValue criteria' do
       end
   
       it 'does not match objects without raw value' do
-        expect(Band.where(name: 90).to_a).to eq []
+        expect(Band.where(decibels: 90).to_a).to eq []
       end
     end
   
@@ -185,7 +185,7 @@ describe 'Queries with Mongoid::RawValue criteria' do
       end
 
       it 'does not match objects without raw value' do
-        expect(Band.where(name: 90.0).to_a).to eq []
+        expect(Band.where(decibels: 90.0).to_a).to eq []
       end
     end
 
@@ -207,6 +207,73 @@ describe 'Queries with Mongoid::RawValue criteria' do
       # TODO: this isn't working for some reason
       xit 'matches objects without raw value' do
         expect(Band.where(updated_at: 1578153600.0).to_a).to eq [band4, band5]
+      end
+    end
+  end
+
+  context 'Mongoid::RawValue<Range>' do
+
+    context 'Integer field' do
+      it 'does not match objects' do
+        expect(Band.where(likes: Mongoid::RawValue(0..2)).to_a).to eq []
+      end
+
+      it 'matches objects without raw value' do
+        expect(Band.where(likes: 0..2).to_a).to eq [band1, band2, band3, band4]
+      end
+    end
+
+    context 'Float field' do
+      it 'does not match objects' do
+        expect(Band.where(rating: Mongoid::RawValue(1..3)).to_a).to eq []
+      end
+
+      it 'matches objects without raw value' do
+        expect(Band.where(rating: 1..3).to_a).to eq [band2, band3]
+      end
+    end
+
+    context 'String field' do
+      it 'matches objects' do
+        expect(Band.where(name: Mongoid::RawValue(1..3)).to_a).to eq []
+      end
+
+      it 'matches objects without raw value' do
+        expect(Band.where(name: 1..3).to_a).to eq [band1, band2, band3, band4]
+      end
+    end
+
+    context 'Range field' do
+      it 'does not match objects' do
+        expect(Band.where(decibels: Mongoid::RawValue(30..90)).to_a).to eq [band2]
+        expect(Band.where(decibels: Mongoid::RawValue(20..100)).to_a).to eq []
+      end
+
+      it 'does not match objects without raw value' do
+        expect(Band.where(decibels: 30..90).to_a).to eq []
+        expect(Band.where(decibels: 20..100).to_a).to eq []
+      end
+    end
+
+    context 'Date field' do
+      it 'does not match objects' do
+        expect(Band.where(founded: Mongoid::RawValue(1577923199..1577923201)).to_a).to eq []
+      end
+
+      # TODO: this isn't working for some reason -- returns all bands
+      xit 'matches objects without raw value' do
+        expect(Band.where(founded: 1577923199..1577923201).to_a).to eq [band3, band4]
+      end
+    end
+
+    context 'Time field' do
+      it 'does not match objects' do
+        expect(Band.where(updated_at: Mongoid::RawValue(1578153599..1578153600)).to_a).to eq []
+      end
+
+      # TODO: this isn't working for some reason
+      xit 'matches objects without raw value' do
+        expect(Band.where(updated_at: 1578153599..1578153600).to_a).to eq [band4, band5]
       end
     end
   end
