@@ -425,7 +425,7 @@ describe Mongoid::Criteria::Queryable::Selector do
             end
 
             it "serializes the raw_value" do
-              expect(selector["key"]).to eq([{ foo: 1, "Bar" => [/baz/, BSON::Decimal128.new('2'), {"$gte"=>4, "$lte"=>5}] }, 3])
+              expect(selector["key"]).to eq([{ foo: 1, "Bar" => [/baz/, BSON::Decimal128.new('2'), {"max"=>5, "min"=>4}] }, 3])
             end
           end
         end
@@ -672,7 +672,7 @@ describe Mongoid::Criteria::Queryable::Selector do
                   end
 
                   it "serializes the raw_value" do
-                    expect(selector["key"]).to eq([{ foo: "1", "Bar" => [/baz/, BSON::Decimal128.new('2'), {"$gte"=>4, "$lte"=>5}] }, 3])
+                    expect(selector["key"]).to eq([{ foo: "1", "Bar" => [/baz/, BSON::Decimal128.new('2'), {"max"=>5, "min"=>4}] }, 3])
                   end
                 end
               end

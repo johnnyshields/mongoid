@@ -75,7 +75,7 @@ module Mongoid
 
         # Get the store name and store value. If the value is of type range,
         # we need may need to change the store_name as well as the store_value,
-        # therefore, we cannot just use the evole method.
+        # therefore, we cannot just use the evolve method.
         #
         # @param [ String ] name The name of the field.
         # @param [ Object ] serializer The optional serializer for the field.
@@ -85,7 +85,7 @@ module Mongoid
         def store_creds(name, serializer, value)
           store_name = localized_key(name, serializer)
           if Range === value
-            evolve_range(store_name, serializer, value)
+            evolve_top_level_range(store_name, serializer, value)
           else
             [ store_name, evolve(serializer, value) ]
           end
@@ -147,11 +147,14 @@ module Mongoid
         #
         # @param [ Object ] serializer The optional serializer for the field.
         # @param [ Object ] value The value to serialize.
+        # @param [ Object ] is_raw_value Indicates that the evolve should be
+        #   processed as a member of a Mongoid::RawValue. Used for recursion.
         #
         # @return [ Object ] The serialized object.
-        def evolve(serializer, value)
+        def evolve(serializer, value, is_raw_value = false)
 
           if value.is_a?(Mongoid::RawValue)
+            is_raw_value = true
             value = value.raw_value
 
             # Mongoid::RawValue skips any field-specific serialization logic
@@ -160,20 +163,18 @@ module Mongoid
 
           _value = case value
                    when Hash
-                     evolve_hash(serializer, value)
+                     evolve_hash(serializer, value, is_raw_value)
                    when Array
-                     evolve_array(serializer, value)
+                     evolve_array(serializer, value, is_raw_value)
                    when Range
-                     value.__evolve_range__(serializer: serializer)
-                   when Mongoid::RawValue
-                     value
+                     evolve_range(serializer, value, is_raw_value)
                    else
                      (serializer || value.class).evolve(value)
                    end
           _value
         end
 
-        # Evolve a single key selection with array values.
+        # Evolve a single key selection with an array value.
         #
         # @api private
         #
@@ -182,15 +183,17 @@ module Mongoid
         #
         # @param [ Object ] serializer The optional serializer for the field.
         # @param [ Array<Object> ] value The array to serialize.
+        # @param [ Object ] is_raw_value Indicates that the evolve should be
+        #   processed as a member of a Mongoid::RawValue. Used for recursion.
         #
         # @return [ Object ] The serialized array.
-        def evolve_array(serializer, value)
+        def evolve_array(serializer, value, is_raw_value = false)
           value.map do |_value|
-            evolve(serializer, _value)
+            evolve(serializer, _value, is_raw_value)
           end
         end
 
-        # Evolve a single key selection with hash values.
+        # Evolve a single key selection with a hash value.
         #
         # @api private
         #
@@ -199,19 +202,45 @@ module Mongoid
         #
         # @param [ Object ] serializer The optional serializer for the field.
         # @param [ Hash ] value The hash to serialize.
+        # @param [ Object ] is_raw_value Indicates that the evolve should be
+        #   processed as a member of a Mongoid::RawValue. Used for recursion.
         #
         # @return [ Object ] The serialized hash.
-        def evolve_hash(serializer, value)
+        def evolve_hash(serializer, value, is_raw_value = false)
           value.each_pair do |operator, _value|
             if operator =~ /exists|type|size/
               value[operator] = _value
             else
-              value[operator] = evolve(serializer, _value)
+              value[operator] = evolve(serializer, _value, is_raw_value)
             end
           end
         end
 
-        # Evolve a single key selection with range values. This method traverses
+        # Evolve a single key selection with a range value.
+        #
+        # @api private
+        #
+        # @example Evolve a simple selection.
+        #   selector.evolve(field, (1..3))
+        #
+        # @param [ Object ] serializer The optional serializer for the field.
+        # @param [ Range ] value The range to serialize.
+        # @param [ Object ] is_raw_value Indicates that the evolve should be
+        #   processed as a member of a Mongoid::RawValue. Used for recursion.
+        #
+        # @return [ Hash ] The serialized range.
+        def evolve_range(serializer, value, is_raw_value = false)
+          if is_raw_value
+            # (1..3) becomes { "min" => 1, "max" => 3 }
+            value.mongoize
+          else
+            # (1..3) becomes { "$gte" => 1, "$lte" => 5 }
+            value.__evolve_range__(serializer: serializer)
+          end
+        end
+
+        # Evolve a single key selection with range value at a top-level
+        # node in a multi-list selection. This method traverses
         # the association tree to build a query for the given value and
         # serializer. There are three parts to the query here:
         #
@@ -239,12 +268,12 @@ module Mongoid
         #
         # @api private
         #
-        # @param [ String ] key The to store the range for.
+        # @param [ String ] key The key to store the range for.
         # @param [ Object ] serializer The optional serializer for the field.
         # @param [ Range ] value The Range to serialize.
         #
         # @return [ Array<String, Hash> ] The store name and serialized Range.
-        def evolve_range(key, serializer, value)
+        def evolve_top_level_range(key, serializer, value)
           v = value.__evolve_range__(serializer: serializer)
           assocs = []
           Fields.traverse_association_tree(key, serializers, associations, aliased_associations) do |meth, obj, is_field|
