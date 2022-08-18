@@ -150,16 +150,20 @@ module Mongoid
         #
         # @return [ Object ] The serialized object.
         def evolve(serializer, value)
-          case value
-          when Hash
-            evolve_hash(serializer, value)
-          when Array
-            evolve_array(serializer, value)
-          when Range
-            value.__evolve_range__(serializer: serializer)
-          else
-            (serializer || value.class).evolve(value)
-          end
+          _value = case value
+                   when Hash
+                     evolve_hash(serializer, value)
+                   when Array
+                     evolve_array(serializer, value)
+                   when Range
+                     value.__evolve_range__(serializer: serializer)
+                   when Mongoid::RawValue
+                     value
+                   else
+                     (serializer || value.class).evolve(value)
+                   end
+          _value = _value.raw_value if _value.is_a?(Mongoid::RawValue)
+          _value
         end
 
         # Evolve a single key selection with array values.
