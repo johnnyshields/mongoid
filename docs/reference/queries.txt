@@ -645,6 +645,25 @@ when they are used with these operator methods:
     class:    Band
     embedded: false>
 
+
+
+Range Expansion
+---------------
+
+Operator methods that support merge strategies all take ``Array`` as their value
+type. Mongoid expands ``Range``,
+when they are used with these operator methods:
+
+.. code-block:: ruby
+
+  Band.in(year: 1950..1960)
+  => #<Mongoid::Criteria
+    selector: {"year"=>{"$gte"=>1950, "$lte"=>1960}}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+
 Additionally, Mongoid has historically wrapped non-``Array`` values in arrays,
 as the following example demonstrates:
 
