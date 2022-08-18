@@ -19,6 +19,7 @@ class Band
   field :decimal, type: BSON::Decimal128
   field :y, as: :years, type: Integer
   field :founded, type: Date
+  field :decibels, type: Range
   field :deleted, type: Boolean
   field :mojo, type: Object
   field :fans
