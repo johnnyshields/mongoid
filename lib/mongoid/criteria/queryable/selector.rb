@@ -150,6 +150,14 @@ module Mongoid
         #
         # @return [ Object ] The serialized object.
         def evolve(serializer, value)
+
+          if value.is_a?(Mongoid::RawValue)
+            value = value.raw_value
+
+            # Mongoid::RawValue skips any field-specific serialization logic
+            serializer = nil
+          end
+
           _value = case value
                    when Hash
                      evolve_hash(serializer, value)
@@ -162,7 +170,6 @@ module Mongoid
                    else
                      (serializer || value.class).evolve(value)
                    end
-          _value = _value.raw_value if _value.is_a?(Mongoid::RawValue)
           _value
         end
 

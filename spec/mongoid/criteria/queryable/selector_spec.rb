@@ -403,6 +403,32 @@ describe Mongoid::Criteria::Queryable::Selector do
             end
           end
         end
+
+        context "when providing a Mongoid::RawValue" do
+
+          context "and raw_value is a string" do
+
+            before do
+              selector.send(method, "key", Mongoid::RawValue("Foo"))
+            end
+
+            it "serializes the raw_value" do
+              expect(selector["key"]).to eq("Foo")
+            end
+          end
+
+          context "and raw_value is a complex type" do
+            config_override :map_big_decimal_to_decimal128, true
+
+            before do
+              selector.send(method, "key", Mongoid::RawValue([{ foo: 1, "Bar" => [/baz/, BigDecimal('2'), 4..5] }, 3]))
+            end
+
+            it "serializes the raw_value" do
+              expect(selector["key"]).to eq([{ foo: 1, "Bar" => [/baz/, BSON::Decimal128.new('2'), {"$gte"=>4, "$lte"=>5}] }, 3])
+            end
+          end
+        end
       end
 
       context "when serializers are provided" do
@@ -600,6 +626,53 @@ describe Mongoid::Criteria::Queryable::Selector do
                         end
                       end
                     end
+                  end
+                end
+              end
+
+              context "when the criterion is a Mongoid::RawValue" do
+
+                context "and raw_value is a serializable string" do
+
+                  before do
+                    selector.send(method, "key", Mongoid::RawValue("1"))
+                  end
+
+                  it "serializes the value" do
+                    expect(selector["key"]).to eq("1")
+                  end
+                end
+
+                context "and raw_value is a serializable type" do
+
+                  before do
+                    selector.send(method, "key", Mongoid::RawValue(BigDecimal('2')))
+                  end
+
+                  it "serializes the value" do
+                    expect(selector["key"]).to eq(BSON::Decimal128.new('2'))
+                  end
+                end
+
+                context "and raw_value is a non-serializable string" do
+
+                  before do
+                    selector.send(method, "key", Mongoid::RawValue("Foo"))
+                  end
+
+                  it "serializes the value" do
+                    expect(selector["key"]).to eq("Foo")
+                  end
+                end
+
+                context "and raw_value is a complex type" do
+
+                  before do
+                    selector.send(method, "key", Mongoid::RawValue([{ foo: "1", "Bar" => [/baz/, BigDecimal('2'), 4..5] }, 3]))
+                  end
+
+                  it "serializes the raw_value" do
+                    expect(selector["key"]).to eq([{ foo: "1", "Bar" => [/baz/, BSON::Decimal128.new('2'), {"$gte"=>4, "$lte"=>5}] }, 3])
                   end
                 end
               end
