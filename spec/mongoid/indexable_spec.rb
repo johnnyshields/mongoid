@@ -751,7 +751,7 @@ describe Mongoid::Indexable do
         end
       end
 
-      context 'when using multiple levels of nested operators' do
+      context 'when using multiple levels of nonsensical nested operators' do
         let(:partial_filter_expression) do
           {
             '$foo' => {
