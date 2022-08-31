@@ -186,6 +186,24 @@ See the section on :ref:`Localize :present Field Option <present-fields>` for
 more details on how these are used.
 
 
+Support for Passing Raw Values into Queries
+-------------------------------------------
+
+When performing queries, it is now possible skip Mongoid's type coercion logic
+using the ``Mongoid::RawValue`` wrapper class. This can be useful when legacy
+data in the database is of a different type than the field definition.
+
+.. code-block:: ruby
+
+   class Person
+     include Mongoid::Document
+     field :age, type: Integer
+   end
+
+   # Query for the string "42", not the integer 42
+   Person.where(age: Mongoid::RawValue("42"))
+
+
 Added ``:to`` and ``:from`` options to ``attribute_changed?``
 -------------------------------------------------------------
 
