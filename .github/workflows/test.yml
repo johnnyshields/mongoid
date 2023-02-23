@@ -306,8 +306,6 @@ jobs:
       with:
         ruby-version: "${{matrix.ruby}}"
         bundler: 2.4.7
-    - name: rubygems
-      run: gem update --system
     - name: bundle
       run: bundle install --jobs 4 --retry 3
       env:
