@@ -1600,7 +1600,7 @@ Mongoid also has some helpful methods on criteria.
        *This method accepts the dot notation, thus permitting referencing
        fields in embedded associations.*
 
-       *You may use ``splat_arrays: true`` arg to tally array values
+       *You may use ``unwind: true`` arg to tally array values
        individually.*
 
        *This method respects :ref:`field aliases <field-aliases>`,
@@ -1623,8 +1623,8 @@ Mongoid also has some helpful methods on criteria.
           #      ['jazz'] => 4,
           #      ['fusion', 'dance'] => 2 }
 
-          # Use `splat_arrays: true` to tally the array members instead:
-          Band.all.tally(:genres, splat_arrays: true)
+          # Use `unwind: true` to tally the array members instead:
+          Band.all.tally(:genres, unwind: true)
           # => { 'jazz' => 5,
           #      'fusion' => 3,
           #      'dance' => 2 }

@@ -837,13 +837,13 @@ describe Mongoid::Contextual::Mongo do
     end
 
     let(:criteria) { Band.where(origin: "tally") }
-    let(:splat_arrays) { false }
+    let(:unwind) { false }
 
     shared_examples_for "scalar value examples" do
 
       context "when tallying a string" do
         let(:tally) do
-          criteria.tally(:name, splat_arrays: splat_arrays)
+          criteria.tally(:name, unwind: unwind)
         end
   
         it "returns the correct hash" do
@@ -853,7 +853,7 @@ describe Mongoid::Contextual::Mongo do
   
       context "using an aliased field" do
         let(:tally) do
-          criteria.tally(:years, splat_arrays: splat_arrays)
+          criteria.tally(:years, unwind: unwind)
         end
   
         it "returns the correct hash" do
@@ -863,7 +863,7 @@ describe Mongoid::Contextual::Mongo do
   
       context "when tallying a demongoizable field" do
         let(:tally) do
-          criteria.tally(:sales, splat_arrays: splat_arrays)
+          criteria.tally(:sales, unwind: unwind)
         end
   
         it "returns the correct hash" do
@@ -894,7 +894,7 @@ describe Mongoid::Contextual::Mongo do
   
         context "when getting the demongoized field" do
           let(:tallied) do
-            Dictionary.tally(:description, splat_arrays: splat_arrays)
+            Dictionary.tally(:description, unwind: unwind)
           end
   
           it "returns the translation for the current locale" do
@@ -904,7 +904,7 @@ describe Mongoid::Contextual::Mongo do
   
         context "when getting a specific locale" do
           let(:tallied) do
-            Dictionary.tally("description.de", splat_arrays: splat_arrays)
+            Dictionary.tally("description.de", unwind: unwind)
           end
   
           it "returns the translation for the the specific locale" do
@@ -914,7 +914,7 @@ describe Mongoid::Contextual::Mongo do
   
         context "when getting the full hash" do
           let(:tallied) do
-            Dictionary.tally("description_translations", splat_arrays: splat_arrays)
+            Dictionary.tally("description_translations", unwind: unwind)
           end
   
           it "returns the correct hash" do
@@ -929,7 +929,7 @@ describe Mongoid::Contextual::Mongo do
 
       context "when tallying an embedded field" do
         let(:tally) do
-          criteria.tally("label.name", splat_arrays: splat_arrays)
+          criteria.tally("label.name", unwind: unwind)
         end
 
         it "returns the correct hash" do
@@ -939,7 +939,7 @@ describe Mongoid::Contextual::Mongo do
 
       context "when some keys are missing" do
         before do
-          3.times { Band.create!(origin: "tally", splat_arrays: splat_arrays) }
+          3.times { Band.create!(origin: "tally", unwind: unwind) }
         end
   
         let(:tally) do
@@ -957,7 +957,7 @@ describe Mongoid::Contextual::Mongo do
       context "when tallying demongoizable values from typeless fields" do
         let!(:person1) { Person.create!(ssn: /hello/) }
         let!(:person2) { Person.create!(ssn: BSON::Decimal128.new("1")) }
-        let(:tally) { Person.tally("ssn", splat_arrays: splat_arrays) }
+        let(:tally) { Person.tally("ssn", unwind: unwind) }
   
         context "< BSON 5" do
           max_bson_version '4.99.99'
@@ -993,8 +993,8 @@ describe Mongoid::Contextual::Mongo do
 
     it_behaves_like 'scalar value examples'
 
-    context 'when :splat_arrays is true' do
-      let(:splat_arrays) { true }
+    context 'when :unwind is true' do
+      let(:unwind) { true }
 
       it_behaves_like 'scalar value examples'
     end
@@ -1020,7 +1020,7 @@ describe Mongoid::Contextual::Mongo do
 
       context "when getting the demongoized field" do
         let(:tallied) do
-          Person.tally("addresses.name", splat_arrays: splat_arrays)
+          Person.tally("addresses.name", unwind: unwind)
         end
 
         it "returns the translation for the current locale" do
@@ -1030,8 +1030,8 @@ describe Mongoid::Contextual::Mongo do
           )
         end
 
-        context "when :splat_arrays true" do
-          let(:splat_arrays) { true }
+        context "when :unwind true" do
+          let(:unwind) { true }
 
           it "returns the correct hash" do
             expect(tallied).to eq({ "en1" => 2,
@@ -1043,7 +1043,7 @@ describe Mongoid::Contextual::Mongo do
 
       context "when getting a specific locale" do
         let(:tallied) do
-          Person.tally("addresses.name.de", splat_arrays: splat_arrays)
+          Person.tally("addresses.name.de", unwind: unwind)
         end
 
         it "returns the translation for the the specific locale" do
@@ -1053,8 +1053,8 @@ describe Mongoid::Contextual::Mongo do
           )
         end
 
-        context "when :splat_arrays true" do
-          let(:splat_arrays) { true }
+        context "when :unwind true" do
+          let(:unwind) { true }
 
           it "returns the correct hash" do
             expect(tallied).to eq({ "de1" => 2,
@@ -1066,7 +1066,7 @@ describe Mongoid::Contextual::Mongo do
 
       context "when getting the full hash" do
         let(:tallied) do
-          Person.tally("addresses.name_translations", splat_arrays: splat_arrays)
+          Person.tally("addresses.name_translations", unwind: unwind)
         end
 
         it "returns the correct hash" do
@@ -1076,8 +1076,8 @@ describe Mongoid::Contextual::Mongo do
           )
         end
 
-        context "when :splat_arrays true" do
-          let(:splat_arrays) { true }
+        context "when :unwind true" do
+          let(:unwind) { true }
 
           it "returns the correct hash" do
             expect(tallied).to eq({ { "de" => "de1", "en" => "en1" } => 2,
@@ -1092,7 +1092,7 @@ describe Mongoid::Contextual::Mongo do
       let(:criteria) { Band.where(origin: "tally2") }
 
       let(:tally) do
-        criteria.tally("fanatics.age", splat_arrays: splat_arrays)
+        criteria.tally("fanatics.age", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -1102,8 +1102,8 @@ describe Mongoid::Contextual::Mongo do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash" do
           expect(tally).to eq(1 => 3,
@@ -1117,7 +1117,7 @@ describe Mongoid::Contextual::Mongo do
       let(:criteria) { Band.where(origin: "tally2") }
 
       let(:tally) do
-        criteria.tally("fanatics", splat_arrays: splat_arrays)
+        criteria.tally("fanatics", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -1125,8 +1125,8 @@ describe Mongoid::Contextual::Mongo do
         expect(tally).to eq(exp)
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash" do
           exp = [fans1, fans2, fans3].flatten.map(&:attributes).index_with(1)
@@ -1139,7 +1139,7 @@ describe Mongoid::Contextual::Mongo do
       let(:criteria) { Band.where(origin: "tally2") }
 
       let(:tally) do
-        criteria.tally("genres", splat_arrays: splat_arrays)
+        criteria.tally("genres", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -1149,8 +1149,8 @@ describe Mongoid::Contextual::Mongo do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash" do
           expect(tally).to eq(1 => 3,
@@ -1164,7 +1164,7 @@ describe Mongoid::Contextual::Mongo do
       let(:criteria) { Band.where(origin: "tally") }
 
       let(:tally) do
-        criteria.tally("genres.x", splat_arrays: splat_arrays)
+        criteria.tally("genres.x", unwind: unwind)
       end
 
       it "returns the correct hash without the nil keys" do
@@ -1174,8 +1174,8 @@ describe Mongoid::Contextual::Mongo do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash" do
           expect(tally).to eq(1 => 3,
@@ -1194,7 +1194,7 @@ describe Mongoid::Contextual::Mongo do
       let(:criteria) { Band.where(origin: "tally") }
 
       let(:tally) do
-        criteria.tally("genres.x", splat_arrays: splat_arrays)
+        criteria.tally("genres.x", unwind: unwind)
       end
 
       it "returns the correct hash without the nil keys" do
@@ -1205,8 +1205,8 @@ describe Mongoid::Contextual::Mongo do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash without the nil keys" do
           expect(tally).to eq(1 => 5,
@@ -1224,7 +1224,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:tally) do
-        Person.tally("array", splat_arrays: splat_arrays)
+        Person.tally("array", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -1234,8 +1234,8 @@ describe Mongoid::Contextual::Mongo do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash without the nil keys" do
           expect(tally).to eq(1 => 2,
@@ -1249,7 +1249,7 @@ describe Mongoid::Contextual::Mongo do
       let(:criteria) { Band.where(origin: "tally") }
 
       let(:tally) do
-        criteria.tally("genres.y.z", splat_arrays: splat_arrays)
+        criteria.tally("genres.y.z", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -1259,8 +1259,8 @@ describe Mongoid::Contextual::Mongo do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash without the nil keys" do
           expect(tally).to eq(1 => 3,
@@ -1278,7 +1278,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:tally) do
-        Person.tally("addresses.code.deepest.array.y.z", splat_arrays: splat_arrays)
+        Person.tally("addresses.code.deepest.array.y.z", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -1286,8 +1286,8 @@ describe Mongoid::Contextual::Mongo do
                             [ [ 1, 3 ] ] => 1)
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash without the nil keys" do
           expect(tally).to eq([ 1, 2 ] => 2,
@@ -1308,7 +1308,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:tally) do
-        Person.tally("addresses.code.deepest.array.y.z", splat_arrays: splat_arrays)
+        Person.tally("addresses.code.deepest.array.y.z", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -1318,8 +1318,8 @@ describe Mongoid::Contextual::Mongo do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash without the nil keys" do
           expect(tally).to eq([ 1, 2 ] => 4,
@@ -1336,7 +1336,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:tally) do
-        Person.tally("name.translations.language", splat_arrays: splat_arrays)
+        Person.tally("name.translations.language", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -1346,8 +1346,8 @@ describe Mongoid::Contextual::Mongo do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash without the nil keys" do
           expect(tally).to eq(1 => 3,

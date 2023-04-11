@@ -2098,13 +2098,13 @@ describe Mongoid::Contextual::Memory do
       described_class.new(criteria2)
     end
 
-    let(:splat_arrays) { false }
+    let(:unwind) { false }
 
     shared_examples_for "scalar value examples" do
 
       context "when tallying a string" do
         let(:tally) do
-          context.tally(:name, splat_arrays: splat_arrays)
+          context.tally(:name, unwind: unwind)
         end
 
         it "returns the correct hash" do
@@ -2114,7 +2114,7 @@ describe Mongoid::Contextual::Memory do
 
       context "using an aliased field" do
         let(:tally) do
-          context.tally(:years, splat_arrays: splat_arrays)
+          context.tally(:years, unwind: unwind)
         end
 
         it "returns the correct hash" do
@@ -2124,7 +2124,7 @@ describe Mongoid::Contextual::Memory do
 
       context "when tallying a demongoizable field" do
         let(:tally) do
-          context.tally(:sales, splat_arrays: splat_arrays)
+          context.tally(:sales, unwind: unwind)
         end
 
         it "returns the correct hash" do
@@ -2162,7 +2162,7 @@ describe Mongoid::Contextual::Memory do
 
         context "when getting the demongoized field" do
           let(:tallied) do
-            context.tally(:description, splat_arrays: splat_arrays)
+            context.tally(:description, unwind: unwind)
           end
 
           it "returns the translation for the current locale" do
@@ -2172,7 +2172,7 @@ describe Mongoid::Contextual::Memory do
 
         context "when getting a specific locale" do
           let(:tallied) do
-            context.tally("description.de", splat_arrays: splat_arrays)
+            context.tally("description.de", unwind: unwind)
           end
 
           it "returns the translation for the the specific locale" do
@@ -2182,7 +2182,7 @@ describe Mongoid::Contextual::Memory do
 
         context "when getting the full hash" do
           let(:tallied) do
-            context.tally("description_translations", splat_arrays: splat_arrays)
+            context.tally("description_translations", unwind: unwind)
           end
 
           it "returns the correct hash" do
@@ -2205,7 +2205,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         let(:tally) do
-          context.tally(:name, splat_arrays: splat_arrays)
+          context.tally(:name, unwind: unwind)
         end
 
         it "returns the correct hash" do
@@ -2219,8 +2219,8 @@ describe Mongoid::Contextual::Memory do
 
     it_behaves_like 'scalar value examples'
 
-    context 'when :splat_arrays is true' do
-      let(:splat_arrays) { true }
+    context 'when :unwind is true' do
+      let(:unwind) { true }
 
       it_behaves_like 'scalar value examples'
     end
@@ -2260,7 +2260,7 @@ describe Mongoid::Contextual::Memory do
 
       context "when getting the demongoized field" do
         let(:tallied) do
-          context.tally("addresses.name", splat_arrays: splat_arrays)
+          context.tally("addresses.name", unwind: unwind)
         end
 
         it "returns the translation for the current locale" do
@@ -2270,8 +2270,8 @@ describe Mongoid::Contextual::Memory do
           )
         end
 
-        context "when :splat_arrays true" do
-          let(:splat_arrays) { true }
+        context "when :unwind true" do
+          let(:unwind) { true }
 
           it "returns the correct hash" do
             expect(tallied).to eq({ "en1" => 2,
@@ -2283,7 +2283,7 @@ describe Mongoid::Contextual::Memory do
 
       context "when getting a specific locale" do
         let(:tallied) do
-          context.tally("addresses.name.de", splat_arrays: splat_arrays)
+          context.tally("addresses.name.de", unwind: unwind)
         end
 
         it "returns the translation for the the specific locale" do
@@ -2293,8 +2293,8 @@ describe Mongoid::Contextual::Memory do
           )
         end
 
-        context "when :splat_arrays true" do
-          let(:splat_arrays) { true }
+        context "when :unwind true" do
+          let(:unwind) { true }
 
           it "returns the correct hash" do
             expect(tallied).to eq({ "de1" => 2,
@@ -2306,7 +2306,7 @@ describe Mongoid::Contextual::Memory do
 
       context "when getting the full hash" do
         let(:tallied) do
-          context.tally("addresses.name_translations", splat_arrays: splat_arrays)
+          context.tally("addresses.name_translations", unwind: unwind)
         end
 
         it "returns the correct hash" do
@@ -2316,8 +2316,8 @@ describe Mongoid::Contextual::Memory do
           )
         end
 
-        context "when :splat_arrays true" do
-          let(:splat_arrays) { true }
+        context "when :unwind true" do
+          let(:unwind) { true }
 
           it "returns the correct hash" do
             expect(tallied).to eq({ { "de" => "de1", "en" => "en1" } => 2,
@@ -2330,7 +2330,7 @@ describe Mongoid::Contextual::Memory do
 
     context "when tallying an embedded field" do
       let(:tally) do
-        context.tally("label.name", splat_arrays: splat_arrays)
+        context.tally("label.name", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -2341,7 +2341,7 @@ describe Mongoid::Contextual::Memory do
     context "when tallying an element in an embeds_many field" do
 
       let(:tally) do
-        context2.tally("fanatics.age", splat_arrays: splat_arrays)
+        context2.tally("fanatics.age", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -2351,8 +2351,8 @@ describe Mongoid::Contextual::Memory do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash" do
           expect(tally).to eq(1 => 3,
@@ -2365,7 +2365,7 @@ describe Mongoid::Contextual::Memory do
     context "when tallying an embeds_many field" do
 
       let(:tally) do
-        context2.tally("fanatics", splat_arrays: splat_arrays)
+        context2.tally("fanatics", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -2376,8 +2376,8 @@ describe Mongoid::Contextual::Memory do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash" do
           exp = [fans1, fans2, fans3].flatten.index_with(1)
@@ -2389,7 +2389,7 @@ describe Mongoid::Contextual::Memory do
     context "when tallying a field of type array" do
 
       let(:tally) do
-        context2.tally("genres", splat_arrays: splat_arrays)
+        context2.tally("genres", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -2399,8 +2399,8 @@ describe Mongoid::Contextual::Memory do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash" do
           expect(tally).to eq(1 => 3,
@@ -2413,7 +2413,7 @@ describe Mongoid::Contextual::Memory do
     context "when tallying an element from an array of hashes" do
 
       let(:tally) do
-        context.tally("genres.x", splat_arrays: splat_arrays)
+        context.tally("genres.x", unwind: unwind)
       end
 
       it "returns the correct hash without the nil keys" do
@@ -2423,8 +2423,8 @@ describe Mongoid::Contextual::Memory do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash" do
           expect(tally).to eq(1 => 3,
@@ -2445,7 +2445,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       let(:tally) do
-        context.tally("genres.x", splat_arrays: splat_arrays)
+        context.tally("genres.x", unwind: unwind)
       end
 
       it "returns the correct hash without the nil keys" do
@@ -2456,8 +2456,8 @@ describe Mongoid::Contextual::Memory do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash without the nil keys" do
           expect(tally).to eq(1 => 5,
@@ -2479,7 +2479,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       let(:tally) do
-        context.tally("array", splat_arrays: splat_arrays)
+        context.tally("array", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -2489,8 +2489,8 @@ describe Mongoid::Contextual::Memory do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash without the nil keys" do
           expect(tally).to eq(1 => 2,
@@ -2503,7 +2503,7 @@ describe Mongoid::Contextual::Memory do
     context "when going multiple levels deep in arrays" do
 
       let(:tally) do
-        context.tally("genres.y.z", splat_arrays: splat_arrays)
+        context.tally("genres.y.z", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -2513,8 +2513,8 @@ describe Mongoid::Contextual::Memory do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash without the nil keys" do
           expect(tally).to eq(1 => 3,
@@ -2527,7 +2527,7 @@ describe Mongoid::Contextual::Memory do
     context "when going multiple levels deep in an array" do
 
       let(:tally) do
-        context.tally("genres.y.z", splat_arrays: splat_arrays)
+        context.tally("genres.y.z", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -2537,8 +2537,8 @@ describe Mongoid::Contextual::Memory do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash without the nil keys" do
           expect(tally).to eq(1 => 3,
@@ -2561,7 +2561,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       let(:tally) do
-        context.tally("addresses.code.deepest.array.y.z", splat_arrays: splat_arrays)
+        context.tally("addresses.code.deepest.array.y.z", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -2571,8 +2571,8 @@ describe Mongoid::Contextual::Memory do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash without the nil keys" do
           expect(tally).to eq([ 1, 2 ] => 2,
@@ -2605,7 +2605,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       let(:tally) do
-        context.tally("addresses.code.deepest.array.y.z", splat_arrays: splat_arrays)
+        context.tally("addresses.code.deepest.array.y.z", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -2615,8 +2615,8 @@ describe Mongoid::Contextual::Memory do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash without the nil keys" do
           expect(tally).to eq([ 1, 2 ] => 4,
@@ -2637,7 +2637,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       let(:tally) do
-        context.tally("name.translations.language", splat_arrays: splat_arrays)
+        context.tally("name.translations.language", unwind: unwind)
       end
 
       it "returns the correct hash" do
@@ -2647,8 +2647,8 @@ describe Mongoid::Contextual::Memory do
         )
       end
 
-      context "when :splat_arrays true" do
-        let(:splat_arrays) { true }
+      context "when :unwind true" do
+        let(:unwind) { true }
 
         it "returns the correct hash without the nil keys" do
           expect(tally).to eq(1 => 3,

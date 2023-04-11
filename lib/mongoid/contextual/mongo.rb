@@ -465,23 +465,23 @@ module Mongoid
       #   # => { [ 1, 2 ] => 1 }
       #
       # @param [ String | Symbol ] field The field name.
-      # @param [ Boolean ] :splat_arrays Whether to tally array
+      # @param [ Boolean ] :unwind Whether to tally array
       #   member values individually. Default false.
       #
       # @return [ Hash ] The hash of counts.
-      def tally(field, splat_arrays: false)
+      def tally(field, unwind: false)
         name = klass.cleanse_localized_field_names(field)
         is_translation = "#{name}_translations" == field.to_s
 
         # Must add a $project stage when using $unwind with nested fields
         # due to a bug in MongoDB. See: https://jira.mongodb.org/browse/SERVER-59713
-        projected = 'p' if splat_arrays && (is_translation || name.include?('.'))
+        projected = 'p' if unwind && (is_translation || name.include?('.'))
 
         fld = klass.traverse_association_tree(name)
         pipeline = []
         pipeline << { "$match" => view.filter } if view.filter.present?
         pipeline << { "$project" => { "#{projected}" => "$#{name}" } } if projected
-        pipeline << { "$unwind" => "$#{projected || name}" } if splat_arrays
+        pipeline << { "$unwind" => "$#{projected || name}" } if unwind
         pipeline << { "$group" => { _id: "$#{projected || name}", counts: { "$sum": 1 } } }
 
         collection.aggregate(pipeline).each_with_object({}) do |doc, tallies|

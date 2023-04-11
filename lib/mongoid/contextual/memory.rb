@@ -285,15 +285,15 @@ module Mongoid
       #   context.tally(:name)
       #
       # @param [ String | Symbol ] field Field to tally.
-      # @param [ Boolean ] :splat_arrays Whether to tally array
+      # @param [ Boolean ] :unwind Whether to tally array
       #   member values individually. Default false.
       #
       # @return [ Hash ] The hash of counts.
-      def tally(field, splat_arrays: false)
+      def tally(field, unwind: false)
         documents.each_with_object({}) do |doc, tallies|
           key = retrieve_value_at_path(doc, field)
 
-          if splat_arrays && key.is_a?(Array)
+          if unwind && key.is_a?(Array)
             key.each do |array_value|
               tallies[array_value] ||= 0
               tallies[array_value] += 1
