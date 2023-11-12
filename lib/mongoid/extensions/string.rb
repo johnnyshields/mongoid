@@ -6,10 +6,6 @@ module Mongoid
 
     # Adds type-casting behavior to String class.
     module String
-
-      # @attribute [rw] unconvertable_to_bson If the document is unconvertable.
-      attr_accessor :unconvertable_to_bson
-
       # Evolve the string into an object id if possible.
       #
       # @example Evolve the string.
@@ -38,19 +34,17 @@ module Mongoid
       #   "2012-01-01".__mongoize_time__
       #   # => 2012-01-01 00:00:00 -0500
       #
+      # @raise [ ArgumentError ] The string is not a valid time string.
+      #
       # @return [ Time | ActiveSupport::TimeWithZone ] Local time in the
       #   configured default time zone corresponding to this string.
       def __mongoize_time__
-        # This extra parse from Time is because ActiveSupport::TimeZone
-        # either returns nil or Time.now if the string is empty or invalid,
-        # which is a regression from pre-3.0 and also does not agree with
-        # the core Time API.
-        parsed = ::Time.parse(self)
-        if ::Time == ::Time.configured
-          parsed
-        else
-          ::Time.configured.parse(self)
-        end
+        # This extra Time.parse is required to raise an error if the string
+        # is not a valid time string. ActiveSupport::TimeZone does not
+        # perform this check.
+        ::Time.parse(self)
+
+        ::Time.zone.parse(self)
       end
 
       # Convert the string to a collection friendly name.
@@ -61,16 +55,6 @@ module Mongoid
       # @return [ String ] The string in collection friendly form.
       def collectionize
         tableize.gsub("/", "_")
-      end
-
-      # Is the string a valid value for a Mongoid id?
-      #
-      # @example Is the string an id value?
-      #   "_id".mongoid_id?
-      #
-      # @return [ true | false ] If the string is id or _id.
-      def mongoid_id?
-        self =~ /\A(|_)id\z/
       end
 
       # Is the string a number? The literals "NaN", "Infinity", and "-Infinity"
@@ -124,16 +108,6 @@ module Mongoid
       # @return [ true | false ] If the string ends with "_before_type_cast"
       def before_type_cast?
         ends_with?("_before_type_cast")
-      end
-
-      # Is the object not to be converted to bson on criteria creation?
-      #
-      # @example Is the object unconvertable?
-      #   object.unconvertable_to_bson?
-      #
-      # @return [ true | false ] If the object is unconvertable.
-      def unconvertable_to_bson?
-        @unconvertable_to_bson ||= false
       end
 
       private

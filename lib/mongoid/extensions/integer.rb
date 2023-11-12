@@ -14,7 +14,7 @@ module Mongoid
       #
       # @return [ Time | ActiveSupport::TimeWithZone ] The time.
       def __mongoize_time__
-        ::Time.configured.at(self)
+        ::Time.zone.at(self)
       end
 
       # Is the integer a number?
@@ -24,16 +24,6 @@ module Mongoid
       #
       # @return [ true ] Always true.
       def numeric?
-        true
-      end
-
-      # Is the object not to be converted to bson on criteria creation?
-      #
-      # @example Is the object unconvertable?
-      #   object.unconvertable_to_bson?
-      #
-      # @return [ true ] If the object is unconvertable.
-      def unconvertable_to_bson?
         true
       end
 

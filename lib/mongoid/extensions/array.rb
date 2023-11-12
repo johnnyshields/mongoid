@@ -3,7 +3,6 @@
 
 module Mongoid
   module Extensions
-
     # Adds type-casting behavior to Array class.
     module Array
 
@@ -16,16 +15,6 @@ module Mongoid
       def __evolve_object_id__
         map!(&:__evolve_object_id__)
         self
-      end
-
-      # Get the array of args as arguments for a find query.
-      #
-      # @example Get the array as find args.
-      #   [ 1, 2, 3 ].__find_args__
-      #
-      # @return [ Array ] The array of args.
-      def __find_args__
-        flat_map{ |a| a.__find_args__ }.uniq{ |a| a.to_s }
       end
 
       # Mongoize the array into an array of object ids.
@@ -51,37 +40,7 @@ module Mongoid
       #   configured default time zone corresponding to date/time components
       #   in this array.
       def __mongoize_time__
-        ::Time.configured.local(*self)
-      end
-
-      # Checks whether conditions given in this array are known to be
-      # unsatisfiable, i.e., querying with this array will always return no
-      # documents.
-      #
-      # This method used to assume that the array is the list of criteria
-      # to be used with an $and operator. This assumption is no longer made;
-      # therefore, since the interpretation of conditions in the array differs
-      # between $and, $or and $nor operators, this method now always returns
-      # false.
-      #
-      # This method is deprecated. Mongoid now uses
-      # +_mongoid_unsatisfiable_criteria?+ internally; this method is retained
-      # for backwards compatibility only. It always returns false.
-      #
-      # @return [ false ] Always false.
-      # @deprecated
-      def blank_criteria?
-        false
-      end
-
-      # Is the array a set of multiple arguments in a method?
-      #
-      # @example Is this multi args?
-      #   [ 1, 2, 3 ].multi_arged?
-      #
-      # @return [ true | false ] If the array is multi args.
-      def multi_arged?
-        !first.is_a?(Hash) && first.resizable? || size > 1
+        ::Time.zone.local(*self)
       end
 
       # Turn the object from the ruby type we deal with to a Mongo friendly
@@ -122,23 +81,6 @@ module Mongoid
 
       module ClassMethods
 
-        # Convert the provided object to a proper array of foreign keys.
-        #
-        # @example Mongoize the object.
-        #   Array.__mongoize_fk__(constraint, object)
-        #
-        # @param [ Mongoid::Association::Relatable ] association The association metadata.
-        # @param [ Object ] object The object to convert.
-        #
-        # @return [ Array ] The array of ids.
-        def __mongoize_fk__(association, object)
-          if object.resizable?
-            object.blank? ? object : association.convert_to_foreign_key(object)
-          else
-            object.blank? ? [] : association.convert_to_foreign_key(Array(object))
-          end
-        end
-
         # Turn the object from the ruby type we deal with to a Mongo friendly
         # type.
         #
@@ -172,5 +114,3 @@ end
 
 ::Array.__send__(:include, Mongoid::Extensions::Array)
 ::Array.extend(Mongoid::Extensions::Array::ClassMethods)
-
-::Mongoid.deprecate(Array, :blank_criteria)

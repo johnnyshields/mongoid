@@ -3,18 +3,10 @@
 
 module Mongoid
   module Extensions
-
     # Adds type-casting behavior to Range class.
     module Range
-
-      # Get the range as arguments for a find.
-      #
-      # @example Get the range as find args.
-      #   range.__find_args__
-      #
-      # @return [ Array ] The range as an array.
-      def __find_args__
-        to_a
+      def self.included(base)
+        base.extend(ClassMethods)
       end
 
       # Turn the object from the ruby type we deal with to a Mongo friendly
@@ -39,7 +31,6 @@ module Mongoid
       end
 
       module ClassMethods
-
         # Convert the object from its mongo friendly ruby type to this type.
         #
         # @example Demongoize the object.
@@ -107,5 +98,4 @@ module Mongoid
   end
 end
 
-::Range.__send__(:include, Mongoid::Extensions::Range)
-::Range.extend(Mongoid::Extensions::Range::ClassMethods)
+Range.include(Mongoid::Extensions::Range)
