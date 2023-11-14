@@ -52,4 +52,9 @@ def standard_dependencies
   if ENV['FLE'] == 'helper'
     gem 'libmongocrypt-helper', '~> 1.8.0'
   end
+
+  platform :windows do
+    gem 'tzinfo-data'
+    gem 'wdm', '>= 0.1.0'
+  end
 end
