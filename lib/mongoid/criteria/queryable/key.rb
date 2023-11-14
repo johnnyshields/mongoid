@@ -58,6 +58,10 @@ module Mongoid
       # Key instances can be thought of as procs that map a value to the
       # MongoDB query expression required to obtain the key's condition,
       # given the value.
+      #
+      # @deprecated This class is related to the legacy Symbol Query Macro
+      # functionality which has been extracted to a gem. It will be removed
+      # in a future version of Mongoid.
       class Key
 
         # @return [ String | Symbol ] The name of the field.
