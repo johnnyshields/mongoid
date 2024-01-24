@@ -15,9 +15,11 @@ module Mongoid
         # @param [ String | Symbol ] _field The field name.
         #
         # @return [ Hash ] A Hash with count, sum of 0 and max, min, avg of nil.
+        # @deprecated
         def aggregates(_field)
           Aggregable::EMPTY_RESULT.dup
         end
+        Mongoid.deprecate(self, :aggregates)
 
         # Always returns zero.
         #

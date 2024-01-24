@@ -15,11 +15,13 @@ module Mongoid
         # @return [ Hash ] A Hash containing the aggregate values.
         #   If no documents are present, then returned Hash will have
         #   count, sum of 0 and max, min, avg of nil.
+        # @deprecated
         def aggregates(field)
           %w(count sum avg min max).each_with_object({}) do |method, hash|
             hash[method] = send(method, field)
           end
         end
+        Mongoid.deprecate(self, :aggregates)
 
         # Get the average value of the provided field.
         #
